@@ -43,7 +43,8 @@
             display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; letter-spacing: 0.5px;
         }
         
-        .card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); border-left: 6px solid #ccc; transition: 0.3s; scroll-margin-top: 20px; border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
+        /* Borda padrão cinza e elegante para as aulas que estão em espera */
+        .card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); border-left: 6px solid #cbd5e1; transition: 0.3s; scroll-margin-top: 20px; border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
         
         /* Destaque da Aula Atual (AGORA) */
         .card.atual { box-shadow: 0 0 0 2px var(--warning), 0 8px 24px rgba(245, 158, 11, 0.2); border-left-color: var(--warning) !important; border-top: none; border-right: none; border-bottom: none; }
@@ -52,6 +53,10 @@
         /* Destaque da PRÓXIMA Aula */
         .card.proxima { box-shadow: 0 0 0 2px var(--accent), 0 8px 20px rgba(59, 130, 246, 0.15); border-left-color: var(--accent) !important; border-top: none; border-right: none; border-bottom: none; }
         .badge-proxima { background: #3b82f6; color: white; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; vertical-align: middle; margin-left: 8px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px; }
+
+        /* Destaque de Aulas PASSADAS */
+        .card.passada { opacity: 0.45; filter: grayscale(100%); background: #f1f5f9; box-shadow: none; border-left-color: #e2e8f0 !important; }
+        .card.passada .horario { color: var(--text-muted); }
 
         @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
@@ -91,7 +96,7 @@
         </div>
         
         <div class="turno-title"><i class="ph-fill ph-sun" style="color: #f59e0b;"></i> MANHÃ</div>
-        <div class="card" style="border-left-color: #2563eb;">
+        <div class="card">
             <div class="card-header">
                 <span class="horario">08:10 às 09:00</span>
                 <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
@@ -114,7 +119,7 @@
                 <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 10</span>
             </div>
         </div>
-        <div class="card" style="border-left-color: #2563eb;">
+        <div class="card">
             <div class="card-header">
                 <span class="horario">09:00 às 09:50</span>
                 <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
@@ -137,7 +142,7 @@
                 <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 31</span>
             </div>
         </div>
-        <div class="card" style="border-left-color: #2563eb;">
+        <div class="card">
             <div class="card-header">
                 <span class="horario">11:00 às 11:50</span>
                 <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
@@ -160,7 +165,7 @@
                 <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 31</span>
             </div>
         </div><div class="turno-title"><i class="ph-fill ph-cloud-sun" style="color: #f97316;"></i> TARDE</div>
-        <div class="card" style="border-left-color: #2563eb;">
+        <div class="card">
             <div class="card-header">
                 <span class="horario">17:50 às 18:40</span>
                 <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
@@ -185,7 +190,7 @@
         </div>
         
         <div class="footer-branding">
-            <i class="ph-fill ph-code"></i> Gerado por Zenilson Lacerda
+            <i class="ph-fill ph-code"></i> IdealTech por Zenilson Lacerda
         </div>
     </div>
 
@@ -213,7 +218,7 @@
                 
                 // Limpa marcações anteriores para evitar duplicidade ao atualizar
                 cards.forEach(card => {
-                    card.classList.remove('atual', 'proxima');
+                    card.classList.remove('atual', 'proxima', 'passada');
                     const badge = card.querySelector('.badge-atual, .badge-proxima');
                     if(badge) badge.remove();
                 });
@@ -222,14 +227,19 @@
                 let targetStartTime = null;
                 let targetCards = [];
 
-                // Primeira passada: tenta achar a aula de AGORA
+                // Primeira Passada: Marca as PASSADAS e encontra se tem alguma rolando AGORA
                 for (let card of cards) {
                     const timeText = card.querySelector('.horario').textContent;
                     const match = timeText.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
                     if (match) {
                         const start = match[1];
                         const end = match[2];
-                        if (currentTimeStr >= start && currentTimeStr <= end) {
+                        
+                        if (currentTimeStr > end) {
+                            // Já passou do horário final
+                            card.classList.add('passada');
+                        } else if (currentTimeStr >= start && currentTimeStr <= end) {
+                            // Está rolando AGORA
                             statusTipo = 'AGORA';
                             if (!targetStartTime) targetStartTime = start;
                             if (start === targetStartTime) targetCards.push(card);
@@ -237,9 +247,12 @@
                     }
                 }
 
-                // Segunda passada: se não tem aula rolando, acha a PRÓXIMA
+                // Segunda Passada: Se não tem nada rolando agora, busca a PRÓXIMA
                 if (!statusTipo) {
                     for (let card of cards) {
+                        // Ignora os cards que já marcamos como passados
+                        if (card.classList.contains('passada')) continue;
+
                         const timeText = card.querySelector('.horario').textContent;
                         const match = timeText.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
                         if (match) {
@@ -253,7 +266,7 @@
                     }
                 }
 
-                // Aplica as classes e cria os badges
+                // Aplica os selos nas aulas selecionadas
                 if (targetCards.length > 0) {
                     targetCards.forEach(card => {
                         const horarioSpan = card.querySelector('.horario');
@@ -266,7 +279,7 @@
                         }
                     });
                     
-                    // Rola a tela apenas na primeira vez que a página é carregada
+                    // Rola a tela (só na primeira vez)
                     if (!scrollJaFeito) {
                         setTimeout(() => {
                             targetCards[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -279,10 +292,10 @@
             // GATILHO 1: Executa na hora que a página carrega
             atualizarStatusAulas();
 
-            // GATILHO 2: Executa a cada 1 minuto para manter atualizado
+            // GATILHO 2: Executa a cada 1 minuto
             setInterval(atualizarStatusAulas, 60000);
 
-            // GATILHO 3: Executa na hora que o celular sai do bolso / tela acende
+            // GATILHO 3: Quando tira o celular do bolso / acende a tela
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
                     atualizarStatusAulas();
