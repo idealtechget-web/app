@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OCR Pro - IdealTech</title>
+    
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Bibliotecas Core -->
+    <script src="https://unpkg.com/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    
+    <!-- Cropper.js para recorte de imagem -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        ideal: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 900: '#1e3a8a' }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { transition: background-color 0.3s, color 0.3s; }
+        /* Modal do Cropper e Webcam */
+        #cropperModal, #cameraModal { backdrop-filter: blur(5px); }
+        .cropper-container { max-height: 60vh; }
+        /* Custom Scrollbar para o Textarea */
+        textarea::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track { background: transparent; }
+        textarea::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        .dark textarea::-webkit-scrollbar-thumb { background-color: #475569; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Navbar Minimalista com Botão de Tema -->
+    <nav class="w-full p-4 flex justify-end max-w-7xl mx-auto">
+        <button id="themeToggle" class="p-2 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+            <i id="themeIcon" class="ph-bold ph-moon text-xl"></i>
+        </button>
+    </nav>
+
+    <!-- Container Principal -->
+    <div class="max-w-7xl mx-auto px-4 pb-8 flex-grow w-full">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-3 flex items-center justify-center gap-3">
+                <i class="ph-fill ph-scan text-ideal-600 dark:text-ideal-500"></i>
+                Extrator OCR
+            </h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium max-w-2xl mx-auto text-sm md:text-base">
+                Extração direta de textos em imagens e PDFs.
+            </p>
+        </header>
+
+        <!-- Corpo do App -->
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-0">
+                
+                <!-- PAINEL ESQUERDO: CONTROLES -->
+                <div class="lg:col-span-5 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col">
+                    <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                        <i class="ph-bold ph-upload-simple text-ideal-600 dark:text-ideal-500"></i> Origem do Documento
+                    </h2>
+                    
+                    <!-- Botões de Ação Rápida -->
+                    <div class="grid grid-cols-3 gap-2 mb-6">
+                        <button onclick="document.getElementById('imageInput').click()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-ideal-50 dark:hover:bg-slate-600 hover:border-ideal-300 transition-colors group">
+                            <i class="ph-duotone ph-image text-2xl text-slate-500 dark:text-slate-300 group-hover:text-ideal-600 dark:group-hover:text-ideal-400 mb-1"></i>
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">Galeria</span>
+                        </button>
+                        
+                        <button id="openCameraBtn" class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-ideal-50 dark:hover:bg-slate-600 hover:border-ideal-300 transition-colors group">
+                            <i class="ph-duotone ph-camera text-2xl text-slate-500 dark:text-slate-300 group-hover:text-ideal-600 dark:group-hover:text-ideal-400 mb-1"></i>
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">Câmera</span>
+                        </button>
+
+                        <button onclick="document.getElementById('pdfInput').click()" class="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:bg-ideal-50 dark:hover:bg-slate-600 hover:border-ideal-300 transition-colors group">
+                            <i class="ph-duotone ph-file-pdf text-2xl text-slate-500 dark:text-slate-300 group-hover:text-ideal-600 dark:group-hover:text-ideal-400 mb-1"></i>
+                            <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">PDF</span>
+                        </button>
+                    </div>
+
+                    <!-- Inputs Ocultos -->
+                    <input type="file" id="imageInput" accept="image/*" class="hidden">
+                    <input type="file" id="pdfInput" accept="application/pdf" class="hidden">
+                    
+                    <!-- Preview Area -->
+                    <div id="previewContainer" class="hidden relative w-full rounded-xl border border-slate-200 dark:border-slate-600 overflow-hidden bg-slate-100 dark:bg-slate-900 mb-6 flex-grow flex items-center justify-center p-2 min-h-[200px]">
+                        <img id="imagePreview" alt="Preview" class="max-h-[250px] object-contain rounded">
+                        <button id="editCropBtn" class="absolute top-2 right-2 bg-slate-900/70 hover:bg-slate-900 text-white p-2 rounded-lg backdrop-blur-sm transition-colors text-xs font-bold flex items-center gap-1">
+                            <i class="ph-bold ph-crop"></i> Tratar Recorte
+                        </button>
+                    </div>
+                    
+                    <!-- Status e Progresso -->
+                    <div class="mt-auto bg-white dark:bg-slate-700 p-4 rounded-xl border border-slate-200 dark:border-slate-600 flex items-center gap-4 shadow-sm mb-6">
+                        <div id="statusIcon" class="text-2xl text-slate-400 dark:text-slate-500"><i class="ph-fill ph-hourglass-high"></i></div>
+                        <div class="flex-grow">
+                            <p id="statusText" class="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1">Aguardando arquivo...</p>
+                            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                <div id="progressBar" class="bg-ideal-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ações -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="processBtn" disabled class="flex items-center justify-center gap-2 bg-ideal-600 hover:bg-ideal-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg disabled:shadow-none w-full">
+                            <i class="ph-bold ph-magnifying-glass"></i> Extrair Texto
+                        </button>
+                        <button id="clearBtn" class="flex items-center justify-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-bold py-3 px-4 rounded-xl transition-all w-full">
+                            <i class="ph-bold ph-trash"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- PAINEL DIREITO: RESULTADO -->
+                <div class="lg:col-span-7 p-6 md:p-8 bg-white dark:bg-slate-800 flex flex-col">
+                    <div class="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-700 pb-4">
+                        <h2 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <i class="ph-bold ph-text-align-left text-ideal-600 dark:text-ideal-400"></i> Texto Extraído
+                        </h2>
+                        <div class="flex gap-2">
+                            <button id="copyBtn" disabled class="text-sm font-bold bg-ideal-50 dark:bg-ideal-900/30 hover:bg-ideal-100 dark:hover:bg-ideal-800/50 disabled:opacity-50 disabled:cursor-not-allowed text-ideal-700 dark:text-ideal-400 py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="ph-bold ph-copy"></i> Copiar
+                            </button>
+                            <button id="saveBtn" disabled class="text-sm font-bold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 dark:text-slate-200 py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+                                <i class="ph-bold ph-download-simple"></i> Salvar TXT
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Texto Bruto Gigante -->
+                    <textarea id="output" placeholder="O texto extraído da imagem aparecerá aqui. Você pode editá-lo livremente antes de copiar." class="w-full flex-grow min-h-[400px] p-5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl font-mono text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-ideal-500 focus:border-transparent resize-y shadow-inner"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="py-6 text-center text-slate-500 dark:text-slate-400 text-sm font-semibold flex items-center justify-center gap-2">
+        <i class="ph-fill ph-code"></i> Zenilson Lacerda | IdealTech — Gestão e Tecnologia
+    </footer>
+
+    <!-- Modal do Cropper -->
+    <div id="cropperModal" class="fixed inset-0 z-50 bg-slate-900/80 hidden flex-col items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl w-full max-w-2xl flex flex-col shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Tratamento de Imagem</h3>
+                <button id="closeCropBtn" class="text-slate-500 hover:text-red-500"><i class="ph-bold ph-x text-xl"></i></button>
+            </div>
+            <div class="w-full bg-black rounded-lg overflow-hidden flex items-center justify-center" style="height: 50vh;">
+                <img id="cropperImage" src="" class="max-w-full max-h-full">
+            </div>
+            <div class="mt-4 flex justify-between items-center gap-2">
+                <span class="text-xs font-semibold text-slate-400"><i class="ph-fill ph-magnifying-glass-plus"></i> Ampliação Inteligente ativada</span>
+                <button id="confirmCropBtn" class="bg-ideal-600 hover:bg-ideal-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Confirmar Recorte</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal da Câmera -->
+    <div id="cameraModal" class="fixed inset-0 z-50 bg-slate-900/90 hidden flex-col items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl w-full max-w-2xl flex flex-col shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white">Câmera / Webcam</h3>
+                <button id="closeCameraBtn" class="text-slate-500 hover:text-red-500"><i class="ph-bold ph-x text-xl"></i></button>
+            </div>
+            <div class="w-full bg-black rounded-lg overflow-hidden flex items-center justify-center relative" style="height: 50vh;">
+                <video id="cameraVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+            </div>
+            <div class="mt-4 flex justify-center gap-2">
+                <button id="captureBtn" class="bg-ideal-600 hover:bg-ideal-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform active:scale-95 flex items-center gap-2">
+                    <i class="ph-bold ph-camera text-xl"></i> Capturar Foto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="notification" class="fixed top-6 right-6 px-6 py-4 rounded-xl shadow-2xl font-bold text-sm transform transition-all duration-300 translate-y-[-100%] opacity-0 z-50 flex items-center gap-3 text-white">
+        <i id="notifIcon" class="ph-bold ph-info text-xl"></i>
+        <span id="notifText">Mensagem</span>
+    </div>
+
+  <script>
+    // Configuração do Worker do PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+    // Controle de Dark Mode
+    const htmlElement = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    
+    function toggleTheme() {
+        if (htmlElement.classList.contains('dark')) {
+            htmlElement.classList.remove('dark');
+            localStorage.setItem('idealtech_ocr_theme', 'light');
+            themeIcon.classList.replace('ph-sun', 'ph-moon');
+        } else {
+            htmlElement.classList.add('dark');
+            localStorage.setItem('idealtech_ocr_theme', 'dark');
+            themeIcon.classList.replace('ph-moon', 'ph-sun');
+        }
+    }
+    
+    if (localStorage.getItem('idealtech_ocr_theme') === 'dark' || (!localStorage.getItem('idealtech_ocr_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        htmlElement.classList.add('dark');
+        themeIcon.classList.replace('ph-moon', 'ph-sun');
+    }
+    themeToggle.addEventListener('click', toggleTheme);
+
+    // Elementos do DOM
+    const imageInput = document.getElementById('imageInput');
+    const pdfInput = document.getElementById('pdfInput');
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const processBtn = document.getElementById('processBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const output = document.getElementById('output');
+    const statusIcon = document.getElementById('statusIcon');
+    const statusText = document.getElementById('statusText');
+    const progressBar = document.getElementById('progressBar');
+    
+    // Variáveis
+    let currentImageFile = null;
+    let preProcessedDataUrl = null; 
+    let worker = null;
+    
+    // Instância do Cropper
+    let cropper = null;
+    const cropperModal = document.getElementById('cropperModal');
+    const cropperImage = document.getElementById('cropperImage');
+    const editCropBtn = document.getElementById('editCropBtn');
+    const closeCropBtn = document.getElementById('closeCropBtn');
+    const confirmCropBtn = document.getElementById('confirmCropBtn');
+
+    // Câmera / Webcam (WebRTC)
+    const cameraModal = document.getElementById('cameraModal');
+    const cameraVideo = document.getElementById('cameraVideo');
+    const openCameraBtn = document.getElementById('openCameraBtn');
+    const closeCameraBtn = document.getElementById('closeCameraBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    let mediaStream = null;
+    
+    // Listeners de Input
+    imageInput.addEventListener('change', handleFileSelect);
+    pdfInput.addEventListener('change', handlePdfSelect);
+
+    // ----------------------------------------------------
+    // FUNÇÕES DA CÂMERA (WEB RTC)
+    // ----------------------------------------------------
+    openCameraBtn.addEventListener('click', async () => {
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            cameraVideo.srcObject = mediaStream;
+            cameraModal.classList.remove('hidden');
+            cameraModal.classList.add('flex');
+        } catch (err) {
+            console.error("Erro ao acessar câmera: ", err);
+            showNotification('Não foi possível acessar a câmera ou webcam.', 'error');
+        }
+    });
+
+    function stopCamera() {
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
+        cameraModal.classList.add('hidden');
+        cameraModal.classList.remove('flex');
+    }
+
+    closeCameraBtn.addEventListener('click', stopCamera);
+
+    captureBtn.addEventListener('click', () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = cameraVideo.videoWidth;
+        canvas.height = cameraVideo.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+        
+        canvas.toBlob((blob) => {
+            const imgFile = new File([blob], "captura_webcam.png", { type: "image/png" });
+            stopCamera();
+            processSelectedImage(imgFile);
+        }, 'image/png');
+    });
+
+    // ----------------------------------------------------
+    // CONTROLADORES DO CROPPER (RECORTE E AMPLIAÇÃO)
+    // ----------------------------------------------------
+    editCropBtn.addEventListener('click', () => {
+        if(currentImageFile) {
+            const objectUrl = URL.createObjectURL(currentImageFile);
+            openCropper(objectUrl);
+        }
+    });
+    
+    closeCropBtn.addEventListener('click', () => {
+        cropperModal.classList.add('hidden');
+        cropperModal.classList.remove('flex');
+        if(cropper) cropper.destroy();
+    });
+    
+    confirmCropBtn.addEventListener('click', () => {
+        if(cropper) {
+            const croppedCanvas = cropper.getCroppedCanvas();
+            
+            // Ampliação em 3x para o Tesseract conseguir ler textos minúsculos
+            const scaleFactor = 3; 
+            const scaledCanvas = document.createElement('canvas');
+            scaledCanvas.width = croppedCanvas.width * scaleFactor;
+            scaledCanvas.height = croppedCanvas.height * scaleFactor;
+            
+            const ctx = scaledCanvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false; 
+            ctx.drawImage(croppedCanvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+            
+            preProcessedDataUrl = scaledCanvas.toDataURL('image/png');
+            imagePreview.src = preProcessedDataUrl; 
+            
+            cropperModal.classList.add('hidden');
+            cropperModal.classList.remove('flex');
+            cropper.destroy();
+            showNotification('Recorte e Ampliação aplicados!', 'success');
+        }
+    });
+    
+    // ----------------------------------------------------
+    // LÓGICA PRINCIPAL (UPLOAD E OCR)
+    // ----------------------------------------------------
+    function handleFileSelect(e) {
+      if (e.target.files.length) {
+        const file = e.target.files[0];
+        if (!file.type.startsWith('image/')) {
+          showNotification('Selecione uma imagem válida.', 'error');
+          return;
+        }
+        processSelectedImage(file);
+      }
+    }
+
+    async function handlePdfSelect(e) {
+        if (e.target.files.length) {
+            const file = e.target.files[0];
+            if (file.type !== 'application/pdf') return;
+            
+            updateStatus('Lendo PDF...', '<i class="ph-fill ph-spinner-gap animate-spin text-ideal-500"></i>', 50);
+            
+            const fileReader = new FileReader();
+            fileReader.onload = async function() {
+                const typedarray = new Uint8Array(this.result);
+                try {
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    const page = await pdf.getPage(1); 
+                    
+                    const scale = 2.0; 
+                    const viewport = page.getViewport({scale: scale});
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    await page.render({canvasContext: context, viewport: viewport}).promise;
+                    
+                    canvas.toBlob((blob) => {
+                        const imgFile = new File([blob], "pdf-page1.png", { type: "image/png" });
+                        processSelectedImage(imgFile);
+                        updateStatus('PDF convertido em imagem.', '<i class="ph-fill ph-check-circle text-ideal-500"></i>', 0);
+                    });
+                } catch(err) {
+                    showNotification('Erro ao ler PDF.', 'error');
+                }
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+    }
+
+    function processSelectedImage(file) {
+      currentImageFile = file; 
+      preProcessedDataUrl = null; 
+      
+      const objectUrl = URL.createObjectURL(file); 
+      
+      imagePreview.src = objectUrl;
+      previewContainer.classList.remove('hidden');
+      
+      processBtn.disabled = false;
+      processBtn.innerHTML = `<i class="ph-bold ph-magnifying-glass"></i> Extrair Texto`;
+      updateStatus('Arquivo pronto.', '<i class="ph-fill ph-check-circle text-ideal-500"></i>', 0);
+      
+      // Abre o recorte automaticamente para foco direto no texto
+      setTimeout(() => openCropper(objectUrl), 300);
+    }
+
+    function openCropper(imgUrl) {
+        cropperImage.src = imgUrl;
+        cropperModal.classList.remove('hidden');
+        cropperModal.classList.add('flex');
+        
+        if(cropper) cropper.destroy();
+        
+        cropperImage.onload = () => {
+            cropper = new Cropper(cropperImage, {
+                viewMode: 2,
+                dragMode: 'crop',
+                autoCropArea: 1,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        };
+    }
+    
+    processBtn.addEventListener('click', async () => {
+      if (!currentImageFile) return;
+      
+      processBtn.disabled = true;
+      processBtn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Extraindo...';
+      updateStatus('Iniciando OCR...', '<i class="ph-fill ph-spinner-gap animate-spin text-ideal-500"></i>', 10);
+      
+      try {
+        worker = await Tesseract.createWorker('por', 1, {
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              updateStatus(`Lendo documento: ${Math.round(m.progress * 100)}%`, '<i class="ph-fill ph-spinner-gap animate-spin text-ideal-500"></i>', 30 + (m.progress * 50));
+            }
+          }
+        });
+        
+        // Padrão de whitelist cobrindo todos os caracteres úteis em português e símbolos comuns
+        const whitelist = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ÁÉÍÓÚÂÊÔÃÕÇáéíóúâêôãõç@.,:;-/_()[]{}| \n';
+        
+        await worker.setParameters({
+          tessedit_char_whitelist: whitelist,
+          preserve_interword_spaces: '1',
+          tessedit_pageseg_mode: '6', // 6 é ideal para blocos de texto contínuos
+        });
+        
+        const imgTarget = preProcessedDataUrl ? preProcessedDataUrl : currentImageFile;
+        
+        const { data } = await worker.recognize(imgTarget);
+        await worker.terminate();
+        worker = null;
+        
+        // Joga o texto bruto tratado para a Textarea gigante
+        output.value = tratarTexto(data.text);
+        
+        copyBtn.disabled = false;
+        saveBtn.disabled = false;
+        
+        updateStatus('Extração concluída!', '<i class="ph-fill ph-check-circle text-emerald-500"></i>', 100);
+        showNotification(`Texto extraído com sucesso!`);
+        
+        processBtn.innerHTML = `<i class="ph-bold ph-arrows-clockwise"></i> Extrair Novamente`;
+        processBtn.disabled = false;
+        
+      } catch (error) {
+        updateStatus('Erro na extração', '<i class="ph-fill ph-warning-circle text-red-500"></i>', 0);
+        showNotification('Erro durante o OCR.', 'error');
+        processBtn.disabled = false;
+        processBtn.innerHTML = `<i class="ph-bold ph-magnifying-glass"></i> Tentar Novamente`;
+      }
+    });
+    
+    function tratarTexto(texto) {
+      if (!texto) return '';
+      return texto
+        .replace(/\s{2,}/g, ' ') // Remove espaços vazios duplos
+        .replace(/[\r\n]+/g, '\n') // Padroniza quebras de linha
+        .trim();
+    }
+    
+    // Funções de UI (Cópia, Salvar, Clear)
+    copyBtn.addEventListener('click', () => {
+      if(output.value.trim() === '') {
+          showNotification('A caixa de texto está vazia.', 'warning');
+          return;
+      }
+      navigator.clipboard.writeText(output.value).then(() => showNotification('Texto copiado com sucesso!'));
+    });
+    
+    saveBtn.addEventListener('click', () => {
+      if(output.value.trim() === '') return;
+      const blob = new Blob([output.value], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = `idealtech_texto_${new Date().toISOString().slice(0, 10)}.txt`;
+      a.click(); URL.revokeObjectURL(a.href);
+      showNotification('Arquivo TXT salvo!');
+    });
+    
+    function updateStatus(msg, iconHTML, prog) {
+      statusIcon.innerHTML = iconHTML; statusText.textContent = msg; progressBar.style.width = `${prog}%`;
+    }
+    
+    clearBtn.addEventListener('click', () => {
+      imageInput.value = ''; pdfInput.value = '';
+      previewContainer.classList.add('hidden');
+      
+      currentImageFile = null; preProcessedDataUrl = null;
+      output.value = '';
+      
+      updateStatus('Aguardando arquivo...', '<i class="ph-fill ph-hourglass-high"></i>', 0);
+      processBtn.disabled = true; processBtn.innerHTML = '<i class="ph-bold ph-magnifying-glass"></i> Extrair Texto';
+      copyBtn.disabled = true; saveBtn.disabled = true;
+      if (worker) { worker.terminate(); worker = null; }
+      showNotification('Área de trabalho limpa.');
+    });
+    
+    function showNotification(msg, type = 'success') {
+      const n = document.getElementById('notification'), t = document.getElementById('notifText'), i = document.getElementById('notifIcon');
+      t.textContent = msg;
+      n.classList.remove('bg-emerald-500', 'bg-red-500', 'bg-amber-500');
+      if (type === 'error') { n.classList.add('bg-red-500'); i.className = 'ph-bold ph-warning-circle text-xl'; }
+      else if (type === 'warning') { n.classList.add('bg-amber-500'); i.className = 'ph-bold ph-warning text-xl'; }
+      else { n.classList.add('bg-emerald-500'); i.className = 'ph-bold ph-check-circle text-xl'; }
+      n.classList.remove('translate-y-[-100%]', 'opacity-0');
+      setTimeout(() => n.classList.add('translate-y-[-100%]', 'opacity-0'), 4000);
+    }
+  </script>
+</body>
+</html>
