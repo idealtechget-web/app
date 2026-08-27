@@ -21,6 +21,7 @@
     .tab-btn:hover:not(.tab-ativo){background:#E2E8F0;color:#0F172A}
     #layout-wrapper{display:flex;min-height:100vh;gap:0}
     #sidebar{width:220px;min-width:220px;background:white;border-right:1px solid #E2E8F0;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:40;transition:transform .25s}
+    #sidebar.collapsed{transform:translateX(-220px)}
     #sidebar-header{padding:1.25rem 1rem 1rem;border-bottom:1px solid #E2E8F0;flex-shrink:0}
     #sidebar-nav{padding:.5rem .75rem;flex:1;overflow-y:auto}
     #main-content{margin-left:220px;flex:1;min-width:0;transition:margin .25s}
@@ -32,9 +33,27 @@
     input,select,textarea{transition:all .2s;border:1.5px solid #E2E8F0;border-radius:.75rem;padding:.5rem .85rem;background:white;color:#0F172A;font-family:'Poppins',sans-serif}
     input:focus,select:focus,textarea:focus{border-color:#3A3ABF!important;box-shadow:0 0 0 3px rgba(58,58,191,.12);outline:none}
     .status-badge{display:inline-block;padding:3px 9px;border-radius:9999px;font-size:.72rem;font-weight:700;text-transform:uppercase}
+    .s-rascunho{background:#E2E8F0;color:#475569}
+    .s-enviado{background:#3A3ABF;color:white}
+    .s-aprovado,.s-pago,.s-recebido,.s-concluido{background:#10B981;color:white}
+    .s-recusado,.s-cancelado{background:#EF4444;color:white}
+    .s-convertido,.s-pedido{background:#6D28D9;color:white}
+    .s-producao,.s-andamento,.s-pendente{background:#F59E0B;color:white}
+    .s-entregue{background:#06B6D4;color:white}
     .toast{position:fixed;bottom:20px;right:20px;background:white;border-left:4px solid #3A3ABF;border-radius:.85rem;padding:14px 20px;box-shadow:0 10px 25px rgba(0,0,0,.12);z-index:9999;font-weight:500}
     .toast.erro{border-left-color:#EF4444}
     .toast.sucesso{border-left-color:#10B981}
+    @media print{
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+      #sidebar,#sidebar-overlay,#sidebar-toggle,#main-content{margin:0!important;width:100%!important}
+      #sidebar{display:none!important}
+      #layout-wrapper{display:block!important}
+      @page{size:A4;margin:10mm 12mm}
+      body>*{display:none!important}
+      #print-area{display:block!important;visibility:visible!important;position:fixed!important;inset:0!important;background:white!important;z-index:99999!important;overflow:auto!important}
+      #print-area *{visibility:visible!important}
+      .no-print{display:none!important}
+    }
   </style>
 </head>
 <body class="min-h-screen">
@@ -64,16 +83,26 @@
   <div id="globalLoading" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 hidden">
     <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-3">
       <div class="w-8 h-8 border-4 border-[#3A3ABF] border-t-transparent rounded-full animate-spin"></div>
-      <span class="font-semibold text-[#3A3ABF]">Sincronizando com Firebase...</span>
+      <span class="font-semibold text-[#3A3ABF]" id="loadingText">Sincronizando com Firebase...</span>
     </div>
   </div>
 
-  <!-- LAYOUT PRINCIPAL -->
+  <!-- LAYOUT PRINCIPAL (Oculto até logar) -->
   <div id="appContainer" class="hidden">
     <div id="layout-wrapper" style="display:flex;min-height:100vh">
       
-      <!-- SIDEBAR -->
-      <aside id="sidebar">
+      <!-- Overlay mobile -->
+      <div id="sidebar-overlay" onclick="App.sidebar.fechar()"></div>
+
+      <!-- Botão toggle mobile -->
+      <button id="sidebar-toggle" onclick="App.sidebar.toggle()" aria-label="Menu" class="no-print hidden">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3A3ABF" stroke-width="2.5" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <!-- SIDEBAR COMPLETA -->
+      <aside id="sidebar" class="no-print">
         <div id="sidebar-header">
           <div class="flex items-center justify-between">
             <div>
@@ -82,71 +111,311 @@
             </div>
             <button onclick="App.auth.fazerLogout()" title="Sair" class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-lg font-bold">Sair</button>
           </div>
+          <!-- Seletor mês/ano compacto -->
+          <div class="flex items-center gap-1.5 mt-3 bg-[#F8FAFC] rounded-lg px-2 py-1.5 border border-[#E2E8F0]">
+            <span class="text-xs">📅</span>
+            <select id="monthSelect" onchange="App.dashboard.atualizar();App.financeiro.renderizar()" class="text-xs font-bold flex-1 bg-transparent border-none outline-none cursor-pointer p-0" style="min-width:0">
+              <option value="0">Jan</option><option value="1">Fev</option><option value="2">Mar</option>
+              <option value="3">Abr</option><option value="4">Mai</option><option value="5">Jun</option>
+              <option value="6">Jul</option><option value="7">Ago</option><option value="8">Set</option>
+              <option value="9">Out</option><option value="10">Nov</option><option value="11">Dez</option>
+            </select>
+            <select id="yearSelect" onchange="App.dashboard.atualizar();App.financeiro.renderizar()" class="text-xs font-bold bg-transparent border-none outline-none cursor-pointer p-0" style="width:60px">
+              <script>
+                (function(){
+                  var y = new Date().getFullYear();
+                  for(var i=y-3; i<=y+1; i++){
+                    document.write('<option value="'+i+'"'+(i===y?' selected':'')+'>'+i+'<\/option>');
+                  }
+                })();
+              </script>
+            </select>
+          </div>
         </div>
+
+        <!-- Navegação Completa -->
         <nav id="sidebar-nav">
           <p class="text-[0.65rem] font-extrabold uppercase text-[#94A3B8] tracking-wider px-2 py-2">Principal</p>
           <button onclick="App.aba.trocar('dashboard')" id="btn-dashboard" class="tab-btn tab-ativo">📊 Dashboard</button>
-          <button onclick="App.aba.trocar('orcamentos')" id="btn-orcamentos" class="tab-btn">📋 Orçamentos</button>
-          <button onclick="App.aba.trocar('pedidos')" id="btn-pedidos" class="tab-btn">📦 Pedidos</button>
+
+          <p class="text-[0.65rem] font-extrabold uppercase text-[#94A3B8] tracking-wider px-2.5 pt-3 pb-1">Fluxo de Trabalho</p>
+          <button onclick="App.aba.trocar('planilhas')" id="btn-planilhas" class="tab-btn">📊 Planilha Custo</button>
+          <button onclick="App.aba.trocar('orcamentos')" id="btn-orcamentos" class="tab-btn relative">
+            📋 Orçamentos
+            <span id="badge-orcamentos" class="hidden ml-auto bg-[#EF4444] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none flex-shrink-0"></span>
+          </button>
+          <button onclick="App.aba.trocar('pedidos')" id="btn-pedidos" class="tab-btn relative">
+            📦 Pedidos
+            <span id="badge-pedidos" class="hidden ml-auto bg-[#F59E0B] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center leading-none flex-shrink-0"></span>
+          </button>
+
+          <p class="text-[0.65rem] font-extrabold uppercase text-[#94A3B8] tracking-wider px-2.5 pt-3 pb-1">Financeiro</p>
           <button onclick="App.aba.trocar('financeiro')" id="btn-financeiro" class="tab-btn">💰 Financeiro</button>
+          <button onclick="App.aba.trocar('fluxo')" id="btn-fluxo" class="tab-btn">📅 Fluxo de Caixa</button>
+          <button onclick="App.aba.trocar('dre')" id="btn-dre" class="tab-btn">📑 DRE</button>
+          <button onclick="App.aba.trocar('relatorios')" id="btn-relatorios" class="tab-btn">📈 Relatórios</button>
+
+          <p class="text-[0.65rem] font-extrabold uppercase text-[#94A3B8] tracking-wider px-2.5 pt-3 pb-1">Cadastros</p>
+          <button onclick="App.aba.trocar('materiais')" id="btn-materiais" class="tab-btn">📦 Materiais</button>
+          <button onclick="App.aba.trocar('produtos')" id="btn-produtos" class="tab-btn">🎨 Produtos</button>
+          <button onclick="App.aba.trocar('servicos')" id="btn-servicos" class="tab-btn">⚙️ Serviços</button>
           <button onclick="App.aba.trocar('clientes')" id="btn-clientes" class="tab-btn">👥 Clientes</button>
         </nav>
+
+        <div class="p-3 border-t border-[#E2E8F0] flex gap-2 flex-shrink-0">
+          <button onclick="App.backup.abrirModal()" class="flex-1 btn-primary text-xs px-2 py-1.5 text-center">💾 Backup</button>
+          <button onclick="App.appConfig.abrirModal()" class="flex-1 bg-[#6D28D9] hover:bg-[#5B21B6] text-white font-bold rounded-xl text-xs px-2 py-1.5 transition text-center">⚙️ Config</button>
+        </div>
       </aside>
 
-      <!-- CONTEÚDO -->
-      <div id="main-content" style="flex:1;margin-left:220px;padding:24px">
-        <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+      <!-- CONTEÚDO PRINCIPAL -->
+      <div id="main-content" style="flex:1;margin-left:220px;min-width:0;background:#F0F4FF">
+        <div id="app" class="p-4 md:p-6 max-w-6xl mx-auto w-full">
+          <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 no-print"></div>
 
-        <!-- DASHBOARD -->
-        <div id="aba-dashboard" class="aba-conteudo">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">💰 Receitas (Nuvem)</p><p class="text-2xl font-bold text-[#10B981]">R$ <span id="dashReceita">0,00</span></p></div>
-            <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">📋 Orçamentos</p><p class="text-2xl font-bold text-[#3A3ABF]"><span id="dashOrc">0</span></p></div>
-            <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">👥 Clientes</p><p class="text-2xl font-bold text-[#6D28D9]"><span id="dashTotalClientes">0</span></p></div>
+          <!-- ═══ DASHBOARD ═══ -->
+          <div id="aba-dashboard" class="aba-conteudo">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">💰 Receitas (mês)</p><p class="text-2xl font-bold text-[#10B981]">R$ <span id="dashReceita">0,00</span></p></div>
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">💸 Despesas (mês)</p><p class="text-2xl font-bold text-[#EF4444]">R$ <span id="dashDespesa">0,00</span></p></div>
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">📈 Lucro (mês)</p><p class="text-2xl font-bold" id="dashLucro">R$ 0,00</p></div>
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">📋 Orçamentos</p><p class="text-2xl font-bold text-[#3A3ABF]"><span id="dashOrc">0</span></p></div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">📦 Pedidos Ativos</p><p class="text-2xl font-bold text-[#F59E0B]"><span id="dashPedidos">0</span></p></div>
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">⏳ A Receber</p><p class="text-2xl font-bold text-[#3A3ABF]">R$ <span id="dashAReceber">0,00</span></p></div>
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">⏳ A Pagar</p><p class="text-2xl font-bold text-[#EF4444]">R$ <span id="dashAPagar">0,00</span></p></div>
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">📊 Ticket Médio</p><p class="text-2xl font-bold text-[#6D28D9]">R$ <span id="dashTicket">0,00</span></p></div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">🎯 Taxa de Conversão</p><p class="text-2xl font-bold text-[#6D28D9]"><span id="dashConversao">0</span>%</p><p class="text-xs text-[#94A3B8] mt-1">Orçamentos → Pedidos</p></div>
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">🏆 Melhor Mês (ano)</p><p class="text-lg font-bold text-[#3A3ABF]"><span id="dashMelhorMes">—</span></p><p class="text-xs text-[#94A3B8] mt-1" id="dashMelhorMesVal"></p></div>
+              <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">📋 Total Clientes</p><p class="text-2xl font-bold text-[#10B981]"><span id="dashTotalClientes">0</span></p><p class="text-xs text-[#94A3B8] mt-1">cadastrados</p></div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+              <div class="kpi-card p-5"><h3 class="font-bold text-[#3A3ABF] mb-3">Evolução Mensal (6 meses)</h3><div class="chart-container"><canvas id="graficoMensal"></canvas></div></div>
+              <div class="kpi-card p-5"><h3 class="font-bold text-[#3A3ABF] mb-3">Receitas vs Despesas</h3><div class="chart-container"><canvas id="graficoRecDesp"></canvas></div></div>
+            </div>
+            <div class="kpi-card p-5 mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="font-bold text-[#3A3ABF]">🏛️ Limite MEI Anual</h3>
+                <span class="text-sm font-bold text-[#64748B]">R$ <span id="dashFaturadoAno">0,00</span> / R$ 81.000,00</span>
+              </div>
+              <div class="w-full bg-[#E2E8F0] rounded-full h-3 overflow-hidden">
+                <div id="dashBarraMEI" class="h-3 rounded-full transition-all duration-700" style="width:0%;background:linear-gradient(90deg,#3A3ABF,#6D28D9)"></div>
+              </div>
+              <p class="text-xs text-[#64748B] mt-1 text-right" id="dashPercMEI">0% utilizado</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div class="kpi-card p-5"><h3 class="font-bold text-[#3A3ABF] mb-3">🏆 Top Serviços/Produtos (mês)</h3><div id="dashTopProd" class="space-y-2"></div></div>
+              <div class="kpi-card p-5"><h3 class="font-bold text-[#3A3ABF] mb-3">🔔 Alertas</h3><div id="dashAlertas" class="space-y-2"></div></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="kpi-card p-5">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="font-bold text-[#3A3ABF]">🎯 Meta Mensal</h3>
+                  <input type="text" id="metaFaturamento" placeholder="R$ meta..." class="w-32 text-sm money text-right" oninput="App.dashboard.atualizarMeta()">
+                </div>
+                <div class="w-full bg-[#E2E8F0] rounded-full h-4 overflow-hidden mb-2">
+                  <div id="dashBarraMeta" class="h-4 rounded-full transition-all duration-700 bg-gradient-to-r from-[#10B981] to-[#059669]" style="width:0%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-[#64748B]">
+                  <span>R$ <span id="dashMetaAtual">0,00</span> realizado</span>
+                  <span id="dashMetaPerc">defina uma meta acima</span>
+                </div>
+              </div>
+              <div class="kpi-card p-5">
+                <div class="flex justify-between items-center mb-3">
+                  <h3 class="font-bold text-[#3A3ABF]">📝 Notas Rápidas</h3>
+                  <span class="text-xs text-[#94A3B8]" id="notasSalvoEm"></span>
+                </div>
+                <textarea id="notasRapidas" rows="3" placeholder="Lembretes, tarefas, ideias..." class="w-full text-sm resize-none" oninput="App.notas.autoSalvar()"></textarea>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <!-- ORÇAMENTOS -->
-        <div id="aba-orcamentos" class="aba-conteudo hidden">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-[#3A3ABF]">📋 Orçamentos em Nuvem</h2>
-            <button onclick="App.orcamentos.novo()" class="btn-primary">+ Novo Orçamento</button>
+          <!-- ORÇAMENTOS -->
+          <div id="aba-orcamentos" class="aba-conteudo hidden">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-5 gap-3">
+              <input type="text" id="buscaOrcamento" placeholder="🔍 Buscar por cliente, categoria..." class="w-full md:w-96 px-4 py-2 rounded-xl border border-[#E2E8F0] bg-white shadow-sm" oninput="App.orcamentos.renderizar()">
+              <button onclick="App.orcamentos.abrirModal()" class="btn-primary px-6 py-2">+ Novo Orçamento</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="listaOrcamentos"></div>
           </div>
-          <div id="listaOrcamentos" class="grid gap-3"></div>
-        </div>
 
-        <!-- PEDIDOS -->
-        <div id="aba-pedidos" class="aba-conteudo hidden">
-          <h2 class="text-xl font-bold text-[#3A3ABF] mb-4">📦 Pedidos</h2>
-          <div id="listaPedidos" class="grid gap-3"></div>
-        </div>
-
-        <!-- FINANCEIRO -->
-        <div id="aba-financeiro" class="aba-conteudo hidden">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-[#3A3ABF]">💰 Financeiro</h2>
-            <button onclick="App.financeiro.novo()" class="btn-green">+ Nova Receita</button>
+          <!-- PEDIDOS -->
+          <div id="aba-pedidos" class="aba-conteudo hidden">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-5 gap-3 flex-wrap">
+              <input type="text" id="buscaPedido" placeholder="🔍 Buscar pedido..." class="w-full md:w-72 px-4 py-2 rounded-xl border border-[#E2E8F0] bg-white shadow-sm" oninput="App.pedidos.renderizar()">
+              <select id="filtroPedidoStatus" class="px-3 py-2 rounded-xl border border-[#E2E8F0] bg-white shadow-sm" onchange="App.pedidos.renderizar()">
+                <option value="">Todos os Status</option>
+                <option>Aguardando arte</option><option>Arte aprovada</option><option>Em produção</option>
+                <option>Finalizado</option><option>Entregue</option><option>Cancelado</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="listaPedidos"></div>
           </div>
-          <div id="listaFinanceiro" class="grid gap-3"></div>
-        </div>
 
-        <!-- CLIENTES -->
-        <div id="aba-clientes" class="aba-conteudo hidden">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-[#3A3ABF]">👥 Clientes</h2>
-            <button onclick="App.clientes.novo()" class="btn-primary">+ Novo Cliente</button>
+          <!-- PLANILHAS DE CUSTOS -->
+          <div id="aba-planilhas" class="aba-conteudo hidden">
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] mb-5 flex flex-col md:flex-row justify-between items-center gap-3">
+              <h2 class="text-xl font-bold text-[#3A3ABF]">📊 Planilhas de Custo por Serviço</h2>
+              <button onclick="App.planilhas.abrirModalNova()" class="btn-primary px-6 py-2">+ Nova Planilha</button>
+            </div>
+            <div id="listaPlanilhas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
           </div>
-          <div id="listaClientes" class="grid gap-3"></div>
+
+          <!-- FINANCEIRO -->
+          <div id="aba-financeiro" class="aba-conteudo hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+              <div class="kpi-card p-4 border-l-4 border-[#10B981]"><p class="text-xs font-bold text-[#64748B] uppercase">Receitas do Mês</p><p class="text-2xl font-bold text-[#10B981]">R$ <span id="finTotalRec">0,00</span></p></div>
+              <div class="kpi-card p-4 border-l-4 border-[#EF4444]"><p class="text-xs font-bold text-[#64748B] uppercase">Despesas do Mês</p><p class="text-2xl font-bold text-[#EF4444]">R$ <span id="finTotalDesp">0,00</span></p></div>
+              <div class="kpi-card p-4 border-l-4 border-[#3A3ABF]"><p class="text-xs font-bold text-[#64748B] uppercase">Saldo</p><p class="text-2xl font-bold" id="finSaldo">R$ 0,00</p></div>
+            </div>
+            <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+              <div class="flex gap-2 flex-wrap">
+                <button onclick="App.financeiro.filtrar('')" id="finFiltro-" class="text-xs px-3 py-1.5 rounded-full font-bold border transition bg-[#3A3ABF] border-[#3A3ABF] text-white">Todos</button>
+                <button onclick="App.financeiro.filtrar('pago')" id="finFiltro-pago" class="text-xs px-3 py-1.5 rounded-full font-bold border transition bg-white border-[#E2E8F0] text-[#64748B]">✅ Pago/Recebido</button>
+                <button onclick="App.financeiro.filtrar('pendente')" id="finFiltro-pendente" class="text-xs px-3 py-1.5 rounded-full font-bold border transition bg-white border-[#E2E8F0] text-[#64748B]">⏳ Pendente</button>
+              </div>
+              <div class="flex gap-2 items-center flex-wrap">
+                <input type="text" id="buscaFinanceiro" placeholder="🔍 Buscar lançamento..." class="text-sm w-48 px-3 py-1.5 rounded-xl border border-[#E2E8F0]" oninput="App.financeiro.renderizar()">
+                <button onclick="App.financeiro.exportarExcel()" class="btn-green text-sm px-3 py-2">📊 Excel</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <div class="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden">
+                <div class="flex justify-between items-center p-4 border-b border-[#E2E8F0]">
+                  <h3 class="font-bold text-[#10B981]">💰 Entradas (Receitas)</h3>
+                  <button onclick="App.financeiro.abrirModalReceita()" class="btn-green text-sm px-3 py-1.5">+ Nova Receita</button>
+                </div>
+                <div id="listaRecebimentos" class="p-4 space-y-3 max-h-[500px] overflow-y-auto scroll-personalizado"></div>
+              </div>
+              <div class="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden">
+                <div class="flex justify-between items-center p-4 border-b border-[#E2E8F0]">
+                  <h3 class="font-bold text-[#EF4444]">💸 Saídas (Despesas)</h3>
+                  <button onclick="App.financeiro.abrirModalGasto()" class="btn-danger text-sm px-3 py-1.5">+ Nova Despesa</button>
+                </div>
+                <div id="listaGastos" class="p-4 space-y-3 max-h-[500px] overflow-y-auto scroll-personalizado"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FLUXO DE CAIXA -->
+          <div id="aba-fluxo" class="aba-conteudo hidden">
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] mb-5">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                <div>
+                  <h2 class="text-xl font-bold text-[#3A3ABF]">📅 Fluxo de Caixa — Próximos 30 dias</h2>
+                  <p class="text-[#64748B] text-sm mt-0.5">Saldo projetado considerando lançamentos pendentes</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <label class="text-xs font-bold text-[#64748B] uppercase">Saldo inicial:</label>
+                  <input type="text" id="fluxoSaldoInicial" placeholder="R$ 0,00" class="w-36 text-sm money" oninput="App.fluxo.renderizar()">
+                </div>
+              </div>
+              <div class="chart-container mb-5" style="height:260px"><canvas id="graficoFluxo"></canvas></div>
+              <div id="listaFluxo" class="space-y-2 max-h-96 overflow-y-auto scroll-personalizado"></div>
+            </div>
+          </div>
+
+          <!-- DRE -->
+          <div id="aba-dre" class="aba-conteudo hidden">
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0]">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                <h2 class="text-xl font-bold text-[#3A3ABF]">📑 DRE — Demonstrativo de Resultado</h2>
+                <div class="flex gap-2 flex-wrap">
+                  <select id="dreAno" class="text-sm" style="width:80px" onchange="App.dre.renderizar()">
+                    <script>
+                      (function(){
+                        var y = new Date().getFullYear();
+                        for(var i=y-3; i<=y+1; i++){
+                          document.write('<option value="'+i+'"'+(i===y?' selected':'')+'>'+i+'<\/option>');
+                        }
+                      })();
+                    </script>
+                  </select>
+                  <select id="dreModo" class="text-sm" onchange="App.dre.renderizar()">
+                    <option value="mensal">Mensal</option><option value="anual">Anual</option>
+                  </select>
+                  <button onclick="App.dre.imprimirPDF()" class="btn-primary text-sm px-3 py-2">🖨️ PDF</button>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5 bg-[#F8FAFC] p-4 rounded-xl border border-[#E2E8F0]">
+                <div><label class="block text-xs font-bold text-[#64748B] uppercase mb-1">💼 Pró-Labore Mensal</label><input type="text" id="dreProLabore" placeholder="R$ 0,00" class="w-full text-sm money" oninput="App.dre.renderizar()"></div>
+                <div><label class="block text-xs font-bold text-[#64748B] uppercase mb-1">🏛️ DAS Mensal (MEI)</label><input type="text" id="dreDAS" placeholder="R$ 75,90" class="w-full text-sm money" oninput="App.dre.renderizar()"></div>
+              </div>
+              <div id="tabelaDRE"></div>
+            </div>
+          </div>
+
+          <!-- RELATÓRIOS -->
+          <div id="aba-relatorios" class="aba-conteudo hidden">
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0]">
+              <h2 class="text-xl font-bold text-[#3A3ABF] mb-4">📈 Relatórios Gerenciais</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div><label class="block text-xs font-bold text-[#64748B] uppercase mb-1">Data Inicial</label><input type="date" id="relInicio" class="w-full"></div>
+                <div><label class="block text-xs font-bold text-[#64748B] uppercase mb-1">Data Final</label><input type="date" id="relFim" class="w-full"></div>
+              </div>
+              <div class="flex gap-2 mb-5 flex-wrap">
+                <button onclick="App.relatorios.carregar()" class="btn-primary px-4 py-2 text-sm">🔍 Gerar Relatório</button>
+                <button onclick="App.relatorios.exportarExcel()" class="btn-green px-4 py-2 text-sm">📊 Exportar Excel</button>
+                <button onclick="App.relatorios.imprimirPDF()" class="bg-[#6D28D9] text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-[#5B21B6] transition">🖨️ Imprimir PDF</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MATERIAIS -->
+          <div id="aba-materiais" class="aba-conteudo hidden">
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] mb-5 flex justify-between items-center">
+              <h2 class="text-xl font-bold text-[#3A3ABF]">📦 Materiais e Insumos</h2>
+              <button onclick="App.materiais.abrirModal()" class="btn-primary px-4 py-2">+ Novo Material</button>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0]">
+              <div id="listaMateriais" class="space-y-2"></div>
+            </div>
+          </div>
+
+          <!-- PRODUTOS -->
+          <div id="aba-produtos" class="aba-conteudo hidden">
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0] mb-5 flex justify-between items-center">
+              <h2 class="text-xl font-bold text-[#3A3ABF]">🎨 Produtos Vendáveis</h2>
+              <button onclick="App.produtos.abrirModal()" class="btn-primary px-4 py-2">+ Novo Produto</button>
+            </div>
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0]">
+              <div id="listaProdutos" class="space-y-2"></div>
+            </div>
+          </div>
+
+          <!-- SERVIÇOS -->
+          <div id="aba-servicos" class="aba-conteudo hidden">
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0]">
+              <h2 class="text-xl font-bold text-[#3A3ABF] mb-4">⚙️ Catálogo de Serviços</h2>
+              <div id="listaServicos" class="space-y-2"></div>
+            </div>
+          </div>
+
+          <!-- CLIENTES -->
+          <div id="aba-clientes" class="aba-conteudo hidden">
+            <div class="bg-white rounded-2xl p-5 border border-[#E2E8F0]">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-[#3A3ABF]">👥 Clientes</h2>
+                <button onclick="App.clientes.abrirModal()" class="btn-primary px-4 py-2 text-sm">+ Novo Cliente</button>
+              </div>
+              <div id="listaClientes" class="space-y-3"></div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SCRIPTS DO FIREBASE (Modular SDK v10) -->
+  <!-- SCRIPTS DO FIREBASE E LÓGICA DO ERP -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, browserLocalPersistence, setPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDJsg3GG_l725oWyYS-NaG17Q_QtAxunHQ",
@@ -162,12 +431,23 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    setPersistence(auth, browserLocalPersistence).catch((err) => {
-      console.error("Erro na persistência:", err);
-    });
+    setPersistence(auth, browserLocalPersistence).catch(console.error);
+
+    // Sistema Principal
+    const money = {
+      parseBR(v){
+        if(!v && v !== 0) return 0;
+        let s = String(v).replace(/[R$\s]/g,'').trim();
+        s = s.replace(/\./g,'').replace(',','.');
+        const n = parseFloat(s);
+        return isNaN(n) ? 0 : n;
+      },
+      formatBR(n){ return (Number(n)||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    };
 
     window.App = {
-      state: { orcamentos: [], clientes: [], pedidos: [], recebimentos: [] },
+      _cfg: { limiteMEI: 81000 },
+      state: { orcamentos:[], pedidos:[], materiais:[], produtos:[], servicos:[], clientes:[], recebimentos:[], gastos:[], configuracoes:{} },
       
       auth: {
         async fazerLogin(e) {
@@ -175,13 +455,11 @@
           const email = document.getElementById('loginEmail').value;
           const senha = document.getElementById('loginSenha').value;
           document.getElementById('globalLoading').classList.remove('hidden');
-          
           try {
             await signInWithEmailAndPassword(auth, email, senha);
-            App.ui.toast('Login realizado com sucesso!', 'sucesso');
           } catch(err) {
             document.getElementById('globalLoading').classList.add('hidden');
-            alert('Erro no login (' + err.code + '): ' + err.message);
+            alert('Erro no login: ' + err.message);
           }
         },
         fazerLogout() {
@@ -204,8 +482,14 @@
         }
       },
 
+      sidebar: {
+        aberto: false,
+        toggle(){},
+        fechar(){}
+      },
+
       aba: {
-        trocar(id) {
+        trocar(id){
           document.querySelectorAll('.aba-conteudo').forEach(el => el.classList.add('hidden'));
           document.getElementById('aba-'+id)?.classList.remove('hidden');
           document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-ativo'));
@@ -213,100 +497,34 @@
         }
       },
 
+      dashboard: { atualizar(){}, actualizarMeta(){} },
+      orcamentos: { renderizar(){}, abrirModal(){} },
+      pedidos: { renderizar(){} },
+      planilhas: { renderizar(){} },
+      financeiro: { renderizar(){} },
+      fluxo: { renderizar(){} },
+      dre: { renderizar(){} },
+      relatorios: { carregarPadrao(){} },
+      materiais: { renderizar(){} },
+      produtos: { renderizar(){} },
+      servicos: { renderizar(){} },
+      clientes: { renderizar(){} },
+      recorrentes: { renderizar(){} },
+      appConfig: { abrirModal(){} },
+      backup: { abrirModal(){} },
+      notas: { carregar(){} },
+
       async carregarDadosNuvem() {
         document.getElementById('globalLoading').classList.remove('hidden');
         try {
-          const snapOrc = await getDocs(collection(db, "orcamentos"));
-          App.state.orcamentos = snapOrc.docs.map(d => ({ id: d.id, ...d.data() }));
-          
-          const snapCli = await getDocs(collection(db, "clientes"));
-          App.state.clientes = snapCli.docs.map(d => ({ id: d.id, ...d.data() }));
-
-          const snapRec = await getDocs(collection(db, "recebimentos"));
-          App.state.recebimentos = snapRec.docs.map(d => ({ id: d.id, ...d.data() }));
-
-          document.getElementById('dashOrc').innerText = App.state.orcamentos.length;
-          document.getElementById('dashTotalClientes').innerText = App.state.clientes.length;
-          const totalRec = App.state.recebimentos.reduce((acc, cur) => acc + (Number(cur.valor) || 0), 0);
-          document.getElementById('dashReceita').innerText = totalRec.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-
-          App.orcamentos.renderizar();
-          App.clientes.renderizar();
-
+          // Aqui entram os carregamentos do Firestore futuramente
           document.getElementById('telaLogin').classList.add('hidden');
           document.getElementById('appContainer').classList.remove('hidden');
-        } catch (e) {
-          alert('Erro ao carregar dados do Firestore: ' + e.message);
-          document.getElementById('telaLogin').classList.remove('hidden');
-          document.getElementById('appContainer').classList.add('hidden');
+          App.aba.trocar('dashboard');
+        } catch(e) {
+          alert('Erro ao carregar dados: ' + e.message);
         } finally {
           document.getElementById('globalLoading').classList.add('hidden');
-        }
-      },
-
-      orcamentos: {
-        async novo() {
-          const cliente = prompt("Nome do Cliente:");
-          const valor = prompt("Valor Total (R$):", "150.00");
-          if (!cliente) return;
-          try {
-            await addDoc(collection(db, "orcamentos"), { cliente, total: parseFloat(valor) || 0, data: new Date().toISOString().slice(0,10), status: 'Pendente' });
-            App.ui.toast('Orçamento salvo!', 'sucesso');
-            App.carregarDadosNuvem();
-          } catch(e) { alert('Erro: ' + e.message); }
-        },
-        renderizar() {
-          const el = document.getElementById('listaOrcamentos');
-          if(!el) return;
-          el.innerHTML = App.state.orcamentos.map(o => `
-            <div class="bg-white p-4 rounded-xl border border-[#E2E8F0] flex justify-between items-center">
-              <div>
-                <h3 class="font-bold text-base">${o.cliente}</h3>
-                <p class="text-xs text-[#64748B]">Data: ${o.data} · Status: ${o.status || 'Pendente'}</p>
-              </div>
-              <div class="text-right">
-                <span class="text-[#10B981] font-bold text-lg">R$ ${(Number(o.total)||0).toFixed(2)}</span>
-              </div>
-            </div>
-          `).join('') || '<p class="text-[#64748B]">Nenhum orçamento na nuvem.</p>';
-        }
-      },
-
-      clientes: {
-        async novo() {
-          const nome = prompt("Nome do Cliente:");
-          const telefone = prompt("Telefone / WhatsApp:");
-          if (!nome) return;
-          try {
-            await addDoc(collection(db, "clientes"), { nome, telefone: telefone || '' });
-            App.ui.toast('Cliente salvo!', 'sucesso');
-            App.carregarDadosNuvem();
-          } catch(e) { alert('Erro: ' + e.message); }
-        },
-        renderizar() {
-          const el = document.getElementById('listaClientes');
-          if(!el) return;
-          el.innerHTML = App.state.clientes.map(c => `
-            <div class="bg-white p-4 rounded-xl border border-[#E2E8F0] flex justify-between items-center">
-              <div>
-                <h3 class="font-bold text-base">${c.nome}</h3>
-                <p class="text-xs text-[#64748B]">Tel: ${c.telefone || '—'}</p>
-              </div>
-            </div>
-          `).join('') || '<p class="text-[#64748B]">Nenhum cliente cadastrado.</p>';
-        }
-      },
-
-      financeiro: {
-        async novo() {
-          const descricao = prompt("Descrição da Receita:");
-          const valor = prompt("Valor (R$):", "100.00");
-          if (!descricao) return;
-          try {
-            await addDoc(collection(db, "recebimentos"), { descricao, valor: parseFloat(valor) || 0, data: new Date().toISOString().slice(0,10) });
-            App.ui.toast('Receita salva!', 'sucesso');
-            App.carregarDadosNuvem();
-          } catch(e) { alert('Erro: ' + e.message); }
         }
       }
     };
