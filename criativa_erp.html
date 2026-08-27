@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Criativa Personalizados | ERP SaaS v2.0</title>
+  <title>Criativa Personalizados | ERP v2.0 SaaS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -145,8 +145,8 @@
   <!-- SCRIPTS DO FIREBASE (Modular SDK v10) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, browserLocalPersistence, setPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDJsg3GG_l725oWyYS-Nag17Q_QtAxunHQ",
@@ -162,22 +162,30 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    // Garante persistência local para manter a sessão ativa sem loop
+    setPersistence(auth, browserLocalPersistence).catch((err) => {
+      console.error("Erro na persistência:", err);
+    });
+
     window.App = {
       state: { orcamentos: [], clientes: [], pedidos: [], recebimentos: [] },
       
       auth: {
-        fazerLogin(e) {
+        async fazerLogin(e) {
           e.preventDefault();
           const email = document.getElementById('loginEmail').value;
           const senha = document.getElementById('loginSenha').value;
           document.getElementById('globalLoading').classList.remove('hidden');
           
-          signInWithEmailAndPassword(auth, email, senha)
-            .then(() => App.ui.toast('Login realizado com sucesso!', 'sucesso'))
-            .catch(err => {
-              document.getElementById('globalLoading').classList.add('hidden');
-              App.ui.toast('Erro no login: ' + err.message, 'erro');
-            });
+          try {
+            console.log("Tentando autenticar usuário:", email);
+            await signInWithEmailAndPassword(auth, email, senha);
+            App.ui.toast('Login realizado com sucesso!', 'sucesso');
+          } catch(err) {
+            document.getElementById('globalLoading').classList.add('hidden');
+            console.error("Falha no login:", err.code, err.message);
+            alert('Erro no login (' + err.code + '): ' + err.message);
+          }
         },
         fazerLogout() {
           signOut(auth).then(() => {
@@ -190,6 +198,7 @@
       ui: {
         toast(msg, tipo='info') {
           const c = document.getElementById('toastContainer');
+          if(!c) return;
           const t = document.createElement('div');
           t.className = `toast ${tipo}`;
           t.innerText = msg;
@@ -208,21 +217,18 @@
       },
 
       async carregarDadosNuvem() {
+        console.log("Iniciando carregamento dos dados do Firestore...");
         document.getElementById('globalLoading').classList.remove('hidden');
         try {
-          // Carregar Orçamentos
           const snapOrc = await getDocs(collection(db, "orcamentos"));
           App.state.orcamentos = snapOrc.docs.map(d => ({ id: d.id, ...d.data() }));
           
-          // Carregar Clientes
           const snapCli = await getDocs(collection(db, "clientes"));
           App.state.clientes = snapCli.docs.map(d => ({ id: d.id, ...d.data() }));
 
-          // Carregar Recebimentos
           const snapRec = await getDocs(collection(db, "recebimentos"));
           App.state.recebimentos = snapRec.docs.map(d => ({ id: d.id, ...d.data() }));
 
-          // Renderizar na tela
           document.getElementById('dashOrc').innerText = App.state.orcamentos.length;
           document.getElementById('dashTotalClientes').innerText = App.state.clientes.length;
           const totalRec = App.state.recebimentos.reduce((acc, cur) => acc + (Number(cur.valor) || 0), 0);
@@ -233,8 +239,12 @@
 
           document.getElementById('telaLogin').classList.add('hidden');
           document.getElementById('appContainer').classList.remove('hidden');
+          console.log("Painel carregado com sucesso!");
         } catch (e) {
-          App.ui.toast('Erro ao sincronizar com Firestore: ' + e.message, 'erro');
+          console.error("Erro ao puxar dados do Firestore:", e);
+          alert('Erro ao carregar dados do Firestore: ' + e.message);
+          document.getElementById('telaLogin').classList.remove('hidden');
+          document.getElementById('appContainer').classList.add('hidden');
         } finally {
           document.getElementById('globalLoading').classList.add('hidden');
         }
@@ -249,7 +259,7 @@
             await addDoc(collection(db, "orcamentos"), { cliente, total: parseFloat(valor) || 0, data: new Date().toISOString().slice(0,10), status: 'Pendente' });
             App.ui.toast('Orçamento salvo!', 'sucesso');
             App.carregarDadosNuvem();
-          } catch(e) { App.ui.toast('Erro: ' + e.message, 'erro'); }
+          } catch(e) { alert('Erro: ' + e.message); }
         },
         renderizar() {
           const el = document.getElementById('listaOrcamentos');
@@ -277,7 +287,7 @@
             await addDoc(collection(db, "clientes"), { nome, telefone: telefone || '' });
             App.ui.toast('Cliente salvo!', 'sucesso');
             App.carregarDadosNuvem();
-          } catch(e) { App.ui.toast('Erro: ' + e.message, 'erro'); }
+          } catch(e) { alert('Erro: ' + e.message); }
         },
         renderizar() {
           const el = document.getElementById('listaClientes');
@@ -302,15 +312,17 @@
             await addDoc(collection(db, "recebimentos"), { descricao, valor: parseFloat(valor) || 0, data: new Date().toISOString().slice(0,10) });
             App.ui.toast('Receita salva!', 'sucesso');
             App.carregarDadosNuvem();
-          } catch(e) { App.ui.toast('Erro: ' + e.message, 'erro'); }
+          } catch(e) { alert('Erro: ' + e.message); }
         }
       }
     };
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log("Sessão ativa detectada para:", user.email);
         App.carregarDadosNuvem();
       } else {
+        console.log("Nenhuma sessão ativa encontrada.");
         document.getElementById('globalLoading').classList.add('hidden');
         document.getElementById('telaLogin').classList.remove('hidden');
       }
