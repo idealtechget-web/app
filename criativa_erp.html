@@ -149,7 +149,7 @@
     import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyDJsg3GG_l725oWyYS-Nag17Q_QtAxunHQ",
+      apiKey: "AIzaSyDJsg3GG_l725oWyYS-NaG17Q_QtAxunHQ",
       authDomain: "erpcriativapersonalizados.firebaseapp.com",
       projectId: "erpcriativapersonalizados",
       storageBucket: "erpcriativapersonalizados.firebasestorage.app",
@@ -162,7 +162,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Garante persistência local para manter a sessão ativa sem loop
     setPersistence(auth, browserLocalPersistence).catch((err) => {
       console.error("Erro na persistência:", err);
     });
@@ -178,12 +177,10 @@
           document.getElementById('globalLoading').classList.remove('hidden');
           
           try {
-            console.log("Tentando autenticar usuário:", email);
             await signInWithEmailAndPassword(auth, email, senha);
             App.ui.toast('Login realizado com sucesso!', 'sucesso');
           } catch(err) {
             document.getElementById('globalLoading').classList.add('hidden');
-            console.error("Falha no login:", err.code, err.message);
             alert('Erro no login (' + err.code + '): ' + err.message);
           }
         },
@@ -217,7 +214,6 @@
       },
 
       async carregarDadosNuvem() {
-        console.log("Iniciando carregamento dos dados do Firestore...");
         document.getElementById('globalLoading').classList.remove('hidden');
         try {
           const snapOrc = await getDocs(collection(db, "orcamentos"));
@@ -239,9 +235,7 @@
 
           document.getElementById('telaLogin').classList.add('hidden');
           document.getElementById('appContainer').classList.remove('hidden');
-          console.log("Painel carregado com sucesso!");
         } catch (e) {
-          console.error("Erro ao puxar dados do Firestore:", e);
           alert('Erro ao carregar dados do Firestore: ' + e.message);
           document.getElementById('telaLogin').classList.remove('hidden');
           document.getElementById('appContainer').classList.add('hidden');
@@ -319,10 +313,8 @@
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("Sessão ativa detectada para:", user.email);
         App.carregarDadosNuvem();
       } else {
-        console.log("Nenhuma sessão ativa encontrada.");
         document.getElementById('globalLoading').classList.add('hidden');
         document.getElementById('telaLogin').classList.remove('hidden');
       }
