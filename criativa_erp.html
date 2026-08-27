@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Criativa Personalizados | ERP SaaS v2.0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:#F0F4FF;color:#0F172A}
+    .scroll-personalizado::-webkit-scrollbar{width:6px}
+    .scroll-personalizado::-webkit-scrollbar-track{background:#E2E8F0;border-radius:3px}
+    .scroll-personalizado::-webkit-scrollbar-thumb{background:#94A3B8;border-radius:3px}
+    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.75);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .25s}
+    .modal-content{background:white;border-radius:1.25rem;padding:28px;max-width:860px;width:95%;max-height:92vh;overflow-y:auto;box-shadow:0 25px 50px -12px rgba(0,0,0,.2);animation:slideIn .25s}
+    .tab-ativo{background:linear-gradient(135deg,#3A3ABF,#6D28D9)!important;color:white!important;box-shadow:0 4px 12px rgba(58,58,191,.25);border-radius:.75rem!important}
+    .tab-btn{transition:all .2s;border-radius:.75rem;padding:.6rem .85rem;font-weight:600;color:#64748B;white-space:nowrap;display:flex;align-items:center;gap:.5rem;width:100%;text-align:left;font-size:.85rem}
+    .tab-btn:hover:not(.tab-ativo){background:#E2E8F0;color:#0F172A}
+    #layout-wrapper{display:flex;min-height:100vh;gap:0}
+    #sidebar{width:220px;min-width:220px;background:white;border-right:1px solid #E2E8F0;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:40;transition:transform .25s}
+    #sidebar-header{padding:1.25rem 1rem 1rem;border-bottom:1px solid #E2E8F0;flex-shrink:0}
+    #sidebar-nav{padding:.5rem .75rem;flex:1;overflow-y:auto}
+    #main-content{margin-left:220px;flex:1;min-width:0;transition:margin .25s}
+    .kpi-card{background:white;border-radius:1rem;padding:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.06);border:1px solid #E2E8F0}
+    .chart-container{height:240px;position:relative;width:100%}
+    .btn-primary{background:linear-gradient(135deg,#3A3ABF,#6D28D9);transition:all .2s;color:white;font-weight:700;border-radius:.75rem;padding:.55rem 1.2rem;box-shadow:0 4px 10px rgba(58,58,191,.3)}
+    .btn-green{background:linear-gradient(135deg,#10B981,#059669);color:white;font-weight:700;border-radius:.75rem;padding:.55rem 1.2rem}
+    .btn-danger{background:linear-gradient(135deg,#EF4444,#DC2626);color:white;font-weight:700;border-radius:.75rem;padding:.55rem 1.2rem}
+    input,select,textarea{transition:all .2s;border:1.5px solid #E2E8F0;border-radius:.75rem;padding:.5rem .85rem;background:white;color:#0F172A;font-family:'Poppins',sans-serif}
+    input:focus,select:focus,textarea:focus{border-color:#3A3ABF!important;box-shadow:0 0 0 3px rgba(58,58,191,.12);outline:none}
+    .status-badge{display:inline-block;padding:3px 9px;border-radius:9999px;font-size:.72rem;font-weight:700;text-transform:uppercase}
+    .toast{position:fixed;bottom:20px;right:20px;background:white;border-left:4px solid #3A3ABF;border-radius:.85rem;padding:14px 20px;box-shadow:0 10px 25px rgba(0,0,0,.12);z-index:9999;font-weight:500}
+    .toast.erro{border-left-color:#EF4444}
+    .toast.sucesso{border-left-color:#10B981}
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- TELA DE LOGIN (SaaS Auth) -->
+  <div id="telaLogin" class="fixed inset-0 bg-[#3A3ABF] flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+      <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold text-[#3A3ABF]">🎨 Criativa ERP</h1>
+        <p class="text-sm text-[#64748B] mt-1">Acesse sua conta em nuvem</p>
+      </div>
+      <form id="formLogin" onsubmit="App.auth.fazerLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-[#64748B] uppercase mb-1">E-mail</label>
+          <input type="email" id="loginEmail" required placeholder="seu@email.com" class="w-full">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#64748B] uppercase mb-1">Senha</label>
+          <input type="password" id="loginSenha" required placeholder="••••••••" class="w-full">
+        </div>
+        <button type="submit" class="w-full btn-primary py-3">Entrar no Sistema</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOADING GLOBAL -->
+  <div id="globalLoading" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-3">
+      <div class="w-8 h-8 border-4 border-[#3A3ABF] border-t-transparent rounded-full animate-spin"></div>
+      <span class="font-semibold text-[#3A3ABF]">Sincronizando com Firebase...</span>
+    </div>
+  </div>
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div id="appContainer" class="hidden">
+    <div id="layout-wrapper" style="display:flex;min-height:100vh">
+      
+      <!-- SIDEBAR -->
+      <aside id="sidebar">
+        <div id="sidebar-header">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-bold text-[#3A3ABF] leading-tight">🎨 Criativa</div>
+              <div class="text-xs text-[#64748B] leading-tight">Cloud SaaS v2.0</div>
+            </div>
+            <button onclick="App.auth.fazerLogout()" title="Sair" class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-lg font-bold">Sair</button>
+          </div>
+        </div>
+        <nav id="sidebar-nav">
+          <p class="text-[0.65rem] font-extrabold uppercase text-[#94A3B8] tracking-wider px-2 py-2">Principal</p>
+          <button onclick="App.aba.trocar('dashboard')" id="btn-dashboard" class="tab-btn tab-ativo">📊 Dashboard</button>
+          <button onclick="App.aba.trocar('orcamentos')" id="btn-orcamentos" class="tab-btn">📋 Orçamentos</button>
+          <button onclick="App.aba.trocar('pedidos')" id="btn-pedidos" class="tab-btn">📦 Pedidos</button>
+          <button onclick="App.aba.trocar('financeiro')" id="btn-financeiro" class="tab-btn">💰 Financeiro</button>
+          <button onclick="App.aba.trocar('clientes')" id="btn-clientes" class="tab-btn">👥 Clientes</button>
+        </nav>
+      </aside>
+
+      <!-- CONTEÚDO -->
+      <div id="main-content" style="flex:1;margin-left:220px;padding:24px">
+        <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+        <!-- DASHBOARD -->
+        <div id="aba-dashboard" class="aba-conteudo">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">💰 Receitas (Nuvem)</p><p class="text-2xl font-bold text-[#10B981]">R$ <span id="dashReceita">0,00</span></p></div>
+            <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">📋 Orçamentos</p><p class="text-2xl font-bold text-[#3A3ABF]"><span id="dashOrc">0</span></p></div>
+            <div class="kpi-card"><p class="text-xs font-bold text-[#64748B] uppercase mb-1">👥 Clientes</p><p class="text-2xl font-bold text-[#6D28D9]"><span id="dashTotalClientes">0</span></p></div>
+          </div>
+        </div>
+
+        <!-- ORÇAMENTOS -->
+        <div id="aba-orcamentos" class="aba-conteudo hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-[#3A3ABF]">📋 Orçamentos em Nuvem</h2>
+            <button onclick="App.orcamentos.novo()" class="btn-primary">+ Novo Orçamento</button>
+          </div>
+          <div id="listaOrcamentos" class="grid gap-3"></div>
+        </div>
+
+        <!-- PEDIDOS -->
+        <div id="aba-pedidos" class="aba-conteudo hidden">
+          <h2 class="text-xl font-bold text-[#3A3ABF] mb-4">📦 Pedidos</h2>
+          <div id="listaPedidos" class="grid gap-3"></div>
+        </div>
+
+        <!-- FINANCEIRO -->
+        <div id="aba-financeiro" class="aba-conteudo hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-[#3A3ABF]">💰 Financeiro</h2>
+            <button onclick="App.financeiro.novo()" class="btn-green">+ Nova Receita</button>
+          </div>
+          <div id="listaFinanceiro" class="grid gap-3"></div>
+        </div>
+
+        <!-- CLIENTES -->
+        <div id="aba-clientes" class="aba-conteudo hidden">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-[#3A3ABF]">👥 Clientes</h2>
+            <button onclick="App.clientes.novo()" class="btn-primary">+ Novo Cliente</button>
+          </div>
+          <div id="listaClientes" class="grid gap-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS DO FIREBASE (Modular SDK v10) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJsg3GG_l725oWyYS-Nag17Q_QtAxunHQ",
+      authDomain: "erpcriativapersonalizados.firebaseapp.com",
+      projectId: "erpcriativapersonalizados",
+      storageBucket: "erpcriativapersonalizados.firebasestorage.app",
+      messagingSenderId: "675253082837",
+      appId: "1:675253082837:web:6913303f8ecbe79161e05c",
+      measurementId: "G-K8ZJ9VVE85"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.App = {
+      state: { orcamentos: [], clientes: [], pedidos: [], recebimentos: [] },
+      
+      auth: {
+        fazerLogin(e) {
+          e.preventDefault();
+          const email = document.getElementById('loginEmail').value;
+          const senha = document.getElementById('loginSenha').value;
+          document.getElementById('globalLoading').classList.remove('hidden');
+          
+          signInWithEmailAndPassword(auth, email, senha)
+            .then(() => App.ui.toast('Login realizado com sucesso!', 'sucesso'))
+            .catch(err => {
+              document.getElementById('globalLoading').classList.add('hidden');
+              App.ui.toast('Erro no login: ' + err.message, 'erro');
+            });
+        },
+        fazerLogout() {
+          signOut(auth).then(() => {
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('telaLogin').classList.remove('hidden');
+          });
+        }
+      },
+
+      ui: {
+        toast(msg, tipo='info') {
+          const c = document.getElementById('toastContainer');
+          const t = document.createElement('div');
+          t.className = `toast ${tipo}`;
+          t.innerText = msg;
+          c.appendChild(t);
+          setTimeout(() => t.remove(), 3000);
+        }
+      },
+
+      aba: {
+        trocar(id) {
+          document.querySelectorAll('.aba-conteudo').forEach(el => el.classList.add('hidden'));
+          document.getElementById('aba-'+id)?.classList.remove('hidden');
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-ativo'));
+          document.getElementById('btn-'+id)?.classList.add('tab-ativo');
+        }
+      },
+
+      async carregarDadosNuvem() {
+        document.getElementById('globalLoading').classList.remove('hidden');
+        try {
+          // Carregar Orçamentos
+          const snapOrc = await getDocs(collection(db, "orcamentos"));
+          App.state.orcamentos = snapOrc.docs.map(d => ({ id: d.id, ...d.data() }));
+          
+          // Carregar Clientes
+          const snapCli = await getDocs(collection(db, "clientes"));
+          App.state.clientes = snapCli.docs.map(d => ({ id: d.id, ...d.data() }));
+
+          // Carregar Recebimentos
+          const snapRec = await getDocs(collection(db, "recebimentos"));
+          App.state.recebimentos = snapRec.docs.map(d => ({ id: d.id, ...d.data() }));
+
+          // Renderizar na tela
+          document.getElementById('dashOrc').innerText = App.state.orcamentos.length;
+          document.getElementById('dashTotalClientes').innerText = App.state.clientes.length;
+          const totalRec = App.state.recebimentos.reduce((acc, cur) => acc + (Number(cur.valor) || 0), 0);
+          document.getElementById('dashReceita').innerText = totalRec.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+
+          App.orcamentos.renderizar();
+          App.clientes.renderizar();
+
+          document.getElementById('telaLogin').classList.add('hidden');
+          document.getElementById('appContainer').classList.remove('hidden');
+        } catch (e) {
+          App.ui.toast('Erro ao sincronizar com Firestore: ' + e.message, 'erro');
+        } finally {
+          document.getElementById('globalLoading').classList.add('hidden');
+        }
+      },
+
+      orcamentos: {
+        async novo() {
+          const cliente = prompt("Nome do Cliente:");
+          const valor = prompt("Valor Total (R$):", "150.00");
+          if (!cliente) return;
+          try {
+            await addDoc(collection(db, "orcamentos"), { cliente, total: parseFloat(valor) || 0, data: new Date().toISOString().slice(0,10), status: 'Pendente' });
+            App.ui.toast('Orçamento salvo!', 'sucesso');
+            App.carregarDadosNuvem();
+          } catch(e) { App.ui.toast('Erro: ' + e.message, 'erro'); }
+        },
+        renderizar() {
+          const el = document.getElementById('listaOrcamentos');
+          if(!el) return;
+          el.innerHTML = App.state.orcamentos.map(o => `
+            <div class="bg-white p-4 rounded-xl border border-[#E2E8F0] flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-base">${o.cliente}</h3>
+                <p class="text-xs text-[#64748B]">Data: ${o.data} · Status: ${o.status || 'Pendente'}</p>
+              </div>
+              <div class="text-right">
+                <span class="text-[#10B981] font-bold text-lg">R$ ${(Number(o.total)||0).toFixed(2)}</span>
+              </div>
+            </div>
+          `).join('') || '<p class="text-[#64748B]">Nenhum orçamento na nuvem.</p>';
+        }
+      },
+
+      clientes: {
+        async novo() {
+          const nome = prompt("Nome do Cliente:");
+          const telefone = prompt("Telefone / WhatsApp:");
+          if (!nome) return;
+          try {
+            await addDoc(collection(db, "clientes"), { nome, telefone: telefone || '' });
+            App.ui.toast('Cliente salvo!', 'sucesso');
+            App.carregarDadosNuvem();
+          } catch(e) { App.ui.toast('Erro: ' + e.message, 'erro'); }
+        },
+        renderizar() {
+          const el = document.getElementById('listaClientes');
+          if(!el) return;
+          el.innerHTML = App.state.clientes.map(c => `
+            <div class="bg-white p-4 rounded-xl border border-[#E2E8F0] flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-base">${c.nome}</h3>
+                <p class="text-xs text-[#64748B]">Tel: ${c.telefone || '—'}</p>
+              </div>
+            </div>
+          `).join('') || '<p class="text-[#64748B]">Nenhum cliente cadastrado.</p>';
+        }
+      },
+
+      financeiro: {
+        async novo() {
+          const descricao = prompt("Descrição da Receita:");
+          const valor = prompt("Valor (R$):", "100.00");
+          if (!descricao) return;
+          try {
+            await addDoc(collection(db, "recebimentos"), { descricao, valor: parseFloat(valor) || 0, data: new Date().toISOString().slice(0,10) });
+            App.ui.toast('Receita salva!', 'sucesso');
+            App.carregarDadosNuvem();
+          } catch(e) { App.ui.toast('Erro: ' + e.message, 'erro'); }
+        }
+      }
+    };
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        App.carregarDadosNuvem();
+      } else {
+        document.getElementById('globalLoading').classList.add('hidden');
+        document.getElementById('telaLogin').classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
