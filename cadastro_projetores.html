@@ -27,7 +27,7 @@
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
         <div class="text-center mb-6">
             <h1 class="text-2xl font-bold text-slate-800">Mapeamento de Projetores</h1>
-            <p class="text-sm text-slate-500">Cadastro por Sala e OCR</p>
+            <p class="text-sm text-slate-500">IdealTech - Gestão e Tecnologia</p>
         </div>
 
         <form id="projectorForm" class="space-y-4">
@@ -96,7 +96,6 @@
     <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-50 hidden flex flex-col items-center justify-center p-4">
         <h3 class="text-white font-bold mb-4 text-center">Ajuste a imagem para o texto ficar em pé</h3>
         
-        <!-- Canvas onde a imagem vai ser desenhada e girada -->
         <div class="relative bg-black rounded-lg overflow-hidden border-2 border-slate-700 mb-6 flex items-center justify-center w-full max-w-sm h-72">
             <canvas id="previewCanvas" class="max-w-full max-h-full"></canvas>
         </div>
@@ -139,7 +138,6 @@
             const ocrMessage = document.getElementById('ocrMessage');
             const progressBar = document.getElementById('progressBar');
 
-            // Elementos do Modal de Rotação
             const modal = document.getElementById('imagePreviewModal');
             const previewCanvas = document.getElementById('previewCanvas');
             const ctx = previewCanvas.getContext('2d');
@@ -151,34 +149,30 @@
             let editIndex = -1;
             let isProcessingOCR = false;
             
-            // Variáveis de estado da imagem
             let currentImg = null;
             let currentRotation = 0;
 
-            // Função para buscar o serial longo (13 a 25 caracteres)
+            // Função Sniper atualizada para focar no "Serial No.:"
             function postProcessText(rawText) {
-                // Remove quebras de linha e limpa um pouco
-                let cleaned = rawText.replace(/\n/g, ' ').trim();
+                let cleaned = rawText.replace(/\n/g, ' ');
+
+                const regexSerial = /Serial\s*N[o0][\.\:\;]*\s*([A-Za-z0-9]{12,25})/i;
+                const match = cleaned.match(regexSerial);
                 
-                // Regex: Busca um bloco de letras/números (sem espaço no meio) que tenha entre 13 e 25 caracteres
-                // Como às vezes o OCR lê um "O" como "0" etc, aceitamos qualquer alfanumérico
-                const match = cleaned.match(/[A-Za-z0-9]{13,25}/);
-                
-                if (match) {
-                    return match[0].toUpperCase();
+                if (match && match[1]) {
+                    return match[1].toUpperCase(); 
                 }
 
-                // Plano B: Se o OCR colocar espaço no meio do serial, tiramos os espaços e tentamos de novo
-                const semEspacos = cleaned.replace(/\s+/g, '');
-                const matchLongo = semEspacos.match(/[A-Za-z0-9]{13,25}/);
+                const semEspacos = cleaned.replace(/[^A-Za-z0-9]/g, '');
+                const matchLongo = semEspacos.match(/[A-Za-z0-9]{15,25}/i);
+                
                 if (matchLongo) {
                     return matchLongo[0].toUpperCase();
                 }
 
-                return cleaned; // Fallback
+                return rawText.trim(); 
             }
 
-            // Lida com a seleção da imagem e abre o Modal
             cameraInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -186,23 +180,20 @@
                 const img = new Image();
                 img.onload = function() {
                     currentImg = img;
-                    currentRotation = 0; // zera rotação ao abrir nova foto
+                    currentRotation = 0; 
                     drawPreviewCanvas();
-                    modal.classList.remove('hidden'); // Exibe o modal
+                    modal.classList.remove('hidden'); 
                 };
                 img.src = URL.createObjectURL(file);
-                // Limpa o input file para permitir selecionar a mesma foto se cancelar
                 cameraInput.value = '';
             });
 
-            // Desenha a imagem no canvas respeitando a rotação
             function drawPreviewCanvas() {
                 if (!currentImg) return;
                 
                 let w = currentImg.width;
                 let h = currentImg.height;
 
-                // Redimensiona mantendo proporção para não pesar
                 if (w > MAX_IMAGE_WIDTH || h > MAX_IMAGE_WIDTH) {
                     const ratio = Math.min(MAX_IMAGE_WIDTH / w, MAX_IMAGE_WIDTH / h);
                     w = w * ratio;
@@ -225,19 +216,16 @@
                 ctx.restore();
             }
 
-            // Gira a imagem
             btnRotate.addEventListener('click', () => {
                 currentRotation = (currentRotation + 90) % 360;
                 drawPreviewCanvas();
             });
 
-            // Cancela o modal
             btnCancelModal.addEventListener('click', () => {
                 modal.classList.add('hidden');
                 currentImg = null;
             });
 
-            // Confirma e inicia o OCR usando o canvas girado
             btnConfirmOcr.addEventListener('click', async () => {
                 modal.classList.add('hidden');
                 
@@ -248,7 +236,6 @@
                 btnSubmit.disabled = true;
 
                 try {
-                    // Manda o canvas (já girado e otimizado) para o Tesseract
                     const result = await Tesseract.recognize(previewCanvas, OCR_LANG, {
                         logger: (m) => {
                             if (m.status === 'recognizing text') {
@@ -264,14 +251,13 @@
                     const rawText = result.data.text;
                     const serial = postProcessText(rawText);
 
-                    // Se a string final tiver mais de 10 caracteres, considera sucesso
                     if (serial.length > 10) {
                         serialInput.value = serial;
                         ocrMessage.textContent = '✅ Serial identificado!';
                         ocrMessage.className = 'text-green-600';
                     } else {
-                        serialInput.value = serial; // Preenche mesmo assim pra ele ver o que o OCR achou
-                        ocrMessage.textContent = '⚠️ Confirme se o serial está correto.';
+                        serialInput.value = serial; 
+                        ocrMessage.textContent = '⚠️ Verifique se o serial está correto.';
                         ocrMessage.className = 'text-amber-600';
                     }
 
