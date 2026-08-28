@@ -2,13 +2,23 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mapeamento de Projetores - IdealTech</title>
+    
+    <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tesseract (OCR) -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <!-- Bibliotecas para o PDF -->
+    
+    <!-- jsPDF (PDF Export) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Cropper.js (Recorte de Imagem) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
     <style>
         .spinner {
             border: 3px solid #e2e8f0;
@@ -21,6 +31,8 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #progressBar { transition: width 0.2s ease; background: #3b82f6; height: 4px; border-radius: 2px; }
         #progressContainer { background: #e2e8f0; border-radius: 2px; height: 4px; overflow: hidden; }
+        /* Ajuste pro Cropper caber na tela do celular */
+        .cropper-container { max-height: 100%; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-4">
@@ -46,7 +58,7 @@
 
                 <div class="flex items-center gap-2 mb-2">
                     <label class="cursor-pointer bg-blue-100 text-blue-700 px-4 py-2 rounded-md font-medium text-sm flex-1 text-center hover:bg-blue-200 transition">
-                        📷 Tirar Foto do Serial
+                        📷 Tirar Foto e Recortar
                         <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
                     </label>
                 </div>
@@ -54,7 +66,7 @@
                 <div id="ocrFeedback" class="mb-2 hidden">
                     <div class="flex items-center gap-3 text-sm">
                         <div class="spinner"></div>
-                        <span id="ocrMessage" class="text-blue-600">Processando imagem...</span>
+                        <span id="ocrMessage" class="text-blue-600">Processando recorte...</span>
                     </div>
                     <div id="progressContainer" class="mt-1">
                         <div id="progressBar" style="width:0%"></div>
@@ -62,6 +74,12 @@
                 </div>
 
                 <input type="text" id="serial" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Digite ou escaneie o serial">
+                
+                <!-- Aqui vai aparecer a foto recortada pra você conferir -->
+                <div id="croppedPreviewContainer" class="mt-2 hidden">
+                    <p class="text-xs text-slate-500 mb-1">Recorte salvo (prova visual):</p>
+                    <img id="croppedPreview" src="" class="border border-slate-300 rounded max-h-16">
+                </div>
             </div>
 
             <div class="flex gap-2">
@@ -79,7 +97,7 @@
                 <h2 class="text-lg font-semibold text-slate-800">Registros (<span id="count">0</span>)</h2>
                 <div class="flex gap-2">
                     <button id="btnExportPDF" class="text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition">
-                        Gerar PDF
+                        PDF
                     </button>
                     <button id="btnExport" class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
                         JSON
@@ -87,28 +105,28 @@
                 </div>
             </div>
             <ul id="registrosList" class="space-y-2 text-sm max-h-60 overflow-y-auto pr-1">
-                <!-- Itens salvos aparecerão aqui -->
+                <!-- Itens salvos -->
             </ul>
         </div>
     </div>
 
-    <!-- MODAL DE PREVIEW E ROTAÇÃO DA IMAGEM -->
+    <!-- MODAL DO CROPPER.JS -->
     <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-50 hidden flex flex-col items-center justify-center p-4">
-        <h3 class="text-white font-bold mb-4 text-center">Ajuste a imagem para o texto ficar em pé</h3>
+        <h3 class="text-white font-bold mb-2 text-center text-sm">Arraste as bordas para isolar SOMENTE o serial</h3>
         
-        <div class="relative bg-black rounded-lg overflow-hidden border-2 border-slate-700 mb-6 flex items-center justify-center w-full max-w-sm h-72">
-            <canvas id="previewCanvas" class="max-w-full max-h-full"></canvas>
+        <div class="w-full max-w-sm h-72 bg-black mb-4 flex items-center justify-center overflow-hidden border border-slate-600">
+            <img id="imageToCrop" class="max-w-full hidden">
         </div>
 
         <div class="flex flex-col gap-3 w-full max-w-sm">
-            <button id="btnRotate" class="bg-blue-600 text-white font-semibold py-3 rounded-md shadow hover:bg-blue-700 transition flex justify-center items-center gap-2">
+            <button id="btnRotate" class="bg-slate-700 text-white font-semibold py-2 rounded-md shadow hover:bg-slate-600 transition flex justify-center items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                Girar 90º
+                Girar Imagem
             </button>
-            <button id="btnConfirmOcr" class="bg-green-600 text-white font-semibold py-3 rounded-md shadow hover:bg-green-700 transition">
-                Ler Serial Agora
+            <button id="btnConfirmCrop" class="bg-green-600 text-white font-semibold py-3 rounded-md shadow hover:bg-green-700 transition">
+                Cortar e Ler Serial
             </button>
-            <button id="btnCancelModal" class="bg-slate-700 text-slate-300 font-semibold py-2 rounded-md hover:bg-slate-800 transition">
+            <button id="btnCancelModal" class="bg-red-600 text-white font-semibold py-2 rounded-md hover:bg-red-700 transition">
                 Cancelar
             </button>
         </div>
@@ -118,8 +136,7 @@
         (function() {
             'use strict';
 
-            const MAX_IMAGE_WIDTH = 1200;
-            const OCR_LANG = 'eng+por';
+            const OCR_LANG = 'eng';
             const STORAGE_KEY = 'projetores_db';
 
             const form = document.getElementById('projectorForm');
@@ -129,6 +146,7 @@
             const patrimonioInput = document.getElementById('patrimonio');
             const registrosList = document.getElementById('registrosList');
             const countSpan = document.getElementById('count');
+            
             const btnExport = document.getElementById('btnExport');
             const btnExportPDF = document.getElementById('btnExportPDF');
             const btnSubmit = document.getElementById('btnSubmit');
@@ -137,139 +155,121 @@
             const ocrFeedback = document.getElementById('ocrFeedback');
             const ocrMessage = document.getElementById('ocrMessage');
             const progressBar = document.getElementById('progressBar');
+            
+            const croppedPreviewContainer = document.getElementById('croppedPreviewContainer');
+            const croppedPreview = document.getElementById('croppedPreview');
 
+            // Elementos do Modal de Recorte
             const modal = document.getElementById('imagePreviewModal');
-            const previewCanvas = document.getElementById('previewCanvas');
-            const ctx = previewCanvas.getContext('2d');
+            const imageToCrop = document.getElementById('imageToCrop');
             const btnRotate = document.getElementById('btnRotate');
-            const btnConfirmOcr = document.getElementById('btnConfirmOcr');
+            const btnConfirmCrop = document.getElementById('btnConfirmCrop');
             const btnCancelModal = document.getElementById('btnCancelModal');
 
             let projetores = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
             let editIndex = -1;
             let isProcessingOCR = false;
             
-            let currentImg = null;
-            let currentRotation = 0;
+            let cropper = null;
+            let currentImageBase64 = null; // Armazena o recorte atual
 
-            // Função Sniper atualizada para focar no "Serial No.:"
-            function postProcessText(rawText) {
-                let cleaned = rawText.replace(/\n/g, ' ');
-
-                const regexSerial = /Serial\s*N[o0][\.\:\;]*\s*([A-Za-z0-9]{12,25})/i;
-                const match = cleaned.match(regexSerial);
-                
-                if (match && match[1]) {
-                    return match[1].toUpperCase(); 
-                }
-
-                const semEspacos = cleaned.replace(/[^A-Za-z0-9]/g, '');
-                const matchLongo = semEspacos.match(/[A-Za-z0-9]{15,25}/i);
-                
-                if (matchLongo) {
-                    return matchLongo[0].toUpperCase();
-                }
-
-                return rawText.trim(); 
-            }
-
+            // Inicia a Câmera e o Cropper
             cameraInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
 
-                const img = new Image();
-                img.onload = function() {
-                    currentImg = img;
-                    currentRotation = 0; 
-                    drawPreviewCanvas();
-                    modal.classList.remove('hidden'); 
-                };
-                img.src = URL.createObjectURL(file);
+                const url = URL.createObjectURL(file);
+                imageToCrop.src = url;
+                imageToCrop.classList.remove('hidden');
+                
+                modal.classList.remove('hidden');
+
+                if (cropper) {
+                    cropper.destroy();
+                }
+
+                // Inicia o Cropper.js com configurações otimizadas para mobile
+                cropper = new Cropper(imageToCrop, {
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 0.8,
+                    restore: false,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                });
+
                 cameraInput.value = '';
             });
 
-            function drawPreviewCanvas() {
-                if (!currentImg) return;
-                
-                let w = currentImg.width;
-                let h = currentImg.height;
-
-                if (w > MAX_IMAGE_WIDTH || h > MAX_IMAGE_WIDTH) {
-                    const ratio = Math.min(MAX_IMAGE_WIDTH / w, MAX_IMAGE_WIDTH / h);
-                    w = w * ratio;
-                    h = h * ratio;
-                }
-
-                if (currentRotation === 90 || currentRotation === 270) {
-                    previewCanvas.width = h;
-                    previewCanvas.height = w;
-                } else {
-                    previewCanvas.width = w;
-                    previewCanvas.height = h;
-                }
-
-                ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                ctx.save();
-                ctx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
-                ctx.rotate(currentRotation * Math.PI / 180);
-                ctx.drawImage(currentImg, -w / 2, -h / 2, w, h);
-                ctx.restore();
-            }
-
             btnRotate.addEventListener('click', () => {
-                currentRotation = (currentRotation + 90) % 360;
-                drawPreviewCanvas();
+                if (cropper) cropper.rotate(90);
             });
 
             btnCancelModal.addEventListener('click', () => {
                 modal.classList.add('hidden');
-                currentImg = null;
+                if (cropper) cropper.destroy();
             });
 
-            btnConfirmOcr.addEventListener('click', async () => {
+            // Executa o corte e manda pro Tesseract
+            btnConfirmCrop.addEventListener('click', async () => {
                 modal.classList.add('hidden');
                 
-                if (isProcessingOCR) return;
+                if (isProcessingOCR || !cropper) return;
                 isProcessingOCR = true;
 
-                showOcrFeedback('Processando OCR...', 0);
+                // Extrai o recorte exato do usuário
+                const canvas = cropper.getCroppedCanvas();
+                
+                // Salva o recorte em qualidade baixa/média para não estourar o LocalStorage
+                currentImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                
+                // Mostra o recorte na tela
+                croppedPreview.src = currentImageBase64;
+                croppedPreviewContainer.classList.remove('hidden');
+
+                showOcrFeedback('Lendo recorte...', 0);
                 btnSubmit.disabled = true;
 
                 try {
-                    const result = await Tesseract.recognize(previewCanvas, OCR_LANG, {
+                    const result = await Tesseract.recognize(canvas, OCR_LANG, {
                         logger: (m) => {
                             if (m.status === 'recognizing text') {
                                 const progress = m.progress || 0;
                                 updateOcrProgress(progress);
                                 if (progress < 1) {
-                                    ocrMessage.textContent = `Reconhecendo texto (${Math.round(progress * 100)}%)...`;
+                                    ocrMessage.textContent = `Lendo (${Math.round(progress * 100)}%)...`;
                                 }
                             }
                         }
                     });
 
-                    const rawText = result.data.text;
-                    const serial = postProcessText(rawText);
+                    let rawText = result.data.text;
+                    // Como foi recortado na mão, removemos TUDO que não for letra ou número
+                    let cleanedSerial = rawText.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
 
-                    if (serial.length > 10) {
-                        serialInput.value = serial;
-                        ocrMessage.textContent = '✅ Serial identificado!';
+                    if (cleanedSerial.length > 5) {
+                        serialInput.value = cleanedSerial;
+                        ocrMessage.textContent = '✅ Finalizado! Confira o serial.';
                         ocrMessage.className = 'text-green-600';
                     } else {
-                        serialInput.value = serial; 
-                        ocrMessage.textContent = '⚠️ Verifique se o serial está correto.';
+                        ocrMessage.textContent = '⚠️ OCR falhou, mas o recorte está salvo. Digite o serial.';
                         ocrMessage.className = 'text-amber-600';
                     }
 
                     updateOcrProgress(1);
                 } catch (err) {
                     console.error('Erro no OCR:', err);
-                    ocrMessage.textContent = '❌ Falha ao ler a imagem.';
+                    ocrMessage.textContent = '❌ Falha ao ler. Use a foto para digitar.';
                     ocrMessage.className = 'text-red-600';
                 } finally {
                     btnSubmit.disabled = false;
                     isProcessingOCR = false;
                     setTimeout(hideOcrFeedback, 4000);
+                    cropper.destroy();
                 }
             });
 
@@ -297,10 +297,15 @@
                 projetores.forEach((p, index) => {
                     const li = document.createElement('li');
                     li.className = 'bg-slate-50 p-3 rounded border border-slate-200 flex justify-between items-center gap-2';
+                    
+                    // Verifica se tem foto salva
+                    const imgTag = p.imagem ? `<img src="${p.imagem}" class="h-8 mt-2 rounded border border-slate-300">` : '';
+
                     li.innerHTML = `
                         <div class="flex-1">
                             <span class="font-bold text-slate-700">Sala ${p.sala}</span><br>
                             <span class="text-xs text-slate-500">Pat: ${p.patrimonio} | SN: ${p.serial}</span>
+                            ${imgTag}
                         </div>
                         <div class="flex gap-3">
                             <button onclick="window.editarItem(${index})" class="text-blue-600 hover:text-blue-800" title="Editar">
@@ -320,6 +325,16 @@
                 salaInput.value = p.sala;
                 patrimonioInput.value = p.patrimonio;
                 serialInput.value = p.serial;
+                
+                // Se tiver imagem salva, mostra no modo de edição
+                if (p.imagem) {
+                    currentImageBase64 = p.imagem;
+                    croppedPreview.src = p.imagem;
+                    croppedPreviewContainer.classList.remove('hidden');
+                } else {
+                    currentImageBase64 = null;
+                    croppedPreviewContainer.classList.add('hidden');
+                }
 
                 editIndex = index;
                 btnSubmit.textContent = 'Atualizar Registro';
@@ -335,8 +350,7 @@
                     projetores.splice(index, 1);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(projetores));
                     if (editIndex === index) {
-                        form.reset();
-                        resetEditMode();
+                        btnCancelEdit.click();
                     } else if (editIndex > index) {
                         editIndex--;
                     }
@@ -350,6 +364,8 @@
                 btnSubmit.classList.replace('bg-blue-600', 'bg-slate-800');
                 btnSubmit.classList.replace('hover:bg-blue-700', 'hover:bg-slate-900');
                 btnCancelEdit.classList.add('hidden');
+                currentImageBase64 = null;
+                croppedPreviewContainer.classList.add('hidden');
             }
 
             form.addEventListener('submit', (e) => {
@@ -365,7 +381,13 @@
 
                 if (!sala || !patrimonio || !serial) return;
 
-                const dadosForm = { sala, patrimonio, serial, data_registro: new Date().toISOString() };
+                const dadosForm = { 
+                    sala, 
+                    patrimonio, 
+                    serial, 
+                    imagem: currentImageBase64, // Salva o recorte visual junto!
+                    data_registro: new Date().toISOString() 
+                };
 
                 if (editIndex === -1) {
                     projetores.push(dadosForm);
@@ -377,6 +399,7 @@
 
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(projetores));
                 form.reset();
+                resetEditMode();
                 renderList();
                 hideOcrFeedback();
             });
