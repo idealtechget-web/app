@@ -243,7 +243,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const dataDoArquivo = "2026-08-28"; 
-            let scrollJaFeito = false; // Trava para não rolar a tela toda hora
+            let ultimoHorarioAtivo = null; // Guarda qual foi a última aula focada
             
             function atualizarStatusAulas() {
                 const today = new Date();
@@ -325,12 +325,12 @@
                         }
                     });
                     
-                    // Rola a tela (só na primeira vez)
-                    if (!scrollJaFeito) {
+                    // Rola a tela sempre que a aula principal mudar
+                    if (targetStartTime !== ultimoHorarioAtivo) {
                         setTimeout(() => {
                             targetCards[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }, 600);
-                        scrollJaFeito = true;
+                        ultimoHorarioAtivo = targetStartTime;
                     }
                 }
             }
