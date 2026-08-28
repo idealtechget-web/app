@@ -921,6 +921,14 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Categoria</label><select id="orcCategoria" class="w-full"><option value="">Selecione...</option><option>🎂 Topo de bolo</option><option>🎉 Kit festa</option><option>💌 Convite</option><option>👕 Camiseta</option><option>☕ Caneca</option><option>📌 Botton</option><option>🎁 Brinde</option><option>✨ Outros</option></select></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Status</label>
+                    <select id="orcStatus" class="w-full">
+                        <option value="Rascunho">Rascunho</option>
+                        <option value="Enviado">Enviado</option>
+                        <option value="Aprovado">Aprovado</option>
+                        <option value="Recusado">Recusado</option>
+                    </select>
+                </div>
                 <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Forma Pagamento</label><select id="orcFormaPag" class="w-full"><option value="">A definir</option><option>Pix</option><option>Dinheiro</option><option>Cartão Débito</option><option>Cartão Crédito</option><option>Transferência</option></select></div>
             </div>
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
@@ -1661,11 +1669,11 @@
                             document.getElementById('orcClienteNome').value = o.cliente || '';
                             document.getElementById('orcWhatsApp').value = o.whatsapp || '';
                             document.getElementById('orcCategoria').value = o.categoria || '';
+                            document.getElementById('orcStatus').value = o.status || 'Rascunho';
                             document.getElementById('orcFormaPag').value = o.formaPagamento || '';
                             document.getElementById('orcPrazo').value = o.prazo || '';
                             document.getElementById('orcValidade').value = o.validade || '';
                             document.getElementById('orcObs').value = o.obs || '';
-                            document.getElementById('orcStatus').value = o.status || 'Rascunho';
                             App._tempItensOrc = o.itens ? JSON.parse(JSON.stringify(o.itens)) : [];
                             const descEl = document.getElementById('orcDescontoValor');
                             const percEl = document.getElementById('orcDescontoPerc');
@@ -1676,8 +1684,8 @@
                         ['orcClienteNome', 'orcWhatsApp', 'orcPrazo', 'orcObs'].forEach(i => document.getElementById(i)
                             .value = '');
                         document.getElementById('orcCategoria').value = '';
-                        document.getElementById('orcFormaPag').value = '';
                         document.getElementById('orcStatus').value = 'Rascunho';
+                        document.getElementById('orcFormaPag').value = '';
                         const v = new Date();
                         v.setDate(v.getDate() + 7);
                         document.getElementById('orcValidade').value = v.toISOString().slice(0, 10);
@@ -1786,6 +1794,7 @@
                     const total = Math.max(0, subtotal - desconto);
                     return {
                         cliente,
+                        clienteId: document.getElementById('orcClienteSelect').value || null,
                         whatsapp: document.getElementById('orcWhatsApp').value.trim(),
                         categoria: document.getElementById('orcCategoria').value,
                         formaPagamento: document.getElementById('orcFormaPag')?.value || '',
@@ -1797,7 +1806,7 @@
                         validade: document.getElementById('orcValidade').value,
                         obs: document.getElementById('orcObs').value.trim(),
                         data: new Date().toISOString().slice(0, 10),
-                        status: document.getElementById('orcStatus').value
+                        status: document.getElementById('orcStatus')?.value || 'Rascunho'
                     };
                 },
                 async salvar() {
