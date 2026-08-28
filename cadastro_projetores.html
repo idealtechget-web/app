@@ -5,20 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mapeamento de Projetores - Bom Jesus Porto Belo</title>
 
-    <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    <!-- Tesseract (OCR) -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-    <!-- jsPDF (PDF Export) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-    <!-- Cropper.js (Recorte de Imagem) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -32,9 +27,7 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
         #progressBar {
             transition: width 0.2s ease;
@@ -48,9 +41,42 @@
             height: 4px;
             overflow: hidden;
         }
+        
+        /* Ajustes do Cropper para Mobile */
         .cropper-container {
             max-height: 100%;
         }
+        
+        /* 1. Previne o menu de contexto do navegador ao segurar o dedo na imagem */
+        .cropper-container,
+        .cropper-drag-box,
+        .cropper-crop-box,
+        .cropper-wrap-box {
+            touch-action: none;
+            -webkit-touch-callout: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* 2. Aumenta as bolinhas de redimensionamento para facilitar o toque no celular */
+        .cropper-point {
+            width: 24px !important;
+            height: 24px !important;
+            background-color: #16a34a !important; /* Verde mais visível */
+            border-radius: 50% !important;
+            opacity: 0.9 !important;
+        }
+        
+        /* Centraliza as bolinhas maiores em seus respectivos eixos */
+        .cropper-point.e { top: calc(50% - 12px); right: -12px; }
+        .cropper-point.n { left: calc(50% - 12px); top: -12px; }
+        .cropper-point.w { top: calc(50% - 12px); left: -12px; }
+        .cropper-point.s { left: calc(50% - 12px); bottom: -12px; }
+        .cropper-point.ne { right: -12px; top: -12px; }
+        .cropper-point.nw { left: -12px; top: -12px; }
+        .cropper-point.sw { left: -12px; bottom: -12px; }
+        .cropper-point.se { right: -12px; bottom: -12px; }
+
         /* Acessibilidade: foco visível */
         button:focus-visible,
         input:focus-visible {
@@ -110,7 +136,7 @@
                     <div class="flex items-center gap-2">
                         <img id="croppedPreview" src="" class="border border-slate-300 rounded max-h-16" alt="Prévia do recorte do serial">
                         <button type="button" id="btnClearImage" class="text-red-500 hover:text-red-700 text-xs font-medium" aria-label="Remover recorte">
-                            <i class="ph ph-x-circle"></i> Remover
+                            <i class="ph ph-x-circle text-base align-text-bottom"></i> Remover
                         </button>
                     </div>
                 </div>
@@ -144,22 +170,25 @@
                 </div>
             </div>
             <ul id="registrosList" class="space-y-2 text-sm max-h-60 overflow-y-auto pr-1">
-                <!-- Renderizado via JS -->
-            </ul>
+                </ul>
         </div>
     </div>
 
-    <!-- MODAL DO CROPPER.JS -->
     <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-50 hidden flex flex-col items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <h3 id="modalTitle" class="text-white font-bold mb-2 text-center text-sm">Arraste as bordas para isolar SOMENTE o serial</h3>
+        <h3 id="modalTitle" class="text-white font-bold mb-2 text-center text-sm">Isole SOMENTE o serial e alinhe a imagem</h3>
 
-        <div class="w-full max-w-sm h-72 bg-black mb-4 flex items-center justify-center overflow-hidden border border-slate-600">
+        <div class="w-full max-w-sm h-72 bg-black flex items-center justify-center overflow-hidden border border-slate-600">
             <img id="imageToCrop" class="max-w-full hidden" alt="Imagem a ser recortada">
+        </div>
+        
+        <div class="flex flex-col items-center w-full max-w-sm mt-3 mb-4">
+            <label for="fineRotation" class="text-slate-300 text-xs mb-1">Ajuste fino de inclinação</label>
+            <input type="range" id="fineRotation" min="-45" max="45" value="0" class="w-full accent-green-600">
         </div>
 
         <div class="flex flex-col gap-3 w-full max-w-sm">
             <button id="btnRotate" class="bg-slate-700 text-white font-semibold py-2 rounded-md shadow hover:bg-slate-600 transition flex justify-center items-center gap-2" aria-label="Girar imagem 90 graus">
-                <i class="ph ph-arrow-clockwise text-xl" aria-hidden="true"></i> Girar Imagem
+                <i class="ph ph-arrow-clockwise text-xl" aria-hidden="true"></i> Tombo de 90º
             </button>
             <button id="btnConfirmCrop" class="bg-green-600 text-white font-semibold py-3 rounded-md shadow hover:bg-green-700 transition flex justify-center items-center gap-2" aria-label="Cortar e ler serial">
                 <i class="ph ph-crop text-xl" aria-hidden="true"></i> Cortar e Ler Serial
@@ -201,6 +230,7 @@
                 btnClearImage: document.getElementById('btnClearImage'),
                 modal: document.getElementById('imagePreviewModal'),
                 imageToCrop: document.getElementById('imageToCrop'),
+                fineRotation: document.getElementById('fineRotation'), // Mapeando o slider
                 btnRotate: document.getElementById('btnRotate'),
                 btnConfirmCrop: document.getElementById('btnConfirmCrop'),
                 btnCancelModal: document.getElementById('btnCancelModal'),
@@ -213,23 +243,21 @@
             let cropperInstance = null;
             let currentImageBase64 = null;
             let currentObjectUrl = null;
+            let currentBaseRotation = 0; // Armazena a rotação bruta de 90 em 90 graus
 
             // ---------- APP OBJECT ----------
             const App = {
-                // Carrega dados do localStorage
                 loadData() {
                     const stored = localStorage.getItem(STORAGE_KEY);
                     projetores = stored ? JSON.parse(stored) : [];
                     this.renderList();
                 },
 
-                // Salva no localStorage
                 saveData() {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(projetores));
                     this.renderList();
                 },
 
-                // Renderiza a lista ordenada
                 renderList() {
                     const sorted = [...projetores].sort((a, b) => {
                         const salaA = a.sala || '';
@@ -241,7 +269,6 @@
                     DOM.count.textContent = projetores.length;
 
                     sorted.forEach((p, idx) => {
-                        // Encontra o índice original no array para editar/excluir
                         const originalIndex = projetores.indexOf(p);
                         const li = document.createElement('li');
                         li.className =
@@ -269,7 +296,6 @@
                         DOM.registrosList.appendChild(li);
                     });
 
-                    // Delegação de eventos para os botões
                     DOM.registrosList.querySelectorAll('.btn-edit').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             const idx = parseInt(btn.dataset.index, 10);
@@ -284,7 +310,6 @@
                     });
                 },
 
-                // Editar um item
                 editItem(index) {
                     const p = projetores[index];
                     if (!p) return;
@@ -307,7 +332,6 @@
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 },
 
-                // Excluir item
                 deleteItem(index) {
                     if (!confirm('Tem certeza que deseja remover este registro?')) return;
                     projetores.splice(index, 1);
@@ -319,7 +343,6 @@
                     this.saveData();
                 },
 
-                // Cancelar edição
                 cancelEdit() {
                     editIndex = -1;
                     DOM.btnSubmit.innerHTML = '<i class="ph ph-floppy-disk text-lg align-text-bottom mr-1"></i> Vincular e Salvar';
@@ -331,7 +354,6 @@
                     DOM.sala.focus();
                 },
 
-                // Limpar preview da imagem
                 clearImagePreview() {
                     currentImageBase64 = null;
                     DOM.croppedPreviewContainer.classList.add('hidden');
@@ -355,7 +377,6 @@
                     DOM.progressBar.style.width = '0%';
                 },
 
-                // Destroi cropper e limpa URL
                 destroyCropper() {
                     if (cropperInstance) {
                         cropperInstance.destroy();
@@ -375,6 +396,10 @@
                     DOM.imageToCrop.src = url;
                     DOM.imageToCrop.classList.remove('hidden');
                     DOM.modal.classList.remove('hidden');
+                    
+                    // Zera os valores de rotação sempre que uma foto nova entra
+                    currentBaseRotation = 0;
+                    DOM.fineRotation.value = 0;
 
                     if (cropperInstance) {
                         this.destroyCropper();
@@ -393,14 +418,12 @@
                         toggleDragModeOnDblclick: false,
                     });
 
-                    // Foco no primeiro botão do modal
                     DOM.btnRotate.focus();
                 },
 
                 closeModal() {
                     DOM.modal.classList.add('hidden');
                     this.destroyCropper();
-                    // Restaura foco para o input de arquivo
                     DOM.cameraInput.focus();
                 },
 
@@ -473,7 +496,6 @@
                         try {
                             const imported = JSON.parse(e.target.result);
                             if (!Array.isArray(imported)) throw new Error('Formato inválido');
-                            // Mescla: mantém o último registro por sala (sobrescreve)
                             const map = new Map();
                             projetores.forEach(p => map.set(p.sala, p));
                             imported.forEach(p => map.set(p.sala, p));
@@ -523,7 +545,6 @@
                 init() {
                     this.loadData();
 
-                    // Eventos do formulário
                     DOM.form.addEventListener('submit', (e) => {
                         e.preventDefault();
                         if (isProcessingOCR) {
@@ -549,7 +570,6 @@
                         if (editIndex === -1) {
                             projetores.push(data);
                         } else {
-                            // Mantém data de criação original
                             data.data_registro = projetores[editIndex].data_registro || data.data_registro;
                             projetores[editIndex] = data;
                         }
@@ -567,17 +587,27 @@
                         this.hideOcrFeedback();
                     });
 
-                    // Câmera / arquivo
                     DOM.cameraInput.addEventListener('change', (e) => {
                         const file = e.target.files[0];
                         if (!file) return;
                         this.openModal(file);
-                        DOM.cameraInput.value = ''; // limpa para permitir re-upload
+                        DOM.cameraInput.value = ''; 
                     });
 
-                    // Botões do modal
+                    // Lógica de Rotação Combinada (Botão + Slider)
                     DOM.btnRotate.addEventListener('click', () => {
-                        if (cropperInstance) cropperInstance.rotate(90);
+                        if (cropperInstance) {
+                            currentBaseRotation += 90;
+                            const fineVal = parseInt(DOM.fineRotation.value, 10) || 0;
+                            cropperInstance.rotateTo(currentBaseRotation + fineVal);
+                        }
+                    });
+
+                    DOM.fineRotation.addEventListener('input', (e) => {
+                        if (cropperInstance) {
+                            const fineVal = parseInt(e.target.value, 10) || 0;
+                            cropperInstance.rotateTo(currentBaseRotation + fineVal);
+                        }
                     });
 
                     DOM.btnConfirmCrop.addEventListener('click', () => {
@@ -588,19 +618,16 @@
                         this.closeModal();
                     });
 
-                    // Fechar modal com ESC
                     DOM.modal.addEventListener('keydown', (e) => {
                         if (e.key === 'Escape') {
                             this.closeModal();
                         }
                     });
 
-                    // Limpar imagem
                     DOM.btnClearImage.addEventListener('click', () => {
                         this.clearImagePreview();
                     });
 
-                    // Import / Export
                     DOM.btnImport.addEventListener('change', (e) => {
                         const file = e.target.files[0];
                         if (file) this.importJSON(file);
@@ -612,10 +639,7 @@
                 }
             };
 
-            // Expõe métodos para uso em atributos inline (não utilizado, mas mantido por segurança)
             window.App = App;
-
-            // Inicializa
             App.init();
 
         })();
