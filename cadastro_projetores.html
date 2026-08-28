@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapeamento de Projetores - IdealTech</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js">
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- Bibliotecas para o PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
-        /* pequenos ajustes para o spinner e progresso */
         .spinner {
             border: 3px solid #e2e8f0;
             border-top-color: #3b82f6;
@@ -17,23 +18,9 @@
             height: 24px;
             animation: spin 0.8s linear infinite;
         }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        #progressBar {
-            transition: width 0.2s ease;
-            background: #3b82f6;
-            height: 4px;
-            border-radius: 2px;
-        }
-        #progressContainer {
-            background: #e2e8f0;
-            border-radius: 2px;
-            height: 4px;
-            overflow: hidden;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #progressBar { transition: width 0.2s ease; background: #3b82f6; height: 4px; border-radius: 2px; }
+        #progressContainer { background: #e2e8f0; border-radius: 2px; height: 4px; overflow: hidden; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-4">
@@ -46,30 +33,24 @@
         <form id="projectorForm" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-slate-700">Número da Sala</label>
-                <input type="text" id="sala" required
-                    class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Ex: Sala 101">
+                <input type="text" id="sala" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Ex: Sala 101">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-700">Número do Patrimônio</label>
-                <input type="text" id="patrimonio" required
-                    class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Ex: 987654">
+                <input type="text" id="patrimonio" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Ex: 987654">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Número de Série (Serial)</label>
 
                 <div class="flex items-center gap-2 mb-2">
-                    <label
-                        class="cursor-pointer bg-blue-100 text-blue-700 px-4 py-2 rounded-md font-medium text-sm flex-1 text-center hover:bg-blue-200 transition">
+                    <label class="cursor-pointer bg-blue-100 text-blue-700 px-4 py-2 rounded-md font-medium text-sm flex-1 text-center hover:bg-blue-200 transition">
                         📷 Tirar Foto do Serial
                         <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
                     </label>
                 </div>
 
-                <!-- Área de feedback do OCR -->
                 <div id="ocrFeedback" class="mb-2 hidden">
                     <div class="flex items-center gap-3 text-sm">
                         <div class="spinner"></div>
@@ -80,18 +61,14 @@
                     </div>
                 </div>
 
-                <input type="text" id="serial" required
-                    class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="Digite ou escaneie o serial">
+                <input type="text" id="serial" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Digite ou escaneie o serial">
             </div>
 
             <div class="flex gap-2">
-                <button type="submit" id="btnSubmit"
-                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-800 hover:bg-slate-900 focus:outline-none transition disabled:opacity-60 disabled:cursor-not-allowed">
+                <button type="submit" id="btnSubmit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-800 hover:bg-slate-900 focus:outline-none transition disabled:opacity-60 disabled:cursor-not-allowed">
                     Vincular e Salvar
                 </button>
-                <button type="button" id="btnCancelEdit"
-                    class="hidden py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none transition">
+                <button type="button" id="btnCancelEdit" class="hidden py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none transition">
                     Cancelar
                 </button>
             </div>
@@ -100,10 +77,14 @@
         <div class="mt-8 border-t pt-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-semibold text-slate-800">Registros (<span id="count">0</span>)</h2>
-                <button id="btnExport"
-                    class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
-                    Exportar JSON
-                </button>
+                <div class="flex gap-2">
+                    <button id="btnExportPDF" class="text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition">
+                        Gerar PDF
+                    </button>
+                    <button id="btnExport" class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">
+                        JSON
+                    </button>
+                </div>
             </div>
             <ul id="registrosList" class="space-y-2 text-sm max-h-60 overflow-y-auto pr-1">
                 <!-- Itens salvos aparecerão aqui -->
@@ -111,17 +92,37 @@
         </div>
     </div>
 
+    <!-- MODAL DE PREVIEW E ROTAÇÃO DA IMAGEM -->
+    <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-50 hidden flex flex-col items-center justify-center p-4">
+        <h3 class="text-white font-bold mb-4 text-center">Ajuste a imagem para o texto ficar em pé</h3>
+        
+        <!-- Canvas onde a imagem vai ser desenhada e girada -->
+        <div class="relative bg-black rounded-lg overflow-hidden border-2 border-slate-700 mb-6 flex items-center justify-center w-full max-w-sm h-72">
+            <canvas id="previewCanvas" class="max-w-full max-h-full"></canvas>
+        </div>
+
+        <div class="flex flex-col gap-3 w-full max-w-sm">
+            <button id="btnRotate" class="bg-blue-600 text-white font-semibold py-3 rounded-md shadow hover:bg-blue-700 transition flex justify-center items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                Girar 90º
+            </button>
+            <button id="btnConfirmOcr" class="bg-green-600 text-white font-semibold py-3 rounded-md shadow hover:bg-green-700 transition">
+                Ler Serial Agora
+            </button>
+            <button id="btnCancelModal" class="bg-slate-700 text-slate-300 font-semibold py-2 rounded-md hover:bg-slate-800 transition">
+                Cancelar
+            </button>
+        </div>
+    </div>
+
     <script>
         (function() {
             'use strict';
 
-            // ----- CONSTANTS -----
             const MAX_IMAGE_WIDTH = 1200;
-            const JPEG_QUALITY = 0.8;
             const OCR_LANG = 'eng+por';
             const STORAGE_KEY = 'projetores_db';
 
-            // ----- DOM REFERENCES -----
             const form = document.getElementById('projectorForm');
             const cameraInput = document.getElementById('cameraInput');
             const serialInput = document.getElementById('serial');
@@ -130,74 +131,125 @@
             const registrosList = document.getElementById('registrosList');
             const countSpan = document.getElementById('count');
             const btnExport = document.getElementById('btnExport');
+            const btnExportPDF = document.getElementById('btnExportPDF');
             const btnSubmit = document.getElementById('btnSubmit');
             const btnCancelEdit = document.getElementById('btnCancelEdit');
+            
             const ocrFeedback = document.getElementById('ocrFeedback');
             const ocrMessage = document.getElementById('ocrMessage');
             const progressBar = document.getElementById('progressBar');
 
-            // ----- STATE -----
+            // Elementos do Modal de Rotação
+            const modal = document.getElementById('imagePreviewModal');
+            const previewCanvas = document.getElementById('previewCanvas');
+            const ctx = previewCanvas.getContext('2d');
+            const btnRotate = document.getElementById('btnRotate');
+            const btnConfirmOcr = document.getElementById('btnConfirmOcr');
+            const btnCancelModal = document.getElementById('btnCancelModal');
+
             let projetores = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
             let editIndex = -1;
             let isProcessingOCR = false;
+            
+            // Variáveis de estado da imagem
+            let currentImg = null;
+            let currentRotation = 0;
 
-            // ----- HELPERS -----
-
-            // Redimensiona a imagem para uma largura máxima (mantém proporção) e retorna um canvas
-            function resizeImage(file) {
-                return new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > MAX_IMAGE_WIDTH) {
-                            const ratio = MAX_IMAGE_WIDTH / width;
-                            width = MAX_IMAGE_WIDTH;
-                            height = height * ratio;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        // Opcional: aplicar filtro de contraste/brilho? (deixamos simples)
-                        resolve(canvas);
-                    };
-                    img.onerror = () => reject(new Error('Falha ao carregar a imagem.'));
-                    img.src = URL.createObjectURL(file);
-                });
-            }
-
-            // Extrai o texto e tenta isolar um possível número de série
+            // Função para buscar o serial longo (13 a 25 caracteres)
             function postProcessText(rawText) {
-                let cleaned = rawText
-                    .replace(/\n/g, ' ')
-                    .replace(/\s{2,}/g, ' ')
-                    .trim();
-
-                // Tenta encontrar um padrão comum de serial (ex.: alfanumérico com traços ou sublinhados)
-                const match = cleaned.match(/[A-Z0-9][A-Z0-9\-_]{5,}/i);
+                // Remove quebras de linha e limpa um pouco
+                let cleaned = rawText.replace(/\n/g, ' ').trim();
+                
+                // Regex: Busca um bloco de letras/números (sem espaço no meio) que tenha entre 13 e 25 caracteres
+                // Como às vezes o OCR lê um "O" como "0" etc, aceitamos qualquer alfanumérico
+                const match = cleaned.match(/[A-Za-z0-9]{13,25}/);
+                
                 if (match) {
                     return match[0].toUpperCase();
                 }
-                return cleaned;
+
+                // Plano B: Se o OCR colocar espaço no meio do serial, tiramos os espaços e tentamos de novo
+                const semEspacos = cleaned.replace(/\s+/g, '');
+                const matchLongo = semEspacos.match(/[A-Za-z0-9]{13,25}/);
+                if (matchLongo) {
+                    return matchLongo[0].toUpperCase();
+                }
+
+                return cleaned; // Fallback
             }
 
-            // ----- OCR FUNCTION -----
-            async function performOCR(file) {
-                // 1. Redimensionar
-                const canvas = await resizeImage(file);
+            // Lida com a seleção da imagem e abre o Modal
+            cameraInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
 
-                // 2. Configurar feedback
+                const img = new Image();
+                img.onload = function() {
+                    currentImg = img;
+                    currentRotation = 0; // zera rotação ao abrir nova foto
+                    drawPreviewCanvas();
+                    modal.classList.remove('hidden'); // Exibe o modal
+                };
+                img.src = URL.createObjectURL(file);
+                // Limpa o input file para permitir selecionar a mesma foto se cancelar
+                cameraInput.value = '';
+            });
+
+            // Desenha a imagem no canvas respeitando a rotação
+            function drawPreviewCanvas() {
+                if (!currentImg) return;
+                
+                let w = currentImg.width;
+                let h = currentImg.height;
+
+                // Redimensiona mantendo proporção para não pesar
+                if (w > MAX_IMAGE_WIDTH || h > MAX_IMAGE_WIDTH) {
+                    const ratio = Math.min(MAX_IMAGE_WIDTH / w, MAX_IMAGE_WIDTH / h);
+                    w = w * ratio;
+                    h = h * ratio;
+                }
+
+                if (currentRotation === 90 || currentRotation === 270) {
+                    previewCanvas.width = h;
+                    previewCanvas.height = w;
+                } else {
+                    previewCanvas.width = w;
+                    previewCanvas.height = h;
+                }
+
+                ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                ctx.save();
+                ctx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
+                ctx.rotate(currentRotation * Math.PI / 180);
+                ctx.drawImage(currentImg, -w / 2, -h / 2, w, h);
+                ctx.restore();
+            }
+
+            // Gira a imagem
+            btnRotate.addEventListener('click', () => {
+                currentRotation = (currentRotation + 90) % 360;
+                drawPreviewCanvas();
+            });
+
+            // Cancela o modal
+            btnCancelModal.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                currentImg = null;
+            });
+
+            // Confirma e inicia o OCR usando o canvas girado
+            btnConfirmOcr.addEventListener('click', async () => {
+                modal.classList.add('hidden');
+                
+                if (isProcessingOCR) return;
+                isProcessingOCR = true;
+
                 showOcrFeedback('Processando OCR...', 0);
                 btnSubmit.disabled = true;
 
                 try {
-                    // 3. Executar Tesseract com logger
-                    const result = await Tesseract.recognize(canvas, OCR_LANG, {
+                    // Manda o canvas (já girado e otimizado) para o Tesseract
+                    const result = await Tesseract.recognize(previewCanvas, OCR_LANG, {
                         logger: (m) => {
                             if (m.status === 'recognizing text') {
                                 const progress = m.progress || 0;
@@ -212,34 +264,29 @@
                     const rawText = result.data.text;
                     const serial = postProcessText(rawText);
 
-                    if (serial.length > 2) {
+                    // Se a string final tiver mais de 10 caracteres, considera sucesso
+                    if (serial.length > 10) {
                         serialInput.value = serial;
                         ocrMessage.textContent = '✅ Serial identificado!';
                         ocrMessage.className = 'text-green-600';
                     } else {
-                        ocrMessage.textContent = '⚠️ Não foi possível identificar um serial. Digite manualmente.';
+                        serialInput.value = serial; // Preenche mesmo assim pra ele ver o que o OCR achou
+                        ocrMessage.textContent = '⚠️ Confirme se o serial está correto.';
                         ocrMessage.className = 'text-amber-600';
                     }
 
-                    // Mantém o progresso em 100% por um instante
                     updateOcrProgress(1);
                 } catch (err) {
                     console.error('Erro no OCR:', err);
-                    ocrMessage.textContent = '❌ Falha ao ler a imagem. Tente novamente ou digite manualmente.';
+                    ocrMessage.textContent = '❌ Falha ao ler a imagem.';
                     ocrMessage.className = 'text-red-600';
                 } finally {
                     btnSubmit.disabled = false;
-                    // Esconde o feedback após alguns segundos, mas mantém a mensagem
-                    setTimeout(() => {
-                        hideOcrFeedback();
-                    }, 4000);
-                    // Limpa o input file para permitir nova captura
-                    cameraInput.value = '';
                     isProcessingOCR = false;
+                    setTimeout(hideOcrFeedback, 4000);
                 }
-            }
+            });
 
-            // ----- UI FEEDBACK -----
             function showOcrFeedback(message, progress = 0) {
                 ocrFeedback.classList.remove('hidden');
                 ocrMessage.textContent = message;
@@ -257,15 +304,13 @@
                 progressBar.style.width = '0%';
             }
 
-            // ----- RENDER LIST -----
             function renderList() {
                 registrosList.innerHTML = '';
                 countSpan.textContent = projetores.length;
 
                 projetores.forEach((p, index) => {
                     const li = document.createElement('li');
-                    li.className =
-                        'bg-slate-50 p-3 rounded border border-slate-200 flex justify-between items-center gap-2';
+                    li.className = 'bg-slate-50 p-3 rounded border border-slate-200 flex justify-between items-center gap-2';
                     li.innerHTML = `
                         <div class="flex-1">
                             <span class="font-bold text-slate-700">Sala ${p.sala}</span><br>
@@ -273,14 +318,10 @@
                         </div>
                         <div class="flex gap-3">
                             <button onclick="window.editarItem(${index})" class="text-blue-600 hover:text-blue-800" title="Editar">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
                             </button>
                             <button onclick="window.removerItem(${index})" class="text-red-500 hover:text-red-700" title="Excluir">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
                             </button>
                         </div>
                     `;
@@ -288,7 +329,6 @@
                 });
             }
 
-            // ----- EDIT / DELETE HELPERS (global) -----
             window.editarItem = function(index) {
                 const p = projetores[index];
                 salaInput.value = p.sala;
@@ -296,7 +336,6 @@
                 serialInput.value = p.serial;
 
                 editIndex = index;
-
                 btnSubmit.textContent = 'Atualizar Registro';
                 btnSubmit.classList.replace('bg-slate-800', 'bg-blue-600');
                 btnSubmit.classList.replace('hover:bg-slate-900', 'hover:bg-blue-700');
@@ -309,19 +348,16 @@
                 if (confirm('Tem certeza que deseja remover o registro desta sala?')) {
                     projetores.splice(index, 1);
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(projetores));
-
                     if (editIndex === index) {
                         form.reset();
                         resetEditMode();
                     } else if (editIndex > index) {
                         editIndex--;
                     }
-
                     renderList();
                 }
             };
 
-            // ----- EDIT MODE -----
             function resetEditMode() {
                 editIndex = -1;
                 btnSubmit.textContent = 'Vincular e Salvar';
@@ -330,10 +366,8 @@
                 btnCancelEdit.classList.add('hidden');
             }
 
-            // ----- FORM SUBMIT -----
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
-
                 if (isProcessingOCR) {
                     alert('Aguarde o processamento da imagem.');
                     return;
@@ -343,17 +377,9 @@
                 const patrimonio = patrimonioInput.value.trim();
                 const serial = serialInput.value.trim();
 
-                if (!sala || !patrimonio || !serial) {
-                    alert('Preencha todos os campos antes de salvar.');
-                    return;
-                }
+                if (!sala || !patrimonio || !serial) return;
 
-                const dadosForm = {
-                    sala,
-                    patrimonio,
-                    serial,
-                    data_registro: new Date().toISOString()
-                };
+                const dadosForm = { sala, patrimonio, serial, data_registro: new Date().toISOString() };
 
                 if (editIndex === -1) {
                     projetores.push(dadosForm);
@@ -366,43 +392,17 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(projetores));
                 form.reset();
                 renderList();
-                // Limpa feedback se estiver visível
                 hideOcrFeedback();
             });
 
-            // ----- CANCEL EDIT -----
             btnCancelEdit.addEventListener('click', () => {
                 form.reset();
                 resetEditMode();
                 hideOcrFeedback();
             });
 
-            // ----- CAMERA INPUT (OCR) -----
-            cameraInput.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                if (isProcessingOCR) return;
-                isProcessingOCR = true;
-
-                try {
-                    await performOCR(file);
-                } catch (err) {
-                    console.error('Erro geral no OCR:', err);
-                    ocrMessage.textContent = '❌ Erro inesperado. Tente novamente.';
-                    ocrMessage.className = 'text-red-600';
-                    btnSubmit.disabled = false;
-                    isProcessingOCR = false;
-                    setTimeout(hideOcrFeedback, 4000);
-                }
-            });
-
-            // ----- EXPORT -----
             btnExport.addEventListener('click', () => {
-                if (projetores.length === 0) {
-                    alert('Nenhum dado para exportar.');
-                    return;
-                }
+                if (projetores.length === 0) return alert('Nenhum dado para exportar.');
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projetores, null, 2));
                 const downloadAnchor = document.createElement('a');
                 downloadAnchor.setAttribute("href", dataStr);
@@ -412,7 +412,39 @@
                 downloadAnchor.remove();
             });
 
-            // ----- INIT -----
+            btnExportPDF.addEventListener('click', () => {
+                if (projetores.length === 0) return alert('Nenhum dado para exportar.');
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                doc.setFontSize(18);
+                doc.text('Relatório de Mapeamento de Projetores', 14, 22);
+                doc.setFontSize(11);
+                doc.setTextColor(100);
+                doc.text('IdealTech - Gestão e Tecnologia', 14, 30);
+                doc.text(`Data da vistoria: ${new Date().toLocaleDateString('pt-BR')}`, 14, 36);
+
+                const tableColumn = ["Sala", "Patrimônio", "Número de Série"];
+                const tableRows = [];
+
+                const projetoresOrdenados = [...projetores].sort((a, b) => a.sala.localeCompare(b.sala, undefined, {numeric: true, sensitivity: 'base'}));
+
+                projetoresOrdenados.forEach(p => {
+                    tableRows.push([p.sala, p.patrimonio, p.serial]);
+                });
+
+                doc.autoTable({
+                    startY: 45,
+                    head: [tableColumn],
+                    body: tableRows,
+                    theme: 'striped',
+                    headStyles: { fillColor: [30, 41, 59] },
+                });
+
+                doc.save('Mapeamento_Projetores_IdealTech.pdf');
+            });
+
             renderList();
             resetEditMode();
 
