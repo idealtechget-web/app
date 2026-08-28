@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mapeamento de Projetores - IdealTech</title>
+    <title>Mapeamento de Projetores - Bom Jesus</title>
     
     <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,7 +31,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         #progressBar { transition: width 0.2s ease; background: #3b82f6; height: 4px; border-radius: 2px; }
         #progressContainer { background: #e2e8f0; border-radius: 2px; height: 4px; overflow: hidden; }
-        /* Ajuste pro Cropper caber na tela do celular */
         .cropper-container { max-height: 100%; }
     </style>
 </head>
@@ -39,7 +38,7 @@
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
         <div class="text-center mb-6">
             <h1 class="text-2xl font-bold text-slate-800">Mapeamento de Projetores</h1>
-            <p class="text-sm text-slate-500">IdealTech - Gestão e Tecnologia</p>
+            <p class="text-sm text-slate-500">Colégio Bom Jesus</p>
         </div>
 
         <form id="projectorForm" class="space-y-4">
@@ -75,7 +74,6 @@
 
                 <input type="text" id="serial" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Digite ou escaneie o serial">
                 
-                <!-- Aqui vai aparecer a foto recortada pra você conferir -->
                 <div id="croppedPreviewContainer" class="mt-2 hidden">
                     <p class="text-xs text-slate-500 mb-1">Recorte salvo (prova visual):</p>
                     <img id="croppedPreview" src="" class="border border-slate-300 rounded max-h-16">
@@ -96,6 +94,12 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-semibold text-slate-800">Registros (<span id="count">0</span>)</h2>
                 <div class="flex gap-2">
+                    <!-- Botão de Importação -->
+                    <label class="cursor-pointer text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
+                        Importar JSON
+                        <input type="file" id="btnImport" accept=".json" class="hidden">
+                    </label>
+                    
                     <button id="btnExportPDF" class="text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition">
                         PDF
                     </button>
@@ -147,6 +151,7 @@
             const registrosList = document.getElementById('registrosList');
             const countSpan = document.getElementById('count');
             
+            const btnImport = document.getElementById('btnImport');
             const btnExport = document.getElementById('btnExport');
             const btnExportPDF = document.getElementById('btnExportPDF');
             const btnSubmit = document.getElementById('btnSubmit');
@@ -159,7 +164,6 @@
             const croppedPreviewContainer = document.getElementById('croppedPreviewContainer');
             const croppedPreview = document.getElementById('croppedPreview');
 
-            // Elementos do Modal de Recorte
             const modal = document.getElementById('imagePreviewModal');
             const imageToCrop = document.getElementById('imageToCrop');
             const btnRotate = document.getElementById('btnRotate');
@@ -171,9 +175,9 @@
             let isProcessingOCR = false;
             
             let cropper = null;
-            let currentImageBase64 = null; // Armazena o recorte atual
+            let currentImageBase64 = null; 
 
-            // Inicia a Câmera e o Cropper
+            // OCR e Câmera
             cameraInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -188,7 +192,6 @@
                     cropper.destroy();
                 }
 
-                // Inicia o Cropper.js com configurações otimizadas para mobile
                 cropper = new Cropper(imageToCrop, {
                     viewMode: 1,
                     dragMode: 'move',
@@ -214,20 +217,15 @@
                 if (cropper) cropper.destroy();
             });
 
-            // Executa o corte e manda pro Tesseract
             btnConfirmCrop.addEventListener('click', async () => {
                 modal.classList.add('hidden');
                 
                 if (isProcessingOCR || !cropper) return;
                 isProcessingOCR = true;
 
-                // Extrai o recorte exato do usuário
                 const canvas = cropper.getCroppedCanvas();
-                
-                // Salva o recorte em qualidade baixa/média para não estourar o LocalStorage
                 currentImageBase64 = canvas.toDataURL('image/jpeg', 0.6);
                 
-                // Mostra o recorte na tela
                 croppedPreview.src = currentImageBase64;
                 croppedPreviewContainer.classList.remove('hidden');
 
@@ -248,7 +246,6 @@
                     });
 
                     let rawText = result.data.text;
-                    // Como foi recortado na mão, removemos TUDO que não for letra ou número
                     let cleanedSerial = rawText.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
 
                     if (cleanedSerial.length > 5) {
@@ -298,7 +295,6 @@
                     const li = document.createElement('li');
                     li.className = 'bg-slate-50 p-3 rounded border border-slate-200 flex justify-between items-center gap-2';
                     
-                    // Verifica se tem foto salva
                     const imgTag = p.imagem ? `<img src="${p.imagem}" class="h-8 mt-2 rounded border border-slate-300">` : '';
 
                     li.innerHTML = `
@@ -326,7 +322,6 @@
                 patrimonioInput.value = p.patrimonio;
                 serialInput.value = p.serial;
                 
-                // Se tiver imagem salva, mostra no modo de edição
                 if (p.imagem) {
                     currentImageBase64 = p.imagem;
                     croppedPreview.src = p.imagem;
@@ -385,7 +380,7 @@
                     sala, 
                     patrimonio, 
                     serial, 
-                    imagem: currentImageBase64, // Salva o recorte visual junto!
+                    imagem: currentImageBase64,
                     data_registro: new Date().toISOString() 
                 };
 
@@ -410,12 +405,51 @@
                 hideOcrFeedback();
             });
 
+            // Lógica de IMPORTAÇÃO de JSON
+            btnImport.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const dadosImportados = JSON.parse(event.target.result);
+                        
+                        if (Array.isArray(dadosImportados)) {
+                            // Mescla os dados pelo número da sala para evitar duplicidade
+                            const mapaSalas = new Map();
+                            
+                            // 1. Coloca os registros que já estão no celular
+                            projetores.forEach(p => mapaSalas.set(p.sala, p));
+                            
+                            // 2. Coloca os registros importados (sobrescreve se a sala já existir)
+                            dadosImportados.forEach(p => mapaSalas.set(p.sala, p));
+                            
+                            // 3. Atualiza o banco
+                            projetores = Array.from(mapaSalas.values());
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(projetores));
+                            
+                            renderList();
+                            alert(`Importação concluída! Total de registros: ${projetores.length}`);
+                        } else {
+                            alert('O arquivo JSON parece estar no formato incorreto.');
+                        }
+                    } catch (error) {
+                        alert('Erro ao processar o arquivo JSON.');
+                        console.error(error);
+                    }
+                    // Reseta o input para permitir importar o mesmo arquivo novamente se precisar
+                    btnImport.value = '';
+                };
+                reader.readAsText(file);
+            });
+
             btnExport.addEventListener('click', () => {
                 if (projetores.length === 0) return alert('Nenhum dado para exportar.');
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projetores, null, 2));
                 const downloadAnchor = document.createElement('a');
                 downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", "mapeamento_projetores.json");
+                downloadAnchor.setAttribute("download", "mapeamento_projetores_bomjesus.json");
                 document.body.appendChild(downloadAnchor);
                 downloadAnchor.click();
                 downloadAnchor.remove();
@@ -431,7 +465,7 @@
                 doc.text('Relatório de Mapeamento de Projetores', 14, 22);
                 doc.setFontSize(11);
                 doc.setTextColor(100);
-                doc.text('IdealTech - Gestão e Tecnologia', 14, 30);
+                doc.text('Colégio Bom Jesus', 14, 30);
                 doc.text(`Data da vistoria: ${new Date().toLocaleDateString('pt-BR')}`, 14, 36);
 
                 const tableColumn = ["Sala", "Patrimônio", "Número de Série"];
@@ -451,7 +485,7 @@
                     headStyles: { fillColor: [30, 41, 59] },
                 });
 
-                doc.save('Mapeamento_Projetores_IdealTech.pdf');
+                doc.save('Mapeamento_Projetores_BomJesus.pdf');
             });
 
             renderList();
