@@ -67,7 +67,7 @@
         }
         #layout-wrapper {
             display: flex;
-            min-height: 100vh;
+            min-height: 100dvh;
         }
         #sidebar {
             width: 250px;
@@ -79,7 +79,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            height: 100vh;
+            height: 100dvh;
             overflow-y: auto;
             z-index: 40;
             transition: transform .25s cubic-bezier(.4, 0, .2, 1);
@@ -89,7 +89,7 @@
             flex: 1;
             min-width: 0;
             background: #f1f5f9;
-            min-height: 100vh;
+            min-height: 100dvh;
             transition: margin .25s cubic-bezier(.4, 0, .2, 1);
         }
         @media (max-width: 768px) {
@@ -103,9 +103,6 @@
             #main-content {
                 margin-left: 0 !important;
                 padding: 1rem !important;
-            }
-            #sidebar-toggle {
-                display: flex !important;
             }
             #sidebar-overlay {
                 display: none;
@@ -342,17 +339,7 @@
             }
         }
         #sidebar-toggle {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 50;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: .6rem;
-            padding: .4rem .5rem;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-            display: none;
+            /* removido */
         }
         @media print {
             * {
@@ -425,14 +412,9 @@
             padding: .75rem .5rem .35rem;
             margin-top: .25rem;
         }
-        /* Overflow tables */
         .table-wrap {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-        }
-        /* Ajustes mobile para modais */
-        .modal-content .grid {
-            gap: 0.75rem;
         }
         @media (max-width: 640px) {
             .modal-content .grid-cols-2 {
@@ -512,11 +494,6 @@
             <!-- Overlay mobile -->
             <div id="sidebar-overlay" onclick="App.sidebar.fechar()"></div>
 
-            <!-- Botão toggle mobile -->
-            <button id="sidebar-toggle" onclick="App.sidebar.toggle()" aria-label="Menu">
-                <i class="ph ph-list ph-lg" style="color:#4f46e5"></i>
-            </button>
-
             <!-- SIDEBAR -->
             <aside id="sidebar" class="no-print">
                 <div id="sidebar-header" class="p-4 border-b border-slate-100 flex-shrink-0">
@@ -552,6 +529,16 @@
 
                 <!-- Navegação -->
                 <nav id="sidebar-nav" class="p-3 flex-1 overflow-y-auto">
+                    <!-- Botões Backup e Config movidos para o topo -->
+                    <div class="flex gap-2 mb-4">
+                        <button onclick="App.backup.abrirModal()" class="flex-1 btn-primary text-xs py-2 text-center flex items-center justify-center gap-1">
+                            <i class="ph ph-database"></i> Backup
+                        </button>
+                        <button onclick="App.appConfig.abrirModal()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-xs py-2 transition text-center flex items-center justify-center gap-1">
+                            <i class="ph ph-gear"></i> Config
+                        </button>
+                    </div>
+
                     <p class="sidebar-group-label">Principal</p>
                     <button onclick="App.aba.trocar('dashboard')" id="btn-dashboard" class="tab-btn tab-ativo">
                         <i class="ph ph-gauge"></i> Dashboard
@@ -599,19 +586,12 @@
                     </button>
                 </nav>
 
-                <div class="p-3 border-t border-slate-100 flex gap-2 flex-shrink-0">
-                    <button onclick="App.backup.abrirModal()" class="flex-1 btn-primary text-xs py-2 text-center flex items-center justify-center gap-1">
-                        <i class="ph ph-database"></i> Backup
-                    </button>
-                    <button onclick="App.appConfig.abrirModal()" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl text-xs py-2 transition text-center flex items-center justify-center gap-1">
-                        <i class="ph ph-gear"></i> Config
-                    </button>
-                </div>
+                <!-- Os botões foram movidos para o topo, esta div é removida -->
             </aside>
 
             <!-- CONTEÚDO PRINCIPAL -->
             <main id="main-content" class="p-4 md:p-6 max-w-7xl mx-auto w-full">
-                <div id="toastContainer" class="fixed bottom-4 right-4 z-50 space-y-2 no-print"></div>
+                <div id="toastContainer" class="fixed bottom-4 right-4 z-[9999] space-y-2 no-print"></div>
 
                 <!-- ═══ DASHBOARD ═══ -->
                 <div id="aba-dashboard" class="aba-conteudo space-y-5">
@@ -1788,6 +1768,12 @@
                 _build() {
                     const cliente = document.getElementById('orcClienteNome').value.trim();
                     if (!cliente) { App.ui.toast('Cliente é obrigatório', 'erro'); return null; }
+                    
+                    // NOVAS VALIDAÇÕES SOLICITADAS
+                    if (!document.getElementById('orcWhatsApp').value.trim()) { App.ui.toast('O WhatsApp do cliente é obrigatório', 'erro'); return null; }
+                    if (!document.getElementById('orcPrazo').value) { App.ui.toast('A previsão de entrega é obrigatória', 'erro'); return null; }
+                    if (!document.getElementById('orcValidade').value) { App.ui.toast('A validade do orçamento é obrigatória', 'erro'); return null; }
+
                     if (!App._tempItensOrc.length) { App.ui.toast('Adicione pelo menos um item', 'erro'); return null; }
                     const subtotal = App._tempItensOrc.reduce((a, b) => a + (b.subtotal || 0), 0);
                     const desconto = money.parseBR(document.getElementById('orcDescontoValor')?.value) || 0;
@@ -4013,9 +3999,6 @@
 
                 bindMoney();
                 App.notas.carregar();
-
-                // REMOVIDO: checagem manual de auth.currentUser para evitar dupla renderização
-                // O onAuthStateChanged será o único responsável por chamar carregarDados()
             }
         };
 
@@ -4033,7 +4016,6 @@
 
         // ─── EXPOSIÇÃO GLOBAL E INIT DIRETO ───
         window.App = App;
-        // Chamada direta do init, sem depender de DOMContentLoaded
         App.init();
         setTimeout(bindMoney, 100);
     </script>
