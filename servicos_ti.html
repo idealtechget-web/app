@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenilson T.I. - Master Dashboard</title>
+    <title>Master Dashboard T.I.</title>
+    
+    <!-- PHOSPHOR ICONS -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <style>
-        /* FORÇAR TODAS AS FONTES PARA MAIÚSCULAS */
-        * {
-            text-transform: uppercase !important;
-        }
-        ::placeholder {
-            text-transform: uppercase !important;
-            color: #aaa; /* mantém a cor original do placeholder, opcional */
-        }
+        * { text-transform: uppercase !important; box-sizing: border-box; }
+        ::placeholder { text-transform: uppercase !important; color: #aaa; }
 
         :root { 
             --p: #3498db; --s: #27ae60; --danger: #e74c3c; --warning: #f39c12; --purple: #9b59b6;
@@ -26,176 +24,259 @@
             padding: 20px; 
             margin: 0; 
             color-scheme: dark;
-            /* text-transform removido daqui pois já está no * */
-        }
-
-        input, select, button, textarea {
-            /* text-transform herdado do * */
         }
 
         .container { max-width: 1200px; margin: auto; }
         
+        /* HEADER */
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        h2.main-title { margin: 0; color: var(--p); font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        h2.main-title { margin: 0; color: var(--p); font-size: 1.8rem; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
         
-        .progress-container { width: 100%; background: var(--border); border-radius: 10px; height: 12px; margin-bottom: 25px; overflow: hidden; }
+        /* PROGRESS */
+        .progress-wrapper { margin-bottom: 25px; }
+        .progress-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .progress-pct { font-size: 0.85rem; font-weight: bold; color: var(--s); }
+        .progress-container { width: 100%; background: var(--border); border-radius: 10px; height: 12px; overflow: hidden; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--warning), var(--s)); width: 0%; transition: width 0.5s ease; }
 
+        /* STORAGE BAR */
+        .storage-bar-wrapper { margin-bottom: 20px; background: var(--box-bg); border-radius: 8px; padding: 10px 15px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+        .storage-label { font-size: 0.75rem; color: #888; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+        .storage-track { flex: 1; background: #333; border-radius: 10px; height: 6px; overflow: hidden; }
+        .storage-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease, background 0.3s; }
+        .storage-pct { font-size: 0.75rem; font-weight: bold; color: #aaa; white-space: nowrap; }
+
+        /* DASHBOARD STATS */
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-box { background: var(--box-bg); padding: 15px; border-radius: 10px; text-align: center; border: 2px solid var(--border); cursor: pointer; transition: 0.2s; user-select: none; }
         .stat-box:hover { transform: translateY(-3px); border-color: #555; }
         .stat-box.active { border-color: var(--p); background: #2a2a2a; box-shadow: 0 0 15px rgba(52, 152, 219, 0.2); }
-        .stat-num { font-size: 2rem; font-weight: bold; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
+        .stat-num { font-size: 2rem; font-weight: bold; margin-bottom: 5px; }
         .stat-num.pendente { color: var(--warning); }
         .stat-num.atrasado { color: var(--danger); }
         .stat-num.concluido { color: var(--s); }
 
-        .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 25px; align-items: start; }
+        /* MAIN GRID */
+        .main-grid { display: grid; grid-template-columns: 360px 1fr; gap: 25px; align-items: start; }
         @media (max-width: 800px) { .main-grid { grid-template-columns: 1fr; } }
 
         .box { background: var(--box-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        h1 { margin-top: 0; color: var(--text); font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        h1 { margin-top: 0; color: var(--text); font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; align-items: center; gap: 8px; }
         
+        /* FORM */
         .form-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; }
-        label { font-size: 0.85rem; font-weight: bold; color: #aaa; margin-bottom: -8px; }
-        .input-field { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: #2a2a2a; color: var(--text); font-size: 1rem; box-sizing: border-box; }
+        label { font-size: 0.85rem; font-weight: bold; color: #aaa; margin-bottom: -8px; display: flex; align-items: center; gap: 5px; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: #2a2a2a; color: var(--text); font-size: 1rem; }
         .input-field:focus { outline: none; border-color: var(--p); }
         input[type="file"] { padding: 8px; font-size: 0.9rem; }
         
-        button.btn-add { background: var(--p); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        button.btn-add { background: var(--p); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         button.btn-add:hover { filter: brightness(1.2); }
         button.btn-edit-mode { background: var(--warning); color: #000; }
 
         .backup-area { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-backup { background: transparent; color: #aaa; border: 1px solid #555; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.2s; }
+        .btn-backup { background: transparent; color: #aaa; border: 1px solid #555; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-backup:hover { background: #333; color: white; }
 
+        /* LIST */
         .list-container { background: var(--box-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); min-height: 500px; }
         
-        .list-controls { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-        .search-bar { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid var(--border); background: #2a2a2a; color: white; font-size: 1rem; min-width: 150px; }
+        .list-controls { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
         
+        /* Envolvendo a busca para botar o ícone de lupa profissional */
+        .search-wrapper { flex: 1; position: relative; min-width: 150px; }
+        .search-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 1.1rem; }
+        .search-bar { width: 100%; padding: 12px 12px 12px 40px; border-radius: 20px; border: 1px solid var(--border); background: #2a2a2a; color: white; font-size: 1rem; }
+        
+        /* PERIOD FILTER */
+        .period-filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn-periodo { background: #2a2a2a; color: #aaa; border: 1px solid var(--border); padding: 7px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-periodo:hover { border-color: #777; color: white; }
+        .btn-periodo.active { background: var(--p); color: white; border-color: var(--p); }
+
         .btn-zap { background: #25D366; color: white; border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
         .btn-zap:hover { background: #128C7E; }
         .btn-mobile { background: var(--purple); color: white; border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
         .btn-mobile:hover { background: #8e44ad; }
         .btn-sync { background: var(--warning); color: #000; border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
         .btn-sync:hover { filter: brightness(0.9); }
+        .btn-export-csv { background: #16a085; color: white; border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-export-csv:hover { background: #1abc9c; }
+        .btn-limpar { background: transparent; border: 1px solid #ff8a80; color: #ff8a80; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-limpar:hover { background: rgba(255, 138, 128, 0.1); }
 
-        .card { background: #1a1a1a; border-radius: 10px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--p); display: flex; justify-content: space-between; align-items: center; border-right: 1px solid var(--border); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: 0.2s; }
+        /* CARDS */
+        .card { background: #1a1a1a; border-radius: 10px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--p); display: flex; justify-content: space-between; align-items: center; border-right: 1px solid var(--border); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: 0.2s; animation: fadeInCard 0.3s ease forwards; opacity: 0; }
+        @keyframes fadeInCard { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .card:hover { transform: translateX(3px); background: #222; }
         
         .card-info { flex: 1; }
         .card-header-info { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
-        .card-data { font-size: 0.85rem; font-weight: bold; color: #8ab4f8; } 
-        .tag-prio { font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; color: white; }
+        .card-data { font-size: 0.85rem; font-weight: bold; color: #8ab4f8; display: flex; align-items: center; gap: 4px; }
+        .card-local { font-size: 0.8rem; color: #aaa; background: #2a2a2a; padding: 2px 8px; border-radius: 4px; border: 1px solid #444; display: flex; align-items: center; gap: 4px; }
+        .tag-prio { font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; color: white; display: flex; align-items: center; gap: 3px; }
         .prio-baixa { background: #555; }
         .prio-normal { background: var(--p); }
         .prio-urgente { background: var(--danger); }
         
         .card-tarefa { font-size: 1.1rem; line-height: 1.4; margin: 0 0 8px 0; color: #fff; }
-        
-        /* Container para múltiplos botões de anexo */
+        .card-data-original { font-size: 0.75rem; color: #f39c12; background: rgba(243,156,18,0.1); border: 1px solid rgba(243,156,18,0.3); padding: 2px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
+
         .anexos-container { display: flex; gap: 5px; flex-wrap: wrap; }
         .btn-anexo { background: transparent; border: 1px solid var(--purple); color: var(--purple); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
         .btn-anexo:hover { background: rgba(155, 89, 182, 0.2); }
 
         .card-acoes { display: flex; gap: 8px; margin-left: 15px; }
-        .btn-acao { background: #2a2a2a; border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: 0.2s; color: var(--text); }
+        .btn-acao { background: #2a2a2a; border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; font-size: 1.1rem; transition: 0.2s; color: var(--text); display: flex; align-items: center; justify-content: center; }
         .btn-acao:hover { background: #3a3a3a; }
-        .btn-check { border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .btn-check { border-radius: 50%; width: 42px; height: 42px; font-size: 1.4rem; }
 
         .card.concluido { border-left-color: var(--s); opacity: 0.5; background: #111a14; } 
         .card.concluido .card-tarefa { text-decoration: line-through; color: #777; }
         .card.concluido .card-data { color: #555; }
         .card.concluido .btn-check { background: var(--s); color: white; border-color: var(--s); }
-        .card.concluido .anexos-container { display: none; } 
+        .card.concluido .anexos-container { display: none; }
+        .card.concluido .card-local { display: none; }
 
         .card.atrasado { border-left-color: var(--danger); background: #2a1111; } 
-        .card.atrasado .card-data { color: #ff8a80; } 
-        .tag-atrasado { background: var(--danger); color: white; font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; animation: piscar 2s infinite; }
+        .card.atrasado .card-data { color: #ff8a80; }
+        .tag-atrasado { background: var(--danger); color: white; font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; animation: piscar 2s infinite; display: flex; align-items: center; gap: 4px; }
         
         @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        /* TOAST SYSTEM */
+        #toast-container { position: fixed; bottom: 25px; right: 25px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: #2a2a2a; color: var(--text); padding: 14px 20px; border-radius: 10px; border-left: 4px solid var(--p); font-size: 0.9rem; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.5); min-width: 260px; max-width: 360px; animation: slideInToast 0.3s ease, fadeOutToast 0.4s ease 2.6s forwards; pointer-events: auto; display: flex; align-items: center; gap: 8px; }
+        .toast i { font-size: 1.2rem; }
+        .toast.success { border-left-color: var(--s); }
+        .toast.danger { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+        @keyframes slideInToast { from { opacity: 0; transform: translateX(60px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeOutToast { from { opacity: 1; } to { opacity: 0; transform: translateX(60px); } }
+
+        /* CONFIRM MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 8888; display: flex; align-items: center; justify-content: center; animation: fadeInOverlay 0.2s; }
+        @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+        .modal-box { background: #1e1e1e; border: 1px solid #444; border-radius: 14px; padding: 30px; max-width: 380px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .modal-title { font-size: 1.1rem; font-weight: bold; color: white; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .modal-msg { font-size: 0.9rem; color: #aaa; margin-bottom: 24px; line-height: 1.5; }
+        .modal-actions { display: flex; gap: 12px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
+        .modal-btn.cancel { background: #333; color: #aaa; }
+        .modal-btn.cancel:hover { background: #444; color: white; }
+        .modal-btn.confirm { background: var(--danger); color: white; }
+        .modal-btn.confirm:hover { filter: brightness(1.2); }
     </style>
 </head>
 <body>
 
+<div id="toast-container"></div>
+
 <div class="container">
     <div class="header-top">
-        <h2 class="main-title">🚀 DASHBOARD T.I.</h2>
+        <h2 class="main-title"><i class="ph ph-rocket-launch"></i> DASHBOARD T.I.</h2>
         <span style="color:#888; font-size:0.9rem;" id="dataHojeText"></span>
     </div>
 
-    <div class="progress-container" title="PROGRESSO DAS TAREFAS">
-        <div class="progress-bar" id="progressBar"></div>
+    <div class="progress-wrapper">
+        <div class="progress-label">
+            <span style="font-size:0.8rem; color:#888;">PROGRESSO GERAL DAS TAREFAS</span>
+            <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+        <div class="progress-container" title="PROGRESSO DAS TAREFAS">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div class="storage-bar-wrapper">
+        <span class="storage-label"><i class="ph ph-hard-drives"></i> ARMAZENAMENTO LOCAL</span>
+        <div class="storage-track">
+            <div class="storage-fill" id="storageFill"></div>
+        </div>
+        <span class="storage-pct" id="storagePct">—</span>
     </div>
 
     <div class="dashboard">
         <div class="stat-box" id="box-pendentes" onclick="aplicarFiltro('pendentes')">
             <div class="stat-num pendente" id="countPendentes">0</div>
-            <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase;">PENDENTES</div>
+            <div style="font-size: 0.8rem; color: #aaa;">PENDENTES</div>
         </div>
         <div class="stat-box" id="box-atrasados" onclick="aplicarFiltro('atrasados')">
             <div class="stat-num atrasado" id="countAtrasados">0</div>
-            <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase;">ATRASADOS</div>
+            <div style="font-size: 0.8rem; color: #aaa;">ATRASADOS</div>
         </div>
         <div class="stat-box" id="box-concluidos" onclick="aplicarFiltro('concluidos')">
             <div class="stat-num concluido" id="countConcluidos">0</div>
-            <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase;">CONCLUÍDOS</div>
+            <div style="font-size: 0.8rem; color: #aaa;">CONCLUÍDOS</div>
         </div>
         <div class="stat-box active" id="box-todos" onclick="aplicarFiltro('todos')">
             <div class="stat-num" id="countTodos" style="color:#fff;">0</div>
-            <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase;">TOTAL GERAL</div>
+            <div style="font-size: 0.8rem; color: #aaa;">TOTAL GERAL</div>
         </div>
     </div>
 
     <div class="main-grid">
         <div class="box">
-            <h1 id="tituloForm">➕ NOVA MANUTENÇÃO</h1>
-            <input type="hidden" id="inputIdEdit"> 
+            <h1 id="tituloForm"><i class="ph ph-plus-circle"></i> NOVA MANUTENÇÃO</h1>
+            <input type="hidden" id="inputIdEdit">
             
             <div class="form-group">
-                <label>DATA AGENDADA</label>
+                <label><i class="ph ph-calendar-blank"></i> DATA AGENDADA</label>
                 <input type="date" id="inputData" class="input-field">
                 
-                <label>HORÁRIO / TURNO</label>
+                <label><i class="ph ph-clock"></i> HORÁRIO / TURNO</label>
                 <input type="text" id="inputHora" class="input-field" placeholder="EX: 14H, LOGO CEDO...">
+
+                <label><i class="ph ph-map-pin"></i> LOCAL / EQUIPAMENTO</label>
+                <input type="text" id="inputLocal" class="input-field" placeholder="EX: SERVIDOR RACK 2, IMPRESSORA RH...">
                 
-                <label>PRIORIDADE</label>
+                <label><i class="ph ph-warning-circle"></i> PRIORIDADE</label>
                 <select id="inputPrioridade" class="input-field">
                     <option value="normal">NORMAL</option>
-                    <option value="urgente">URGENTE 🔥</option>
+                    <option value="urgente">URGENTE</option>
                     <option value="baixa">BAIXA</option>
                 </select>
                 
-                <label>DESCRIÇÃO DO SERVIÇO</label>
+                <label><i class="ph ph-text-align-left"></i> DESCRIÇÃO DO SERVIÇO</label>
                 <input type="text" id="inputTarefa" class="input-field" placeholder="O QUE PRECISA SER FEITO?">
 
-                <label>📎 ANEXAR ARQUIVOS (ATÉ 5 FOTOS OU PDFS)</label>
+                <label><i class="ph ph-paperclip"></i> ANEXAR ARQUIVOS (ATÉ 5 FOTOS OU PDFS)</label>
                 <input type="file" id="inputAnexo" class="input-field" accept="image/*,application/pdf" multiple>
-                <small id="avisoAnexoEdit" style="color:var(--warning); display:none;">⚠️ ESTA TAREFA JÁ POSSUI ANEXOS. SELECIONAR NOVOS IRÁ SUBSTITUIR OS ANTIGOS.</small>
+                <small id="avisoAnexoEdit" style="color:var(--warning); display:none; margin-top: 5px;"><i class="ph ph-warning"></i> ESTA TAREFA JÁ POSSUI ANEXOS. SELECIONAR NOVOS IRÁ SUBSTITUIR OS ANTIGOS.</small>
             </div>
             
-            <button class="btn-add" id="btnSalvar" onclick="salvarTarefa()">💾 LANÇAR TAREFA</button>
-            <button class="btn-add" id="btnCancelarEdit" onclick="cancelarEdicao()" style="display:none; background:#555;">❌ CANCELAR EDIÇÃO</button>
+            <button class="btn-add" id="btnSalvar" onclick="salvarTarefa()"><i class="ph ph-floppy-disk"></i> LANÇAR TAREFA</button>
+            <button class="btn-add" id="btnCancelarEdit" onclick="cancelarEdicao()" style="display:none; background:#555;"><i class="ph ph-x"></i> CANCELAR EDIÇÃO</button>
 
             <div class="backup-area">
-                <button class="btn-backup" onclick="exportarJSON()">💾 BKP TOTAL (.JSON)</button>
-                <button class="btn-backup" onclick="document.getElementById('importFile').click()">📂 RESTAURAR BKP</button>
+                <button class="btn-backup" onclick="exportarJSON()"><i class="ph ph-download-simple"></i> BKP TOTAL (.JSON)</button>
+                <button class="btn-backup" onclick="document.getElementById('importFile').click()"><i class="ph ph-folder-open"></i> RESTAURAR BKP</button>
                 <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarJSON(event)">
             </div>
         </div>
 
         <div class="list-container">
             <div class="list-controls">
-                <input type="text" class="search-bar" id="inputBusca" placeholder="🔍 BUSCAR TAREFA..." onkeyup="renderizarInterface()">
+                <div class="search-wrapper">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" class="search-bar" id="inputBusca" placeholder="BUSCAR POR TAREFA, LOCAL, PRIORIDADE, DATA..." onkeyup="renderizarInterface()">
+                </div>
                 
-                <button class="btn-zap" onclick="gerarRelatorioZap()" title="COPIAR RESUMO">💬 WHATSAPP</button>
-                <button class="btn-mobile" onclick="exportarAppMobile()" title="BAIXAR APP PARA CELULAR">📱 APP CELULAR</button>
-                <button class="btn-sync" onclick="document.getElementById('importSyncMobile').click()" title="PUXAR ARQUIVO DO CELULAR">🔄 SYNC MOBILE</button>
+                <button class="btn-zap" onclick="gerarRelatorioZap()" title="COPIAR RESUMO"><i class="ph ph-whatsapp-logo"></i> WHATSAPP</button>
+                <button class="btn-mobile" onclick="exportarAppMobile()" title="BAIXAR APP PARA CELULAR"><i class="ph ph-device-mobile"></i> APP CELULAR</button>
+                <button class="btn-sync" onclick="document.getElementById('importSyncMobile').click()" title="PUXAR ARQUIVO DO CELULAR"><i class="ph ph-arrows-clockwise"></i> SYNC MOBILE</button>
+                <button class="btn-export-csv" onclick="exportarCSV()" title="EXPORTAR CSV"><i class="ph ph-chart-bar"></i> EXPORTAR CSV</button>
                 <input type="file" id="importSyncMobile" accept=".json" style="display:none" onchange="sincronizarDoCelular(event)">
                 
-                <button onclick="limparConcluidas()" style="background:none; border:none; color:#ff8a80; cursor:pointer; font-size:0.85rem; text-decoration:underline;">LIMPAR CONCLUÍDAS</button>
+                <button class="btn-limpar" onclick="confirmar('REMOVER TODAS AS TAREFAS CONCLUÍDAS?', 'Esta ação irá limpar as tarefas concluídas e liberar memória.', limparConcluidas)"><i class="ph ph-broom"></i> LIMPAR CONCLUÍDAS</button>
+            </div>
+
+            <div class="period-filters">
+                <button class="btn-periodo active" id="periodo-todos" onclick="aplicarPeriodo('todos')"><i class="ph ph-clipboard-text"></i> TODOS</button>
+                <button class="btn-periodo" id="periodo-hoje" onclick="aplicarPeriodo('hoje')"><i class="ph ph-calendar-blank"></i> HOJE</button>
+                <button class="btn-periodo" id="periodo-semana" onclick="aplicarPeriodo('semana')"><i class="ph ph-calendar"></i> ESTA SEMANA</button>
+                <button class="btn-periodo" id="periodo-mes" onclick="aplicarPeriodo('mes')"><i class="ph ph-calendar-check"></i> ESTE MÊS</button>
+                <button class="btn-periodo" id="periodo-proximo" onclick="aplicarPeriodo('proximo')"><i class="ph ph-calendar-plus"></i> PRÓXIMOS 7 DIAS</button>
             </div>
 
             <div id="listaTarefas"></div>
@@ -205,32 +286,78 @@
 
 <script>
     let agenda = [];
-    let filtroAtual = 'todos'; 
+    let filtroAtual = 'todos';
+    let periodoAtual = 'todos';
 
+    // ==================== TOAST ====================
+    function toast(msg, tipo = 'info', duracao = 3000) {
+        const container = document.getElementById('toast-container');
+        const el = document.createElement('div');
+        el.className = `toast ${tipo}`;
+        // Alterado de textContent para innerHTML para suportar ícones Phosphor
+        el.innerHTML = msg;
+        container.appendChild(el);
+        setTimeout(() => el.remove(), duracao + 400);
+    }
+
+    // ==================== MODAL CONFIRM ====================
+    function confirmar(titulo, msg, callback) {
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        overlay.innerHTML = `
+            <div class="modal-box">
+                <div class="modal-title"><i class="ph ph-warning-circle" style="color: var(--warning); font-size: 1.4rem;"></i> ${titulo}</div>
+                <div class="modal-msg">${msg}</div>
+                <div class="modal-actions">
+                    <button class="modal-btn cancel" id="modal-cancel">CANCELAR</button>
+                    <button class="modal-btn confirm" id="modal-confirm">CONFIRMAR</button>
+                </div>
+            </div>`;
+        document.body.appendChild(overlay);
+        overlay.querySelector('#modal-cancel').onclick = () => overlay.remove();
+        overlay.querySelector('#modal-confirm').onclick = () => { overlay.remove(); callback(); };
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    }
+
+    // ==================== STORAGE BAR ====================
+    function atualizarStorageBar() {
+        try {
+            const dados = localStorage.getItem('zenilson_agenda_pro') || '';
+            const usedBytes = new Blob([dados]).size;
+            const maxBytes = 5 * 1024 * 1024;
+            const pct = Math.min((usedBytes / maxBytes) * 100, 100);
+            const usedMB = (usedBytes / (1024 * 1024)).toFixed(2);
+            const fill = document.getElementById('storageFill');
+            fill.style.width = pct + '%';
+            fill.style.background = pct > 80 ? '#e74c3c' : pct > 55 ? '#f39c12' : '#27ae60';
+            document.getElementById('storagePct').textContent = `${usedMB}MB / 5MB (${Math.round(pct)}%)`;
+        } catch(e) {}
+    }
+
+    // ==================== INIT ====================
     window.onload = () => {
         const salvas = localStorage.getItem('zenilson_agenda_pro');
         if (salvas) agenda = JSON.parse(salvas);
 
         const hojeObj = new Date();
         document.getElementById('inputData').value = hojeObj.toISOString().split('T')[0];
-        document.getElementById('dataHojeText').innerText = "HOJE É " + hojeObj.toLocaleDateString('pt-BR').toUpperCase();
+        document.getElementById('dataHojeText').innerHTML = "<i class='ph ph-calendar-blank'></i> HOJE É " + hojeObj.toLocaleDateString('pt-BR').toUpperCase();
         
         document.getElementById('inputTarefa').addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                salvarTarefa();
-            }
+            if (event.key === "Enter") { event.preventDefault(); salvarTarefa(); }
         });
 
-        processarAtrasos(); 
+        processarAtrasos();
+        atualizarStorageBar();
     };
 
+    // ==================== ATRASOS ====================
     function processarAtrasos() {
         const hojeISO = new Date().toISOString().split('T')[0];
         agenda.forEach(item => {
             if (!item.concluida && item.data < hojeISO) {
-                item.dataOriginal = item.data; 
-                item.data = hojeISO; 
+                item.dataOriginal = item.dataOriginal || item.data;
+                item.data = hojeISO;
                 item.atrasado = true;
             } else if (item.data >= hojeISO && item.atrasado) {
                 item.atrasado = false;
@@ -239,6 +366,7 @@
         salvarERenderizar();
     }
 
+    // ==================== ANEXO ====================
     function processarAnexo(file) {
         return new Promise((resolve, reject) => {
             if (file.type.startsWith('image/')) {
@@ -249,25 +377,17 @@
                     img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        // Redução maior para aguentar várias fotos: 800px e 60% de qualidade
-                        const MAX_WIDTH = 800; 
-                        let scaleSize = 1;
-                        if (img.width > MAX_WIDTH) {
-                            scaleSize = MAX_WIDTH / img.width;
-                        }
+                        const MAX_WIDTH = 800;
+                        let scaleSize = img.width > MAX_WIDTH ? MAX_WIDTH / img.width : 1;
                         canvas.width = img.width * scaleSize;
                         canvas.height = img.height * scaleSize;
-                        
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
-                        resolve({ nome: file.name.toUpperCase(), dados: dataUrl });
-                    }
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve({ nome: file.name.toUpperCase(), dados: canvas.toDataURL('image/jpeg', 0.6) });
+                    };
                 };
             } else {
                 if (file.size > 1572864) {
-                    reject(`⚠️ O ARQUIVO ${file.name.toUpperCase()} EXCEDE 1.5MB. ENVIE UM PDF MENOR.`);
+                    reject(`<i class="ph ph-warning"></i> O ARQUIVO ${file.name.toUpperCase()} EXCEDE 1.5MB. ENVIE UM PDF MENOR.`);
                 } else {
                     const reader = new FileReader();
                     reader.readAsDataURL(file);
@@ -277,75 +397,64 @@
         });
     }
 
+    // ==================== SALVAR TAREFA ====================
     async function salvarTarefa() {
         const idEdit = document.getElementById('inputIdEdit').value;
         const data = document.getElementById('inputData').value;
-        const hora = document.getElementById('inputHora').value; 
+        const hora = document.getElementById('inputHora').value;
+        const local = document.getElementById('inputLocal').value.trim();
         const prio = document.getElementById('inputPrioridade').value;
-        const tarefa = document.getElementById('inputTarefa').value;
+        const tarefa = document.getElementById('inputTarefa').value.trim();
         const fileInput = document.getElementById('inputAnexo');
 
-        if (!data || !tarefa) return alert("A DATA E A DESCRIÇÃO SÃO OBRIGATÓRIAS!");
+        if (!data || !tarefa) { toast('<i class="ph ph-warning"></i> A DATA E A DESCRIÇÃO SÃO OBRIGATÓRIAS!', 'warning'); return; }
 
         let arrayAnexos = [];
         
-        // Se escolheu arquivos novos
         if (fileInput.files.length > 0) {
-            if (fileInput.files.length > 5) return alert("POR SEGURANÇA, SELECIONE NO MÁXIMO 5 ARQUIVOS POR VEZ.");
-            
+            if (fileInput.files.length > 5) { toast('<i class="ph ph-warning"></i> SELECIONE NO MÁXIMO 5 ARQUIVOS.', 'warning'); return; }
             try {
-                // Roda o processamento de todos os arquivos selecionados
                 for(let file of fileInput.files) {
                     const processado = await processarAnexo(file);
                     arrayAnexos.push(processado);
                 }
-            } catch (erro) {
-                return alert(erro);
-            }
+            } catch (erro) { toast(erro, 'danger'); return; }
         } else if (idEdit) {
-            // Se está editando e não enviou nada novo, tenta recuperar os anexos velhos
             const tarefaAntiga = agenda.find(t => t.id == idEdit);
-            if(tarefaAntiga && tarefaAntiga.anexos) {
-                arrayAnexos = tarefaAntiga.anexos;
-            }
+            if(tarefaAntiga && tarefaAntiga.anexos) arrayAnexos = tarefaAntiga.anexos;
         }
 
         if (idEdit) {
             const index = agenda.findIndex(t => t.id == idEdit);
             agenda[index].data = data;
             agenda[index].hora = hora;
+            agenda[index].local = local;
             agenda[index].prioridade = prio;
             agenda[index].tarefa = tarefa;
-            agenda[index].anexos = arrayAnexos; // Salva o array
-            agenda[index].atrasado = false; 
+            agenda[index].anexos = arrayAnexos;
+            agenda[index].atrasado = false;
             cancelarEdicao();
+            toast('<i class="ph ph-check-circle"></i> TAREFA ATUALIZADA COM SUCESSO!', 'success');
         } else {
             agenda.push({ 
-                id: Date.now(), 
-                data: data, 
-                hora: hora, 
-                prioridade: prio, 
-                tarefa: tarefa, 
-                anexos: arrayAnexos, 
-                concluida: false, 
-                atrasado: false 
+                id: Date.now(), data, hora, local, prioridade: prio, tarefa,
+                anexos: arrayAnexos, concluida: false, atrasado: false 
             });
             document.getElementById('inputTarefa').value = "";
             document.getElementById('inputHora').value = "";
-            document.getElementById('inputAnexo').value = ""; 
+            document.getElementById('inputLocal').value = "";
+            document.getElementById('inputAnexo').value = "";
+            toast('<i class="ph ph-check-circle"></i> TAREFA LANÇADA COM SUCESSO!', 'success');
         }
         processarAtrasos();
     }
 
-    // Função ajustada para abrir um anexo específico do Array
     function abrirAnexo(id, indexArquivo) {
         const item = agenda.find(t => t.id === id);
         if (!item || !item.anexos || !item.anexos[indexArquivo]) return;
-        
-        const anexo = item.anexos[indexArquivo];
         const a = document.createElement('a');
-        a.href = anexo.dados;
-        a.download = anexo.nome;
+        a.href = item.anexos[indexArquivo].dados;
+        a.download = item.anexos[indexArquivo].nome;
         a.click();
     }
 
@@ -354,36 +463,33 @@
         document.getElementById('inputIdEdit').value = item.id;
         document.getElementById('inputData').value = item.data;
         document.getElementById('inputHora').value = item.hora || "";
+        document.getElementById('inputLocal').value = item.local || "";
         document.getElementById('inputPrioridade').value = item.prioridade || "normal";
         document.getElementById('inputTarefa').value = item.tarefa;
-        document.getElementById('inputAnexo').value = ""; 
+        document.getElementById('inputAnexo').value = "";
+        document.getElementById('avisoAnexoEdit').style.display = (item.anexos && item.anexos.length > 0) ? "block" : "none";
         
-        // Mostra aviso se houver anexos
-        if (item.anexos && item.anexos.length > 0) {
-            document.getElementById('avisoAnexoEdit').style.display = "block";
-        } else {
-            document.getElementById('avisoAnexoEdit').style.display = "none";
-        }
-        
-        document.getElementById('tituloForm').innerText = "✏️ EDITANDO TAREFA";
+        document.getElementById('tituloForm').innerHTML = "<i class='ph ph-pencil-simple'></i> EDITANDO TAREFA";
         const btnSalvar = document.getElementById('btnSalvar');
-        btnSalvar.innerText = "💾 ATUALIZAR TAREFA";
+        btnSalvar.innerHTML = "<i class='ph ph-floppy-disk'></i> ATUALIZAR TAREFA";
         btnSalvar.classList.add('btn-edit-mode');
-        document.getElementById('btnCancelarEdit').style.display = "block";
+        document.getElementById('btnCancelarEdit').style.display = "flex";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function cancelarEdicao() {
         document.getElementById('inputIdEdit').value = "";
         document.getElementById('inputTarefa').value = "";
         document.getElementById('inputHora').value = "";
+        document.getElementById('inputLocal').value = "";
         document.getElementById('inputData').value = new Date().toISOString().split('T')[0];
         document.getElementById('inputPrioridade').value = "normal";
         document.getElementById('inputAnexo').value = "";
         document.getElementById('avisoAnexoEdit').style.display = "none";
         
-        document.getElementById('tituloForm').innerText = "➕ NOVA MANUTENÇÃO";
+        document.getElementById('tituloForm').innerHTML = "<i class='ph ph-plus-circle'></i> NOVA MANUTENÇÃO";
         const btnSalvar = document.getElementById('btnSalvar');
-        btnSalvar.innerText = "💾 LANÇAR TAREFA";
+        btnSalvar.innerHTML = "<i class='ph ph-floppy-disk'></i> LANÇAR TAREFA";
         btnSalvar.classList.remove('btn-edit-mode');
         document.getElementById('btnCancelarEdit').style.display = "none";
     }
@@ -391,24 +497,31 @@
     function alternarStatus(id) {
         const index = agenda.findIndex(t => t.id === id);
         agenda[index].concluida = !agenda[index].concluida;
-        if (agenda[index].concluida) agenda[index].atrasado = false; 
+        if (agenda[index].concluida) {
+            agenda[index].atrasado = false;
+            toast('<i class="ph ph-check-circle"></i> TAREFA CONCLUÍDA!', 'success');
+        } else {
+            toast('<i class="ph ph-arrow-u-up-left"></i> TAREFA REABERTA.', 'info');
+        }
         processarAtrasos();
     }
 
     function excluirTarefa(id) {
-        if(confirm("DESEJA APAGAR ESTA TAREFA?")) {
+        const item = agenda.find(t => t.id === id);
+        confirmar('APAGAR TAREFA?', `"${item.tarefa.substring(0, 60)}"`, () => {
             agenda = agenda.filter(t => t.id !== id);
             salvarERenderizar();
-        }
+            toast('<i class="ph ph-trash"></i> TAREFA REMOVIDA.', 'danger');
+        });
     }
 
     function limparConcluidas() {
-        if(confirm("REMOVER TODAS AS TAREFAS CONCLUÍDAS E SEUS ANEXOS PARA LIBERAR MEMÓRIA?")) {
-            agenda = agenda.filter(t => !t.concluida);
-            salvarERenderizar();
-        }
+        agenda = agenda.filter(t => !t.concluida);
+        salvarERenderizar();
+        toast('<i class="ph ph-broom"></i> TAREFAS CONCLUÍDAS REMOVIDAS!', 'success');
     }
 
+    // ==================== FILTROS ====================
     function aplicarFiltro(tipo) {
         filtroAtual = tipo;
         document.querySelectorAll('.stat-box').forEach(box => box.classList.remove('active'));
@@ -416,39 +529,67 @@
         renderizarInterface();
     }
 
+    function aplicarPeriodo(periodo) {
+        periodoAtual = periodo;
+        document.querySelectorAll('.btn-periodo').forEach(b => b.classList.remove('active'));
+        document.getElementById('periodo-' + periodo).classList.add('active');
+        renderizarInterface();
+    }
+
+    function filtrarPorPeriodo(lista) {
+        if (periodoAtual === 'todos') return lista;
+        const hoje = new Date(); hoje.setHours(0,0,0,0);
+        const hojeISO = hoje.toISOString().split('T')[0];
+        if (periodoAtual === 'hoje') return lista.filter(t => t.data === hojeISO);
+        if (periodoAtual === 'semana') {
+            const fimSemana = new Date(hoje); fimSemana.setDate(hoje.getDate() + (6 - hoje.getDay()));
+            const inicioSemana = new Date(hoje); inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+            return lista.filter(t => t.data >= inicioSemana.toISOString().split('T')[0] && t.data <= fimSemana.toISOString().split('T')[0]);
+        }
+        if (periodoAtual === 'mes') {
+            const ano = hoje.getFullYear(); const mes = String(hoje.getMonth() + 1).padStart(2,'0');
+            return lista.filter(t => t.data.startsWith(`${ano}-${mes}`));
+        }
+        if (periodoAtual === 'proximo') {
+            const em7 = new Date(hoje); em7.setDate(hoje.getDate() + 7);
+            return lista.filter(t => t.data >= hojeISO && t.data <= em7.toISOString().split('T')[0]);
+        }
+        return lista;
+    }
+
+    // ==================== ESTATÍSTICAS ====================
     function atualizarEstatisticas() {
         const concluidos = agenda.filter(t => t.concluida).length;
         const atrasados = agenda.filter(t => t.atrasado && !t.concluida).length;
         const pendentes = agenda.filter(t => !t.concluida && !t.atrasado).length;
         const total = agenda.length;
-
         document.getElementById('countConcluidos').innerText = concluidos;
         document.getElementById('countAtrasados').innerText = atrasados;
         document.getElementById('countPendentes').innerText = pendentes;
         document.getElementById('countTodos').innerText = total;
-
         const progresso = total === 0 ? 0 : (concluidos / total) * 100;
         document.getElementById('progressBar').style.width = progresso + "%";
+        document.getElementById('progressPct').innerText = Math.round(progresso) + "%";
+        atualizarStorageBar();
     }
 
     function salvarERenderizar() {
         try {
             localStorage.setItem('zenilson_agenda_pro', JSON.stringify(agenda));
         } catch (e) {
-            alert("⚠️ ERRO CRÍTICO: O ARMAZENAMENTO DO NAVEGADOR LOTOU! LIMPE AS TAREFAS CONCLUÍDAS (INBOX ZERO) PARA LIBERAR ESPAÇO.");
+            toast('<i class="ph ph-warning-circle"></i> ARMAZENAMENTO LOTOU! LIMPE AS CONCLUÍDAS.', 'danger', 5000);
             return;
         }
-        
         agenda.sort((a, b) => {
             if (a.data !== b.data) return a.data.localeCompare(b.data);
-            const pesos = { "urgente": 1, "normal": 2, "baixa": 3 };
-            return pesos[a.prioridade] - pesos[b.prioridade];
+            const pesos = { urgente: 1, normal: 2, baixa: 3 };
+            return (pesos[a.prioridade] || 2) - (pesos[b.prioridade] || 2);
         });
-
         atualizarEstatisticas();
         renderizarInterface();
     }
 
+    // ==================== RENDERIZAR ====================
     function renderizarInterface() {
         const container = document.getElementById('listaTarefas');
         const termoBusca = document.getElementById('inputBusca').value.toLowerCase();
@@ -459,54 +600,69 @@
         if (filtroAtual === 'atrasados') listaFiltrada = agenda.filter(t => t.atrasado && !t.concluida);
         if (filtroAtual === 'concluidos') listaFiltrada = agenda.filter(t => t.concluida);
 
+        listaFiltrada = filtrarPorPeriodo(listaFiltrada);
+
         if (termoBusca) {
-            listaFiltrada = listaFiltrada.filter(t => t.tarefa.toLowerCase().includes(termoBusca) || (t.hora && t.hora.toLowerCase().includes(termoBusca)));
+            listaFiltrada = listaFiltrada.filter(t =>
+                t.tarefa.toLowerCase().includes(termoBusca) ||
+                (t.hora && t.hora.toLowerCase().includes(termoBusca)) ||
+                (t.local && t.local.toLowerCase().includes(termoBusca)) ||
+                (t.prioridade && t.prioridade.toLowerCase().includes(termoBusca)) ||
+                (t.data && t.data.split('-').reverse().join('/').includes(termoBusca))
+            );
         }
 
         if (listaFiltrada.length === 0) {
-            container.innerHTML = "<p style='text-align:center; color:#777; margin-top: 50px;'>NADA ENCONTRADO PARA ESTA SELEÇÃO.</p>";
+            container.innerHTML = "<p style='text-align:center; color:#777; margin-top: 50px;'><i class='ph ph-magnifying-glass' style='font-size: 2rem; display:block; margin-bottom: 10px;'></i>NADA ENCONTRADO PARA ESTA SELEÇÃO.</p>";
             return;
         }
 
-        listaFiltrada.forEach(item => {
+        listaFiltrada.forEach((item, i) => {
             const dataBR = item.data.split('-').reverse().join('/');
-            const infoHora = item.hora ? ` • 🕒 ${item.hora.toUpperCase()}` : ''; 
+            const infoHora = item.hora ? ` • <i class="ph ph-clock"></i> ${item.hora.toUpperCase()}` : '';
             let statusClass = item.concluida ? "concluido" : "";
             if (item.atrasado) statusClass += " atrasado";
-            const iconeCheck = item.concluida ? "✔️" : "⚪";
+            const iconeCheck = item.concluida ? '<i class="ph ph-check-circle"></i>' : '<i class="ph ph-circle"></i>';
             const prioClass = `prio-${item.prioridade || 'normal'}`;
-            const tagAtraso = item.atrasado ? `<span class="tag-atrasado">⚠️ MUDOU P/ HOJE</span>` : "";
+            const iconeFogo = item.prioridade === 'urgente' ? ' <i class="ph ph-fire"></i>' : '';
+            const tagAtraso = item.atrasado ? `<span class="tag-atrasado"><i class="ph ph-warning"></i> MUDOU P/ HOJE</span>` : "";
+            const tagDataOriginal = (item.atrasado && item.dataOriginal)
+                ? `<span class="card-data-original"><i class="ph ph-push-pin"></i> PREVISTO: ${item.dataOriginal.split('-').reverse().join('/')}</span>` : "";
+            const tagLocal = item.local ? `<span class="card-local"><i class="ph ph-map-pin"></i> ${item.local}</span>` : "";
             
-            // Renderiza múltiplos botões de anexo
             let botoesAnexosHtml = "";
             if (item.anexos && item.anexos.length > 0 && !item.concluida) {
-                item.anexos.forEach((anexo, i) => {
-                    // Corta o nome do arquivo se for muito grande
+                item.anexos.forEach((anexo, idx) => {
                     let nomeCurto = anexo.nome.length > 15 ? anexo.nome.substring(0,12) + "..." : anexo.nome;
-                    botoesAnexosHtml += `<button class="btn-anexo" onclick="abrirAnexo(${item.id}, ${i})" title="BAIXAR ${anexo.nome}">📎 ${nomeCurto}</button>`;
+                    botoesAnexosHtml += `<button class="btn-anexo" onclick="abrirAnexo(${item.id}, ${idx})" title="BAIXAR ${anexo.nome}"><i class="ph ph-paperclip"></i> ${nomeCurto}</button>`;
                 });
             }
 
-            container.innerHTML += `
-            <div class="card ${statusClass}">
+            const card = document.createElement('div');
+            card.className = `card ${statusClass}`;
+            card.style.animationDelay = `${i * 0.04}s`;
+            card.innerHTML = `
                 <div class="card-info">
                     <div class="card-header-info">
-                        <span class="card-data">📅 ${dataBR}${infoHora}</span>
-                        <span class="tag-prio ${prioClass}">${item.prioridade || 'normal'}</span>
+                        <span class="card-data"><i class="ph ph-calendar-blank"></i> ${dataBR}${infoHora}</span>
+                        <span class="tag-prio ${prioClass}">${item.prioridade || 'normal'} ${iconeFogo}</span>
+                        ${tagLocal}
                         ${tagAtraso}
+                        ${tagDataOriginal}
                     </div>
                     <p class="card-tarefa">${item.tarefa}</p>
                     <div class="anexos-container">${botoesAnexosHtml}</div>
                 </div>
                 <div class="card-acoes">
                     <button class="btn-acao btn-check" onclick="alternarStatus(${item.id})" title="MARCAR CONCLUÍDO">${iconeCheck}</button>
-                    <button class="btn-acao" onclick="editarTarefa(${item.id})" title="EDITAR">✏️</button>
-                    <button class="btn-acao" style="color:#ff8a80;" onclick="excluirTarefa(${item.id})" title="EXCLUIR">🗑️</button>
-                </div>
-            </div>`;
+                    <button class="btn-acao" onclick="editarTarefa(${item.id})" title="EDITAR"><i class="ph ph-pencil-simple"></i></button>
+                    <button class="btn-acao" style="color:#ff8a80;" onclick="excluirTarefa(${item.id})" title="EXCLUIR"><i class="ph ph-trash"></i></button>
+                </div>`;
+            container.appendChild(card);
         });
     }
 
+    // ==================== SYNC MOBILE ====================
     function sincronizarDoCelular(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -518,27 +674,27 @@
                     let qtdMarcada = 0;
                     agenda.forEach(tarefa => {
                         if (idsConcluidos.includes(tarefa.id) && !tarefa.concluida) {
-                            tarefa.concluida = true;
-                            tarefa.atrasado = false;
-                            qtdMarcada++;
+                            tarefa.concluida = true; tarefa.atrasado = false; qtdMarcada++;
                         }
                     });
                     processarAtrasos();
-                    alert(`✅ SINCRONIZAÇÃO PERFEITA! ${qtdMarcada} TAREFAS MARCADAS COMO CONCLUÍDAS.`);
+                    toast(`<i class="ph ph-check-circle"></i> SYNC CONCLUÍDO! ${qtdMarcada} TAREFAS MARCADAS.`, 'success');
                 }
-            } catch (error) { alert("❌ ARQUIVO DE SINCRONIZAÇÃO INVÁLIDO."); }
+            } catch (error) { toast('<i class="ph ph-x-circle"></i> ARQUIVO DE SINCRONIZAÇÃO INVÁLIDO.', 'danger'); }
             event.target.value = '';
         };
         reader.readAsText(file);
     }
 
+    // ==================== BACKUP ====================
     function exportarJSON() {
-        if (agenda.length === 0) return alert("AGENDA VAZIA.");
+        if (agenda.length === 0) { toast('<i class="ph ph-warning"></i> AGENDA VAZIA.', 'warning'); return; }
         const blob = new Blob([JSON.stringify(agenda, null, 2)], { type: "application/json" });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `Backup_Master_TI_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
+        toast('<i class="ph ph-floppy-disk"></i> BACKUP EXPORTADO!', 'success');
     }
 
     function importarJSON(event) {
@@ -548,35 +704,62 @@
         reader.onload = function(e) {
             try {
                 const dados = JSON.parse(e.target.result);
-                if (Array.isArray(dados)) { agenda = dados; processarAtrasos(); alert("✅ BACKUP RESTAURADO!"); }
-            } catch (error) { alert("❌ ARQUIVO INVÁLIDO."); }
+                if (Array.isArray(dados)) { agenda = dados; processarAtrasos(); toast('<i class="ph ph-check-circle"></i> BACKUP RESTAURADO!', 'success'); }
+            } catch (error) { toast('<i class="ph ph-x-circle"></i> ARQUIVO INVÁLIDO.', 'danger'); }
             event.target.value = '';
         };
         reader.readAsText(file);
     }
 
+    // ==================== EXPORTAR CSV ====================
+    function exportarCSV() {
+        if (agenda.length === 0) { toast('<i class="ph ph-warning"></i> AGENDA VAZIA.', 'warning'); return; }
+        const header = ['ID','DATA','HORA','LOCAL','PRIORIDADE','TAREFA','STATUS','ATRASADO','DATA ORIGINAL'];
+        const rows = agenda.map(t => [
+            t.id,
+            t.data.split('-').reverse().join('/'),
+            t.hora || '',
+            t.local || '',
+            t.prioridade || 'normal',
+            `"${t.tarefa.replace(/"/g,'""')}"`,
+            t.concluida ? 'CONCLUÍDA' : 'PENDENTE',
+            t.atrasado ? 'SIM' : 'NÃO',
+            t.dataOriginal ? t.dataOriginal.split('-').reverse().join('/') : ''
+        ]);
+        const csv = [header, ...rows].map(r => r.join(';')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Relatorio_TI_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        toast('<i class="ph ph-chart-bar"></i> CSV EXPORTADO COM SUCESSO!', 'success');
+    }
+
+    // ==================== WHATSAPP ====================
+    // Nota: Mantive os emojis nativos aqui porque o envio para o WhatsApp exige texto plano, e não HTML (como os ícones Phosphor).
     function gerarRelatorioZap() {
         const hojeISO = new Date().toISOString().split('T')[0];
         const tarefasHoje = agenda.filter(t => t.data === hojeISO);
-        if(tarefasHoje.length === 0) return alert("NENHUMA TAREFA PARA RELATAR HOJE!");
+        if(tarefasHoje.length === 0) { toast('<i class="ph ph-warning"></i> NENHUMA TAREFA PARA HOJE!', 'warning'); return; }
         let relatorio = `*RESUMO DE MANUTENÇÕES (${new Date().toLocaleDateString('pt-BR').toUpperCase()})* 🚀\n\n`;
         const feitas = tarefasHoje.filter(t => t.concluida);
         const pendentes = tarefasHoje.filter(t => !t.concluida);
         if(feitas.length > 0) {
             relatorio += `✅ *CONCLUÍDAS:*\n`;
-            feitas.forEach(t => relatorio += `- ~${t.tarefa}~\n`);
+            feitas.forEach(t => relatorio += `- ~${t.tarefa}~${t.local ? ' ('+t.local+')' : ''}\n`);
             relatorio += `\n`;
         }
         if(pendentes.length > 0) {
             relatorio += `⏳ *PENDENTES:*\n`;
-            pendentes.forEach(t => relatorio += `- ${t.tarefa} ${t.hora ? '('+t.hora.toUpperCase()+')' : ''}\n`);
+            pendentes.forEach(t => relatorio += `- ${t.tarefa}${t.local ? ' ('+t.local+')' : ''} ${t.hora ? '('+t.hora.toUpperCase()+')' : ''}\n`);
         }
-        navigator.clipboard.writeText(relatorio).then(() => { alert("✅ COPIADO PRO WHATSAPP."); });
+        navigator.clipboard.writeText(relatorio).then(() => toast('<i class="ph ph-check-circle"></i> RELATÓRIO COPIADO PARA O CLIPBOARD!', 'success'));
     }
 
+    // ==================== APP MOBILE ====================
     function exportarAppMobile() {
         const tarefasPendentes = agenda.filter(t => !t.concluida);
-        if(tarefasPendentes.length === 0) return alert("TUDO CONCLUÍDO! NÃO HÁ PENDÊNCIAS PARA MANDAR PRO CELULAR.");
+        if(tarefasPendentes.length === 0) { toast('<i class="ph ph-confetti"></i> TUDO CONCLUÍDO! SEM PENDÊNCIAS PARA O CELULAR.', 'warning'); return; }
 
         const htmlMobile = `<!DOCTYPE html>
 <html lang="pt-br">
@@ -584,101 +767,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>APP MANUTENÇÃO</title>
+    <!-- PHOSPHOR ICONS PARA MOBILE -->
+    <script src="https://unpkg.com/@phosphor-icons/web"><\/script>
     <style>
-        * { text-transform: uppercase !important; }
-        ::placeholder { text-transform: uppercase !important; }
+        * { text-transform: uppercase !important; box-sizing: border-box; }
         :root { --p: #3498db; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --s: #27ae60; --danger: #e74c3c; --warning: #f39c12; --purple: #9b59b6; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; padding-bottom: 80px; }
-        h2 { text-align: center; color: var(--p); margin-bottom: 20px; text-transform: uppercase; }
-        
-        .btn-sync-back { background: var(--warning); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        
-        .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--p); box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
+        h2 { text-align: center; color: var(--p); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-sync-back { background: var(--warning); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--p); display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
         .card.removendo { opacity: 0; transform: translateX(100%); }
-        
-        .data { font-size: 0.8rem; color: #8ab4f8; font-weight: bold; }
-        .urgente { color: var(--danger); font-weight: bold; font-size: 0.75rem; text-transform: uppercase; border: 1px solid var(--danger); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-left: 10px; }
+        .data { font-size: 0.8rem; color: #8ab4f8; font-weight: bold; display: flex; align-items: center; gap: 5px;}
+        .local-tag { font-size: 0.75rem; color: #aaa; background: #2a2a2a; padding: 4px 8px; border-radius: 4px; border: 1px solid #444; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
+        .urgente { color: var(--danger); font-weight: bold; font-size: 0.75rem; border: 1px solid var(--danger); padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; }
         .tarefa { font-size: 1.1rem; margin: 0; line-height: 1.4; }
-        
-        .anexos-container { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn-anexo { background: transparent; border: 1px solid var(--purple); color: var(--purple); padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; text-align: center; margin-bottom: 5px; }
-        .btn-concluir { background: var(--s); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-anexo { background: transparent; border: 1px solid var(--purple); color: var(--purple); padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-concluir { background: var(--s); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
         .empty { text-align: center; color: #777; margin-top: 50px; font-size: 1.1rem; line-height: 1.5; }
     </style>
 </head>
 <body>
-    <h2>📱 APP DE CAMPO</h2>
-    <button class="btn-sync-back" onclick="gerarSincronizacaoRetorno()">🔄 GERAR ARQUIVO DE RETORNO</button>
+    <h2><i class="ph ph-device-mobile"></i> APP DE CAMPO</h2>
+    <button class="btn-sync-back" onclick="gerarSincronizacaoRetorno()"><i class="ph ph-arrows-clockwise"></i> GERAR ARQUIVO DE RETORNO</button>
     <div id="listaMobile"></div>
-
     <script>
         const tarefasInjetadas = ${JSON.stringify(tarefasPendentes)};
         let concluidasMobile = JSON.parse(localStorage.getItem('zenilson_mobile_concluidas')) || [];
-
         function renderizar() {
             const container = document.getElementById('listaMobile');
             container.innerHTML = "";
-            const tarefasVisiveis = tarefasInjetadas.filter(t => !concluidasMobile.includes(t.id));
-
-            if(tarefasVisiveis.length === 0) {
-                container.innerHTML = "<div class='empty'>🎉 TUDO LIMPO!<br><br>NÃO SE ESQUEÇA DE CLICAR EM <b>GERAR ARQUIVO DE RETORNO</b> LÁ NO TOPO E ENVIAR PARA O PC.</div>";
-                return;
-            }
-
-            tarefasVisiveis.forEach(item => {
+            const visiveis = tarefasInjetadas.filter(t => !concluidasMobile.includes(t.id));
+            if(visiveis.length === 0) { container.innerHTML = "<div class='empty'><i class='ph ph-confetti' style='font-size:3rem'></i><br><br>TUDO LIMPO!<br><br>CLIQUE EM GERAR ARQUIVO DE RETORNO E ENVIE AO PC.</div>"; return; }
+            visiveis.forEach(item => {
                 const dataBR = item.data.split('-').reverse().join('/');
-                const infoHora = item.hora ? \` • 🕒 \${item.hora.toUpperCase()}\` : '';
-                const tagUrgente = item.prioridade === 'urgente' ? "<span class='urgente'>URGENTE</span>" : "";
-                
-                let botoesAnexosHtml = "";
+                const infoHora = item.hora ? \` • <i class="ph ph-clock"></i> \${item.hora.toUpperCase()}\` : '';
+                const tagUrgente = item.prioridade === 'urgente' ? "<span class='urgente'><i class='ph ph-fire'></i> URGENTE</span>" : "";
+                const tagLocal = item.local ? \`<div class='local-tag'><i class="ph ph-map-pin"></i> \${item.local}</div>\` : "";
+                let botoesAnexos = "";
                 if (item.anexos && item.anexos.length > 0) {
-                    item.anexos.forEach((anexo, i) => {
-                        let nomeCurto = anexo.nome.length > 15 ? anexo.nome.substring(0,12) + "..." : anexo.nome;
-                        botoesAnexosHtml += \`<button class="btn-anexo" onclick="abrirAnexoMobile(\${item.id}, \${i})">📎 \${nomeCurto}</button>\`;
+                    item.anexos.forEach((a, i) => {
+                        let n = a.nome.length > 15 ? a.nome.substring(0,12)+"..." : a.nome;
+                        botoesAnexos += \`<button class="btn-anexo" onclick="abrirAnexo(\${item.id},\${i})"><i class="ph ph-paperclip"></i> \${n}</button> &nbsp;\`;
                     });
                 }
-
-                container.innerHTML += \`
-                <div class="card" id="card-\${item.id}">
-                    <div><span class="data">📅 \${dataBR}\${infoHora}</span>\${tagUrgente}</div>
-                    <p class="tarefa">\${item.tarefa}</p>
-                    <div class="anexos-container">\${botoesAnexosHtml}</div>
-                    <button class="btn-concluir" onclick="concluirMobile(\${item.id})">✔️ FINALIZAR TAREFA</button>
-                </div>\`;
+                const el = document.createElement('div');
+                el.className = 'card'; el.id = 'card-'+item.id;
+                el.innerHTML = \`<div><span class="data"><i class="ph ph-calendar-blank"></i> \${dataBR}\${infoHora}</span>\${tagUrgente}</div>\${tagLocal}<p class="tarefa">\${item.tarefa}</p><div>\${botoesAnexos}</div><button class="btn-concluir" onclick="concluirMobile(\${item.id})"><i class="ph ph-check-circle"></i> FINALIZAR TAREFA</button>\`;
+                container.appendChild(el);
             });
         }
-
-        function abrirAnexoMobile(id, indexArquivo) {
+        function abrirAnexo(id, i) {
             const item = tarefasInjetadas.find(t => t.id === id);
-            if (!item || !item.anexos || !item.anexos[indexArquivo]) return;
-            const anexo = item.anexos[indexArquivo];
-            const a = document.createElement('a');
-            a.href = anexo.dados;
-            a.download = anexo.nome;
-            a.click();
+            if (!item || !item.anexos || !item.anexos[i]) return;
+            const a = document.createElement('a'); a.href = item.anexos[i].dados; a.download = item.anexos[i].nome; a.click();
         }
-
         function concluirMobile(id) {
-            const card = document.getElementById('card-' + id);
-            card.classList.add('removendo'); 
-            setTimeout(() => {
-                concluidasMobile.push(id);
-                localStorage.setItem('zenilson_mobile_concluidas', JSON.stringify(concluidasMobile));
-                renderizar();
-            }, 300); 
+            const card = document.getElementById('card-'+id);
+            card.classList.add('removendo');
+            setTimeout(() => { concluidasMobile.push(id); localStorage.setItem('zenilson_mobile_concluidas', JSON.stringify(concluidasMobile)); renderizar(); }, 300);
         }
-
         function gerarSincronizacaoRetorno() {
-            if(concluidasMobile.length === 0) return alert("VOCÊ AINDA NÃO CONCLUIU NADA NO CELULAR HOJE!");
+            if(concluidasMobile.length === 0) { alert("VOCÊ AINDA NÃO CONCLUIU NADA!"); return; }
             const blob = new Blob([JSON.stringify(concluidasMobile)], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = \`Retorno_Sincronizacao_TI_\${new Date().toISOString().split('T')[0]}.json\`;
-            a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = \`Retorno_Sincronizacao_TI_\${new Date().toISOString().split('T')[0]}.json\`; a.click();
             localStorage.removeItem('zenilson_mobile_concluidas');
-            alert("✅ ARQUIVO DE RETORNO GERADO! MANDE ESTE ARQUIVO PARA O COMPUTADOR E USE O BOTÃO '🔄 SYNC MOBILE' PARA ATUALIZAR A TELA PRINCIPAL.");
+            alert("✅ ARQUIVO GERADO! MANDE AO COMPUTADOR E USE O BOTÃO SYNC MOBILE.");
         }
-
         window.onload = renderizar;
     <\/script>
 </body>
@@ -689,6 +844,7 @@
         a.href = URL.createObjectURL(blob);
         a.download = `App_Mobile_TI_${new Date().toISOString().split('T')[0]}.html`;
         a.click();
+        toast('<i class="ph ph-device-mobile"></i> APP MOBILE EXPORTADO!', 'success');
     }
 </script>
 
