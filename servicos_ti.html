@@ -230,6 +230,10 @@
                 <label><i class="ph ph-map-pin"></i> LOCAL / EQUIPAMENTO</label>
                 <input type="text" id="inputLocal" class="input-field" placeholder="EX: SERVIDOR RACK 2, IMPRESSORA RH...">
                 
+                <!-- NOVO CAMPO: TÉCNICO RESPONSÁVEL -->
+                <label><i class="ph ph-user"></i> TÉCNICO RESPONSÁVEL (OPCIONAL)</label>
+                <input type="text" id="inputTecnico" class="input-field" placeholder="EX: JOÃO, MARIA...">
+
                 <label><i class="ph ph-warning-circle"></i> PRIORIDADE</label>
                 <select id="inputPrioridade" class="input-field">
                     <option value="normal">NORMAL</option>
@@ -259,7 +263,7 @@
             <div class="list-controls">
                 <div class="search-wrapper">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" class="search-bar" id="inputBusca" placeholder="BUSCAR POR TAREFA, LOCAL, PRIORIDADE, DATA..." onkeyup="renderizarInterface()">
+                    <input type="text" class="search-bar" id="inputBusca" placeholder="BUSCAR POR TAREFA, LOCAL, TÉCNICO, DATA..." onkeyup="renderizarInterface()">
                 </div>
                 
                 <button class="btn-zap" onclick="gerarRelatorioZap()" title="COPIAR RESUMO"><i class="ph ph-whatsapp-logo"></i> WHATSAPP</button>
@@ -294,7 +298,6 @@
         const container = document.getElementById('toast-container');
         const el = document.createElement('div');
         el.className = `toast ${tipo}`;
-        // Alterado de textContent para innerHTML para suportar ícones Phosphor
         el.innerHTML = msg;
         container.appendChild(el);
         setTimeout(() => el.remove(), duracao + 400);
@@ -403,6 +406,7 @@
         const data = document.getElementById('inputData').value;
         const hora = document.getElementById('inputHora').value;
         const local = document.getElementById('inputLocal').value.trim();
+        const tecnico = document.getElementById('inputTecnico').value.trim();
         const prio = document.getElementById('inputPrioridade').value;
         const tarefa = document.getElementById('inputTarefa').value.trim();
         const fileInput = document.getElementById('inputAnexo');
@@ -429,6 +433,7 @@
             agenda[index].data = data;
             agenda[index].hora = hora;
             agenda[index].local = local;
+            agenda[index].tecnico = tecnico;
             agenda[index].prioridade = prio;
             agenda[index].tarefa = tarefa;
             agenda[index].anexos = arrayAnexos;
@@ -437,12 +442,13 @@
             toast('<i class="ph ph-check-circle"></i> TAREFA ATUALIZADA COM SUCESSO!', 'success');
         } else {
             agenda.push({ 
-                id: Date.now(), data, hora, local, prioridade: prio, tarefa,
+                id: Date.now(), data, hora, local, tecnico, prioridade: prio, tarefa,
                 anexos: arrayAnexos, concluida: false, atrasado: false 
             });
             document.getElementById('inputTarefa').value = "";
             document.getElementById('inputHora').value = "";
             document.getElementById('inputLocal').value = "";
+            document.getElementById('inputTecnico').value = "";
             document.getElementById('inputAnexo').value = "";
             toast('<i class="ph ph-check-circle"></i> TAREFA LANÇADA COM SUCESSO!', 'success');
         }
@@ -458,12 +464,22 @@
         a.click();
     }
 
+    function abrirFotoMobile(id, indexArquivo) {
+        const item = agenda.find(t => t.id === id);
+        if (!item || !item.fotosMobile || !item.fotosMobile[indexArquivo]) return;
+        const a = document.createElement('a');
+        a.href = item.fotosMobile[indexArquivo].dados;
+        a.download = `OS_${id}_FOTO_${indexArquivo + 1}.jpg`;
+        a.click();
+    }
+
     function editarTarefa(id) {
         const item = agenda.find(t => t.id === id);
         document.getElementById('inputIdEdit').value = item.id;
         document.getElementById('inputData').value = item.data;
         document.getElementById('inputHora').value = item.hora || "";
         document.getElementById('inputLocal').value = item.local || "";
+        document.getElementById('inputTecnico').value = item.tecnico || "";
         document.getElementById('inputPrioridade').value = item.prioridade || "normal";
         document.getElementById('inputTarefa').value = item.tarefa;
         document.getElementById('inputAnexo').value = "";
@@ -482,6 +498,7 @@
         document.getElementById('inputTarefa').value = "";
         document.getElementById('inputHora').value = "";
         document.getElementById('inputLocal').value = "";
+        document.getElementById('inputTecnico').value = "";
         document.getElementById('inputData').value = new Date().toISOString().split('T')[0];
         document.getElementById('inputPrioridade').value = "normal";
         document.getElementById('inputAnexo').value = "";
@@ -607,6 +624,7 @@
                 t.tarefa.toLowerCase().includes(termoBusca) ||
                 (t.hora && t.hora.toLowerCase().includes(termoBusca)) ||
                 (t.local && t.local.toLowerCase().includes(termoBusca)) ||
+                (t.tecnico && t.tecnico.toLowerCase().includes(termoBusca)) ||
                 (t.prioridade && t.prioridade.toLowerCase().includes(termoBusca)) ||
                 (t.data && t.data.split('-').reverse().join('/').includes(termoBusca))
             );
@@ -629,6 +647,7 @@
             const tagDataOriginal = (item.atrasado && item.dataOriginal)
                 ? `<span class="card-data-original"><i class="ph ph-push-pin"></i> PREVISTO: ${item.dataOriginal.split('-').reverse().join('/')}</span>` : "";
             const tagLocal = item.local ? `<span class="card-local"><i class="ph ph-map-pin"></i> ${item.local}</span>` : "";
+            const tagTecnico = item.tecnico ? `<span class="card-local" style="background: #2a223a; border-color: #554477; color: #dcb3ff;"><i class="ph ph-user"></i> ${item.tecnico}</span>` : "";
             
             let botoesAnexosHtml = "";
             if (item.anexos && item.anexos.length > 0 && !item.concluida) {
@@ -636,6 +655,25 @@
                     let nomeCurto = anexo.nome.length > 15 ? anexo.nome.substring(0,12) + "..." : anexo.nome;
                     botoesAnexosHtml += `<button class="btn-anexo" onclick="abrirAnexo(${item.id}, ${idx})" title="BAIXAR ${anexo.nome}"><i class="ph ph-paperclip"></i> ${nomeCurto}</button>`;
                 });
+            }
+
+            // --- BLOCO DO RELATÓRIO DE CAMPO (Aguardando Aval) ---
+            let htmlRetornoCampo = "";
+            if (!item.concluida && (item.relatorioTecnico || (item.fotosMobile && item.fotosMobile.length > 0))) {
+                let botoesFotosTech = "";
+                if (item.fotosMobile && item.fotosMobile.length > 0) {
+                    item.fotosMobile.forEach((foto, idx) => {
+                        botoesFotosTech += `<button class="btn-anexo" style="border-color: var(--warning); color: var(--warning);" onclick="abrirFotoMobile(${item.id}, ${idx})"><i class="ph ph-image"></i> FOTO DA O.S. ${idx+1}</button> `;
+                    });
+                }
+                
+                htmlRetornoCampo = `
+                    <div style="background: #222; padding: 12px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--warning);">
+                        <div style="font-size: 0.75rem; font-weight: bold; color: var(--warning); margin-bottom: 6px; display: flex; align-items: center; gap: 5px;"><i class="ph ph-warning-circle"></i> AGUARDANDO AVAL - RETORNO DO CAMPO:</div>
+                        <div style="font-size: 0.95rem; color: #ddd; margin-bottom: 10px;">${item.relatorioTecnico || "Sem anotações de texto."}</div>
+                        <div class="anexos-container">${botoesFotosTech}</div>
+                    </div>
+                `;
             }
 
             const card = document.createElement('div');
@@ -647,11 +685,13 @@
                         <span class="card-data"><i class="ph ph-calendar-blank"></i> ${dataBR}${infoHora}</span>
                         <span class="tag-prio ${prioClass}">${item.prioridade || 'normal'} ${iconeFogo}</span>
                         ${tagLocal}
+                        ${tagTecnico}
                         ${tagAtraso}
                         ${tagDataOriginal}
                     </div>
                     <p class="card-tarefa">${item.tarefa}</p>
                     <div class="anexos-container">${botoesAnexosHtml}</div>
+                    ${htmlRetornoCampo}
                 </div>
                 <div class="card-acoes">
                     <button class="btn-acao btn-check" onclick="alternarStatus(${item.id})" title="MARCAR CONCLUÍDO">${iconeCheck}</button>
@@ -669,16 +709,25 @@
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
-                const idsConcluidos = JSON.parse(e.target.result);
-                if (Array.isArray(idsConcluidos)) {
+                const retornoMobile = JSON.parse(e.target.result);
+                if (Array.isArray(retornoMobile)) {
                     let qtdMarcada = 0;
                     agenda.forEach(tarefa => {
-                        if (idsConcluidos.includes(tarefa.id) && !tarefa.concluida) {
-                            tarefa.concluida = true; tarefa.atrasado = false; qtdMarcada++;
+                        const itemRetorno = retornoMobile.find(r => typeof r === 'object' ? r.id === tarefa.id : r === tarefa.id);
+                        
+                        if (itemRetorno && !tarefa.concluida) {
+                            if (typeof itemRetorno === 'object') {
+                                tarefa.relatorioTecnico = itemRetorno.nota;
+                                tarefa.fotosMobile = itemRetorno.fotos || [];
+                            } else {
+                                tarefa.concluida = true;
+                                tarefa.atrasado = false;
+                            }
+                            qtdMarcada++;
                         }
                     });
-                    processarAtrasos();
-                    toast(`<i class="ph ph-check-circle"></i> SYNC CONCLUÍDO! ${qtdMarcada} TAREFAS MARCADAS.`, 'success');
+                    salvarERenderizar();
+                    toast(`<i class="ph ph-check-circle"></i> SYNC CONCLUÍDO! ${qtdMarcada} RELATÓRIOS RECEBIDOS PARA AVAL.`, 'success');
                 }
             } catch (error) { toast('<i class="ph ph-x-circle"></i> ARQUIVO DE SINCRONIZAÇÃO INVÁLIDO.', 'danger'); }
             event.target.value = '';
@@ -714,12 +763,13 @@
     // ==================== EXPORTAR CSV ====================
     function exportarCSV() {
         if (agenda.length === 0) { toast('<i class="ph ph-warning"></i> AGENDA VAZIA.', 'warning'); return; }
-        const header = ['ID','DATA','HORA','LOCAL','PRIORIDADE','TAREFA','STATUS','ATRASADO','DATA ORIGINAL'];
+        const header = ['ID','DATA','HORA','LOCAL','TÉCNICO','PRIORIDADE','TAREFA','STATUS','ATRASADO','DATA ORIGINAL'];
         const rows = agenda.map(t => [
             t.id,
             t.data.split('-').reverse().join('/'),
             t.hora || '',
             t.local || '',
+            t.tecnico || '',
             t.prioridade || 'normal',
             `"${t.tarefa.replace(/"/g,'""')}"`,
             t.concluida ? 'CONCLUÍDA' : 'PENDENTE',
@@ -736,7 +786,6 @@
     }
 
     // ==================== WHATSAPP ====================
-    // Nota: Mantive os emojis nativos aqui porque o envio para o WhatsApp exige texto plano, e não HTML (como os ícones Phosphor).
     function gerarRelatorioZap() {
         const hojeISO = new Date().toISOString().split('T')[0];
         const tarefasHoje = agenda.filter(t => t.data === hojeISO);
@@ -744,6 +793,7 @@
         let relatorio = `*RESUMO DE MANUTENÇÕES (${new Date().toLocaleDateString('pt-BR').toUpperCase()})* 🚀\n\n`;
         const feitas = tarefasHoje.filter(t => t.concluida);
         const pendentes = tarefasHoje.filter(t => !t.concluida);
+        
         if(feitas.length > 0) {
             relatorio += `✅ *CONCLUÍDAS:*\n`;
             feitas.forEach(t => relatorio += `- ~${t.tarefa}~${t.local ? ' ('+t.local+')' : ''}\n`);
@@ -751,89 +801,185 @@
         }
         if(pendentes.length > 0) {
             relatorio += `⏳ *PENDENTES:*\n`;
-            pendentes.forEach(t => relatorio += `- ${t.tarefa}${t.local ? ' ('+t.local+')' : ''} ${t.hora ? '('+t.hora.toUpperCase()+')' : ''}\n`);
+            pendentes.forEach(t => relatorio += `- ${t.tarefa}${t.local ? ' ('+t.local+')' : ''} ${t.hora ? '('+t.hora.toUpperCase()+')' : ''}${t.tecnico ? ' - ['+t.tecnico.toUpperCase()+']' : ''}\n`);
         }
         navigator.clipboard.writeText(relatorio).then(() => toast('<i class="ph ph-check-circle"></i> RELATÓRIO COPIADO PARA O CLIPBOARD!', 'success'));
     }
 
     // ==================== APP MOBILE ====================
     function exportarAppMobile() {
-        const tarefasPendentes = agenda.filter(t => !t.concluida);
-        if(tarefasPendentes.length === 0) { toast('<i class="ph ph-confetti"></i> TUDO CONCLUÍDO! SEM PENDÊNCIAS PARA O CELULAR.', 'warning'); return; }
+        const todasPendentes = agenda.filter(t => !t.concluida);
+        if(todasPendentes.length === 0) { toast('<i class="ph ph-confetti"></i> TUDO CONCLUÍDO! SEM PENDÊNCIAS PARA O CELULAR.', 'warning'); return; }
+
+        let tecnicoAlvo = prompt("Gerar app para qual técnico? (Deixe em branco para incluir TODAS as tarefas)");
+        let tarefasPendentes = todasPendentes;
+
+        // Filtro de Técnico
+        if (tecnicoAlvo !== null && tecnicoAlvo.trim() !== "") {
+            tecnicoAlvo = tecnicoAlvo.trim().toUpperCase();
+            tarefasPendentes = todasPendentes.filter(t => t.tecnico && t.tecnico.toUpperCase().includes(tecnicoAlvo));
+            
+            if (tarefasPendentes.length === 0) {
+                alert("Nenhuma tarefa pendente encontrada para o técnico: " + tecnicoAlvo);
+                return;
+            }
+        } else if (tecnicoAlvo === null) {
+            // Cancelou o prompt
+            return;
+        }
 
         const htmlMobile = `<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>APP MANUTENÇÃO</title>
-    <!-- PHOSPHOR ICONS PARA MOBILE -->
+    <title>APP MANUTENÇÃO - IDEALTECH</title>
     <script src="https://unpkg.com/@phosphor-icons/web"><\/script>
     <style>
-        * { text-transform: uppercase !important; box-sizing: border-box; }
+        * { box-sizing: border-box; }
         :root { --p: #3498db; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --s: #27ae60; --danger: #e74c3c; --warning: #f39c12; --purple: #9b59b6; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; padding-bottom: 80px; }
-        h2 { text-align: center; color: var(--p); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-sync-back { background: var(--warning); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        h2 { text-align: center; color: var(--p); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.5rem; text-transform: uppercase; }
+        .btn-sync-back { background: var(--warning); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: filter 0.2s; }
+        .btn-sync-back:active { filter: brightness(0.8); }
         .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--p); display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
         .card.removendo { opacity: 0; transform: translateX(100%); }
         .data { font-size: 0.8rem; color: #8ab4f8; font-weight: bold; display: flex; align-items: center; gap: 5px;}
         .local-tag { font-size: 0.75rem; color: #aaa; background: #2a2a2a; padding: 4px 8px; border-radius: 4px; border: 1px solid #444; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
-        .urgente { color: var(--danger); font-weight: bold; font-size: 0.75rem; border: 1px solid var(--danger); padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; }
-        .tarefa { font-size: 1.1rem; margin: 0; line-height: 1.4; }
-        .btn-anexo { background: transparent; border: 1px solid var(--purple); color: var(--purple); padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-concluir { background: var(--s); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;}
-        .empty { text-align: center; color: #777; margin-top: 50px; font-size: 1.1rem; line-height: 1.5; }
+        .tarefa { font-size: 1.1rem; margin: 0; line-height: 1.4; text-transform: uppercase; }
+        
+        /* FORMULÁRIO O.S. */
+        .os-form { background: #2a2a2a; padding: 12px; border-radius: 8px; margin-top: 5px; display: flex; flex-direction: column; gap: 10px; border: 1px solid #444; }
+        .os-label { font-size: 0.8rem; color: #aaa; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .os-textarea { width: 100%; background: #1a1a1a; border: 1px solid #555; color: white; padding: 10px; border-radius: 6px; font-family: inherit; resize: vertical; min-height: 60px; text-transform: uppercase; }
+        .os-file { width: 100%; font-size: 0.85rem; color: #aaa; }
+        
+        .btn-concluir { background: var(--s); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; transition: filter 0.2s;}
+        .btn-concluir:active { filter: brightness(0.8); }
+        .empty { text-align: center; color: #777; margin-top: 50px; font-size: 1.1rem; line-height: 1.5; text-transform: uppercase;}
     </style>
 </head>
 <body>
-    <h2><i class="ph ph-device-mobile"></i> APP DE CAMPO</h2>
-    <button class="btn-sync-back" onclick="gerarSincronizacaoRetorno()"><i class="ph ph-arrows-clockwise"></i> GERAR ARQUIVO DE RETORNO</button>
+    <h2><i class="ph ph-device-mobile"></i> APP DE CAMPO ${tecnicoAlvo ? ' - ' + tecnicoAlvo : ''}</h2>
+    <button class="btn-sync-back" onclick="gerarSincronizacaoRetorno()"><i class="ph ph-share-network"></i> COMPARTILHAR RETORNO</button>
     <div id="listaMobile"></div>
     <script>
         const tarefasInjetadas = ${JSON.stringify(tarefasPendentes)};
         let concluidasMobile = JSON.parse(localStorage.getItem('zenilson_mobile_concluidas')) || [];
+        
+        function processarAnexoMobile(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800;
+                        let scaleSize = img.width > MAX_WIDTH ? MAX_WIDTH / img.width : 1;
+                        canvas.width = img.width * scaleSize;
+                        canvas.height = img.height * scaleSize;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve({ nome: file.name, dados: canvas.toDataURL('image/jpeg', 0.6) });
+                    };
+                };
+            });
+        }
+
         function renderizar() {
             const container = document.getElementById('listaMobile');
             container.innerHTML = "";
-            const visiveis = tarefasInjetadas.filter(t => !concluidasMobile.includes(t.id));
-            if(visiveis.length === 0) { container.innerHTML = "<div class='empty'><i class='ph ph-confetti' style='font-size:3rem'></i><br><br>TUDO LIMPO!<br><br>CLIQUE EM GERAR ARQUIVO DE RETORNO E ENVIE AO PC.</div>"; return; }
+            const visiveis = tarefasInjetadas.filter(t => !concluidasMobile.some(c => c.id === t.id));
+            if(visiveis.length === 0) { 
+                container.innerHTML = "<div class='empty'><i class='ph ph-confetti' style='font-size:3rem'></i><br><br>TUDO LIMPO!<br><br>CLIQUE EM COMPARTILHAR E MANDE PARA A BASE.</div>"; 
+                return; 
+            }
             visiveis.forEach(item => {
                 const dataBR = item.data.split('-').reverse().join('/');
                 const infoHora = item.hora ? \` • <i class="ph ph-clock"></i> \${item.hora.toUpperCase()}\` : '';
-                const tagUrgente = item.prioridade === 'urgente' ? "<span class='urgente'><i class='ph ph-fire'></i> URGENTE</span>" : "";
-                const tagLocal = item.local ? \`<div class='local-tag'><i class="ph ph-map-pin"></i> \${item.local}</div>\` : "";
-                let botoesAnexos = "";
-                if (item.anexos && item.anexos.length > 0) {
-                    item.anexos.forEach((a, i) => {
-                        let n = a.nome.length > 15 ? a.nome.substring(0,12)+"..." : a.nome;
-                        botoesAnexos += \`<button class="btn-anexo" onclick="abrirAnexo(\${item.id},\${i})"><i class="ph ph-paperclip"></i> \${n}</button> &nbsp;\`;
-                    });
-                }
+                const tagLocal = item.local ? \`<div class='local-tag'><i class="ph ph-map-pin"></i> \${item.local.toUpperCase()}</div>\` : "";
+                
                 const el = document.createElement('div');
                 el.className = 'card'; el.id = 'card-'+item.id;
-                el.innerHTML = \`<div><span class="data"><i class="ph ph-calendar-blank"></i> \${dataBR}\${infoHora}</span>\${tagUrgente}</div>\${tagLocal}<p class="tarefa">\${item.tarefa}</p><div>\${botoesAnexos}</div><button class="btn-concluir" onclick="concluirMobile(\${item.id})"><i class="ph ph-check-circle"></i> FINALIZAR TAREFA</button>\`;
+                el.innerHTML = \`
+                    <div><span class="data"><i class="ph ph-calendar-blank"></i> \${dataBR}\${infoHora}</span></div>
+                    \${tagLocal}
+                    <p class="tarefa">\${item.tarefa}</p>
+                    <div class="os-form">
+                        <label class="os-label"><i class="ph ph-text-align-left"></i> O QUE FOI FEITO?</label>
+                        <textarea id="nota-\${item.id}" class="os-textarea" placeholder="Descreva os serviços realizados..."></textarea>
+                        
+                        <label class="os-label"><i class="ph ph-camera"></i> FOTOS DA O.S. (OPCIONAL)</label>
+                        <input type="file" id="foto-\${item.id}" class="os-file" accept="image/*" multiple capture="environment">
+                        
+                        <button id="btn-os-\${item.id}" class="btn-concluir" onclick="concluirMobile(\${item.id})"><i class="ph ph-check-circle"></i> SALVAR RELATÓRIO O.S.</button>
+                    </div>
+                \`;
                 container.appendChild(el);
             });
         }
-        function abrirAnexo(id, i) {
-            const item = tarefasInjetadas.find(t => t.id === id);
-            if (!item || !item.anexos || !item.anexos[i]) return;
-            const a = document.createElement('a'); a.href = item.anexos[i].dados; a.download = item.anexos[i].nome; a.click();
-        }
-        function concluirMobile(id) {
+
+        async function concluirMobile(id) {
+            const btn = document.getElementById('btn-os-'+id);
+            btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i> SALVANDO...';
+            btn.disabled = true;
+
+            const nota = document.getElementById('nota-'+id).value.toUpperCase();
+            const fileInput = document.getElementById('foto-'+id);
+            let fotos = [];
+            
+            if (fileInput.files.length > 0) {
+                for(let file of fileInput.files) {
+                    fotos.push(await processarAnexoMobile(file));
+                }
+            }
+            
             const card = document.getElementById('card-'+id);
             card.classList.add('removendo');
-            setTimeout(() => { concluidasMobile.push(id); localStorage.setItem('zenilson_mobile_concluidas', JSON.stringify(concluidasMobile)); renderizar(); }, 300);
+            setTimeout(() => { 
+                concluidasMobile.push({ id: id, nota: nota, fotos: fotos }); 
+                localStorage.setItem('zenilson_mobile_concluidas', JSON.stringify(concluidasMobile)); 
+                renderizar(); 
+            }, 300);
         }
-        function gerarSincronizacaoRetorno() {
-            if(concluidasMobile.length === 0) { alert("VOCÊ AINDA NÃO CONCLUIU NADA!"); return; }
-            const blob = new Blob([JSON.stringify(concluidasMobile)], { type: 'application/json' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-            a.download = \`Retorno_Sincronizacao_TI_\${new Date().toISOString().split('T')[0]}.json\`; a.click();
+
+        async function gerarSincronizacaoRetorno() {
+            if(concluidasMobile.length === 0) { 
+                alert("VOCÊ AINDA NÃO CONCLUIU NENHUMA TAREFA!"); 
+                return; 
+            }
+            
+            const filename = \`Retorno_OS_Campo_\${new Date().toISOString().split('T')[0]}.json\`;
+            const textData = JSON.stringify(concluidasMobile);
+            const blob = new Blob([textData], { type: 'application/json' });
+            
+            try {
+                const fileToShare = new File([blob], filename, { type: 'application/json' });
+                if (navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
+                    await navigator.share({
+                        files: [fileToShare],
+                        title: 'Retorno OS - IdealTech',
+                        text: 'Segue o arquivo de retorno das Ordens de Serviço.'
+                    });
+                    localStorage.removeItem('zenilson_mobile_concluidas');
+                    alert("✅ ARQUIVO COMPARTILHADO COM SUCESSO!");
+                    renderizar();
+                    return; 
+                }
+            } catch (error) {
+                console.log("Compartilhamento cancelado ou falhou. Caindo para download normal.", error);
+            }
+
+            const a = document.createElement('a'); 
+            a.href = URL.createObjectURL(blob);
+            a.download = filename; 
+            a.click();
             localStorage.removeItem('zenilson_mobile_concluidas');
-            alert("✅ ARQUIVO GERADO! MANDE AO COMPUTADOR E USE O BOTÃO SYNC MOBILE.");
+            alert("✅ ARQUIVO BAIXADO (COMO O NAVEGADOR BLOQUEIA O NÚMERO DIRETO PARA ARQUIVOS, SELECIONE O CONTATO DA EMPRESA MANUALMENTE NO WHATSAPP!).");
+            renderizar();
         }
+
         window.onload = renderizar;
     <\/script>
 </body>
@@ -842,7 +988,7 @@
         const blob = new Blob([htmlMobile], { type: 'text/html' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `App_Mobile_TI_${new Date().toISOString().split('T')[0]}.html`;
+        a.download = `App_Mobile_TI_${tecnicoAlvo ? tecnicoAlvo.replace(/\\s/g, '_') + '_' : ''}${new Date().toISOString().split('T')[0]}.html`;
         a.click();
         toast('<i class="ph ph-device-mobile"></i> APP MOBILE EXPORTADO!', 'success');
     }
