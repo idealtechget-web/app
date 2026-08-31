@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenilson T.I. - Master Dashboard</title>
+    <style>
+        /* FORÇAR TODAS AS FONTES PARA MAIÚSCULAS */
+        * {
+            text-transform: uppercase !important;
+        }
+        ::placeholder {
+            text-transform: uppercase !important;
+            color: #aaa; /* mantém a cor original do placeholder, opcional */
+        }
+
+        :root { 
+            --p: #3498db; --s: #27ae60; --danger: #e74c3c; --warning: #f39c12; --purple: #9b59b6;
+            --bg: #121212; --box-bg: #1e1e1e; --text: #e0e0e0; --border: #333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            padding: 20px; 
+            margin: 0; 
+            color-scheme: dark;
+            /* text-transform removido daqui pois já está no * */
+        }
+
+        input, select, button, textarea {
+            /* text-transform herdado do * */
+        }
+
+        .container { max-width: 1200px; margin: auto; }
+        
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        h2.main-title { margin: 0; color: var(--p); font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .progress-container { width: 100%; background: var(--border); border-radius: 10px; height: 12px; margin-bottom: 25px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--warning), var(--s)); width: 0%; transition: width 0.5s ease; }
+
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-box { background: var(--box-bg); padding: 15px; border-radius: 10px; text-align: center; border: 2px solid var(--border); cursor: pointer; transition: 0.2s; user-select: none; }
+        .stat-box:hover { transform: translateY(-3px); border-color: #555; }
+        .stat-box.active { border-color: var(--p); background: #2a2a2a; box-shadow: 0 0 15px rgba(52, 152, 219, 0.2); }
+        .stat-num { font-size: 2rem; font-weight: bold; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
+        .stat-num.pendente { color: var(--warning); }
+        .stat-num.atrasado { color: var(--danger); }
+        .stat-num.concluido { color: var(--s); }
+
+        .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 25px; align-items: start; }
+        @media (max-width: 800px) { .main-grid { grid-template-columns: 1fr; } }
+
+        .box { background: var(--box-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h1 { margin-top: 0; color: var(--text); font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; }
+        label { font-size: 0.85rem; font-weight: bold; color: #aaa; margin-bottom: -8px; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: #2a2a2a; color: var(--text); font-size: 1rem; box-sizing: border-box; }
+        .input-field:focus { outline: none; border-color: var(--p); }
+        input[type="file"] { padding: 8px; font-size: 0.9rem; }
+        
+        button.btn-add { background: var(--p); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        button.btn-add:hover { filter: brightness(1.2); }
+        button.btn-edit-mode { background: var(--warning); color: #000; }
+
+        .backup-area { margin-top: 25px; padding-top: 15px; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-backup { background: transparent; color: #aaa; border: 1px solid #555; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.2s; }
+        .btn-backup:hover { background: #333; color: white; }
+
+        .list-container { background: var(--box-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border); min-height: 500px; }
+        
+        .list-controls { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+        .search-bar { flex: 1; padding: 12px; border-radius: 20px; border: 1px solid var(--border); background: #2a2a2a; color: white; font-size: 1rem; min-width: 150px; }
+        
+        .btn-zap { background: #25D366; color: white; border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-zap:hover { background: #128C7E; }
+        .btn-mobile { background: var(--purple); color: white; border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-mobile:hover { background: #8e44ad; }
+        .btn-sync { background: var(--warning); color: #000; border: none; padding: 10px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn-sync:hover { filter: brightness(0.9); }
+
+        .card { background: #1a1a1a; border-radius: 10px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--p); display: flex; justify-content: space-between; align-items: center; border-right: 1px solid var(--border); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); transition: 0.2s; }
+        .card:hover { transform: translateX(3px); background: #222; }
+        
+        .card-info { flex: 1; }
+        .card-header-info { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
+        .card-data { font-size: 0.85rem; font-weight: bold; color: #8ab4f8; } 
+        .tag-prio { font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; color: white; }
+        .prio-baixa { background: #555; }
+        .prio-normal { background: var(--p); }
+        .prio-urgente { background: var(--danger); }
+        
+        .card-tarefa { font-size: 1.1rem; line-height: 1.4; margin: 0 0 8px 0; color: #fff; }
+        
+        /* Container para múltiplos botões de anexo */
+        .anexos-container { display: flex; gap: 5px; flex-wrap: wrap; }
+        .btn-anexo { background: transparent; border: 1px solid var(--purple); color: var(--purple); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-anexo:hover { background: rgba(155, 89, 182, 0.2); }
+
+        .card-acoes { display: flex; gap: 8px; margin-left: 15px; }
+        .btn-acao { background: #2a2a2a; border: 1px solid var(--border); padding: 8px; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: 0.2s; color: var(--text); }
+        .btn-acao:hover { background: #3a3a3a; }
+        .btn-check { border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+        .card.concluido { border-left-color: var(--s); opacity: 0.5; background: #111a14; } 
+        .card.concluido .card-tarefa { text-decoration: line-through; color: #777; }
+        .card.concluido .card-data { color: #555; }
+        .card.concluido .btn-check { background: var(--s); color: white; border-color: var(--s); }
+        .card.concluido .anexos-container { display: none; } 
+
+        .card.atrasado { border-left-color: var(--danger); background: #2a1111; } 
+        .card.atrasado .card-data { color: #ff8a80; } 
+        .tag-atrasado { background: var(--danger); color: white; font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; animation: piscar 2s infinite; }
+        
+        @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-top">
+        <h2 class="main-title">🚀 DASHBOARD T.I.</h2>
+        <span style="color:#888; font-size:0.9rem;" id="dataHojeText"></span>
+    </div>
+
+    <div class="progress-container" title="PROGRESSO DAS TAREFAS">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="dashboard">
+        <div class="stat-box" id="box-pendentes" onclick="aplicarFiltro('pendentes')">
+            <div class="stat-num pendente" id="countPendentes">0</div>
+            <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase;">PENDENTES</div>
+        </div>
+        <div class="stat-box" id="box-atrasados" onclick="aplicarFiltro('atrasados')">
+            <div class="stat-num atrasado" id="countAtrasados">0</div>
+            <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase;">ATRASADOS</div>
+        </div>
+        <div class="stat-box" id="box-concluidos" onclick="aplicarFiltro('concluidos')">
+            <div class="stat-num concluido" id="countConcluidos">0</div>
+            <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase;">CONCLUÍDOS</div>
+        </div>
+        <div class="stat-box active" id="box-todos" onclick="aplicarFiltro('todos')">
+            <div class="stat-num" id="countTodos" style="color:#fff;">0</div>
+            <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase;">TOTAL GERAL</div>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="box">
+            <h1 id="tituloForm">➕ NOVA MANUTENÇÃO</h1>
+            <input type="hidden" id="inputIdEdit"> 
+            
+            <div class="form-group">
+                <label>DATA AGENDADA</label>
+                <input type="date" id="inputData" class="input-field">
+                
+                <label>HORÁRIO / TURNO</label>
+                <input type="text" id="inputHora" class="input-field" placeholder="EX: 14H, LOGO CEDO...">
+                
+                <label>PRIORIDADE</label>
+                <select id="inputPrioridade" class="input-field">
+                    <option value="normal">NORMAL</option>
+                    <option value="urgente">URGENTE 🔥</option>
+                    <option value="baixa">BAIXA</option>
+                </select>
+                
+                <label>DESCRIÇÃO DO SERVIÇO</label>
+                <input type="text" id="inputTarefa" class="input-field" placeholder="O QUE PRECISA SER FEITO?">
+
+                <label>📎 ANEXAR ARQUIVOS (ATÉ 5 FOTOS OU PDFS)</label>
+                <input type="file" id="inputAnexo" class="input-field" accept="image/*,application/pdf" multiple>
+                <small id="avisoAnexoEdit" style="color:var(--warning); display:none;">⚠️ ESTA TAREFA JÁ POSSUI ANEXOS. SELECIONAR NOVOS IRÁ SUBSTITUIR OS ANTIGOS.</small>
+            </div>
+            
+            <button class="btn-add" id="btnSalvar" onclick="salvarTarefa()">💾 LANÇAR TAREFA</button>
+            <button class="btn-add" id="btnCancelarEdit" onclick="cancelarEdicao()" style="display:none; background:#555;">❌ CANCELAR EDIÇÃO</button>
+
+            <div class="backup-area">
+                <button class="btn-backup" onclick="exportarJSON()">💾 BKP TOTAL (.JSON)</button>
+                <button class="btn-backup" onclick="document.getElementById('importFile').click()">📂 RESTAURAR BKP</button>
+                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importarJSON(event)">
+            </div>
+        </div>
+
+        <div class="list-container">
+            <div class="list-controls">
+                <input type="text" class="search-bar" id="inputBusca" placeholder="🔍 BUSCAR TAREFA..." onkeyup="renderizarInterface()">
+                
+                <button class="btn-zap" onclick="gerarRelatorioZap()" title="COPIAR RESUMO">💬 WHATSAPP</button>
+                <button class="btn-mobile" onclick="exportarAppMobile()" title="BAIXAR APP PARA CELULAR">📱 APP CELULAR</button>
+                <button class="btn-sync" onclick="document.getElementById('importSyncMobile').click()" title="PUXAR ARQUIVO DO CELULAR">🔄 SYNC MOBILE</button>
+                <input type="file" id="importSyncMobile" accept=".json" style="display:none" onchange="sincronizarDoCelular(event)">
+                
+                <button onclick="limparConcluidas()" style="background:none; border:none; color:#ff8a80; cursor:pointer; font-size:0.85rem; text-decoration:underline;">LIMPAR CONCLUÍDAS</button>
+            </div>
+
+            <div id="listaTarefas"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let agenda = [];
+    let filtroAtual = 'todos'; 
+
+    window.onload = () => {
+        const salvas = localStorage.getItem('zenilson_agenda_pro');
+        if (salvas) agenda = JSON.parse(salvas);
+
+        const hojeObj = new Date();
+        document.getElementById('inputData').value = hojeObj.toISOString().split('T')[0];
+        document.getElementById('dataHojeText').innerText = "HOJE É " + hojeObj.toLocaleDateString('pt-BR').toUpperCase();
+        
+        document.getElementById('inputTarefa').addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                salvarTarefa();
+            }
+        });
+
+        processarAtrasos(); 
+    };
+
+    function processarAtrasos() {
+        const hojeISO = new Date().toISOString().split('T')[0];
+        agenda.forEach(item => {
+            if (!item.concluida && item.data < hojeISO) {
+                item.dataOriginal = item.data; 
+                item.data = hojeISO; 
+                item.atrasado = true;
+            } else if (item.data >= hojeISO && item.atrasado) {
+                item.atrasado = false;
+            }
+        });
+        salvarERenderizar();
+    }
+
+    function processarAnexo(file) {
+        return new Promise((resolve, reject) => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        // Redução maior para aguentar várias fotos: 800px e 60% de qualidade
+                        const MAX_WIDTH = 800; 
+                        let scaleSize = 1;
+                        if (img.width > MAX_WIDTH) {
+                            scaleSize = MAX_WIDTH / img.width;
+                        }
+                        canvas.width = img.width * scaleSize;
+                        canvas.height = img.height * scaleSize;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        resolve({ nome: file.name.toUpperCase(), dados: dataUrl });
+                    }
+                };
+            } else {
+                if (file.size > 1572864) {
+                    reject(`⚠️ O ARQUIVO ${file.name.toUpperCase()} EXCEDE 1.5MB. ENVIE UM PDF MENOR.`);
+                } else {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve({ nome: file.name.toUpperCase(), dados: reader.result });
+                }
+            }
+        });
+    }
+
+    async function salvarTarefa() {
+        const idEdit = document.getElementById('inputIdEdit').value;
+        const data = document.getElementById('inputData').value;
+        const hora = document.getElementById('inputHora').value; 
+        const prio = document.getElementById('inputPrioridade').value;
+        const tarefa = document.getElementById('inputTarefa').value;
+        const fileInput = document.getElementById('inputAnexo');
+
+        if (!data || !tarefa) return alert("A DATA E A DESCRIÇÃO SÃO OBRIGATÓRIAS!");
+
+        let arrayAnexos = [];
+        
+        // Se escolheu arquivos novos
+        if (fileInput.files.length > 0) {
+            if (fileInput.files.length > 5) return alert("POR SEGURANÇA, SELECIONE NO MÁXIMO 5 ARQUIVOS POR VEZ.");
+            
+            try {
+                // Roda o processamento de todos os arquivos selecionados
+                for(let file of fileInput.files) {
+                    const processado = await processarAnexo(file);
+                    arrayAnexos.push(processado);
+                }
+            } catch (erro) {
+                return alert(erro);
+            }
+        } else if (idEdit) {
+            // Se está editando e não enviou nada novo, tenta recuperar os anexos velhos
+            const tarefaAntiga = agenda.find(t => t.id == idEdit);
+            if(tarefaAntiga && tarefaAntiga.anexos) {
+                arrayAnexos = tarefaAntiga.anexos;
+            }
+        }
+
+        if (idEdit) {
+            const index = agenda.findIndex(t => t.id == idEdit);
+            agenda[index].data = data;
+            agenda[index].hora = hora;
+            agenda[index].prioridade = prio;
+            agenda[index].tarefa = tarefa;
+            agenda[index].anexos = arrayAnexos; // Salva o array
+            agenda[index].atrasado = false; 
+            cancelarEdicao();
+        } else {
+            agenda.push({ 
+                id: Date.now(), 
+                data: data, 
+                hora: hora, 
+                prioridade: prio, 
+                tarefa: tarefa, 
+                anexos: arrayAnexos, 
+                concluida: false, 
+                atrasado: false 
+            });
+            document.getElementById('inputTarefa').value = "";
+            document.getElementById('inputHora').value = "";
+            document.getElementById('inputAnexo').value = ""; 
+        }
+        processarAtrasos();
+    }
+
+    // Função ajustada para abrir um anexo específico do Array
+    function abrirAnexo(id, indexArquivo) {
+        const item = agenda.find(t => t.id === id);
+        if (!item || !item.anexos || !item.anexos[indexArquivo]) return;
+        
+        const anexo = item.anexos[indexArquivo];
+        const a = document.createElement('a');
+        a.href = anexo.dados;
+        a.download = anexo.nome;
+        a.click();
+    }
+
+    function editarTarefa(id) {
+        const item = agenda.find(t => t.id === id);
+        document.getElementById('inputIdEdit').value = item.id;
+        document.getElementById('inputData').value = item.data;
+        document.getElementById('inputHora').value = item.hora || "";
+        document.getElementById('inputPrioridade').value = item.prioridade || "normal";
+        document.getElementById('inputTarefa').value = item.tarefa;
+        document.getElementById('inputAnexo').value = ""; 
+        
+        // Mostra aviso se houver anexos
+        if (item.anexos && item.anexos.length > 0) {
+            document.getElementById('avisoAnexoEdit').style.display = "block";
+        } else {
+            document.getElementById('avisoAnexoEdit').style.display = "none";
+        }
+        
+        document.getElementById('tituloForm').innerText = "✏️ EDITANDO TAREFA";
+        const btnSalvar = document.getElementById('btnSalvar');
+        btnSalvar.innerText = "💾 ATUALIZAR TAREFA";
+        btnSalvar.classList.add('btn-edit-mode');
+        document.getElementById('btnCancelarEdit').style.display = "block";
+    }
+
+    function cancelarEdicao() {
+        document.getElementById('inputIdEdit').value = "";
+        document.getElementById('inputTarefa').value = "";
+        document.getElementById('inputHora').value = "";
+        document.getElementById('inputData').value = new Date().toISOString().split('T')[0];
+        document.getElementById('inputPrioridade').value = "normal";
+        document.getElementById('inputAnexo').value = "";
+        document.getElementById('avisoAnexoEdit').style.display = "none";
+        
+        document.getElementById('tituloForm').innerText = "➕ NOVA MANUTENÇÃO";
+        const btnSalvar = document.getElementById('btnSalvar');
+        btnSalvar.innerText = "💾 LANÇAR TAREFA";
+        btnSalvar.classList.remove('btn-edit-mode');
+        document.getElementById('btnCancelarEdit').style.display = "none";
+    }
+
+    function alternarStatus(id) {
+        const index = agenda.findIndex(t => t.id === id);
+        agenda[index].concluida = !agenda[index].concluida;
+        if (agenda[index].concluida) agenda[index].atrasado = false; 
+        processarAtrasos();
+    }
+
+    function excluirTarefa(id) {
+        if(confirm("DESEJA APAGAR ESTA TAREFA?")) {
+            agenda = agenda.filter(t => t.id !== id);
+            salvarERenderizar();
+        }
+    }
+
+    function limparConcluidas() {
+        if(confirm("REMOVER TODAS AS TAREFAS CONCLUÍDAS E SEUS ANEXOS PARA LIBERAR MEMÓRIA?")) {
+            agenda = agenda.filter(t => !t.concluida);
+            salvarERenderizar();
+        }
+    }
+
+    function aplicarFiltro(tipo) {
+        filtroAtual = tipo;
+        document.querySelectorAll('.stat-box').forEach(box => box.classList.remove('active'));
+        document.getElementById('box-' + tipo).classList.add('active');
+        renderizarInterface();
+    }
+
+    function atualizarEstatisticas() {
+        const concluidos = agenda.filter(t => t.concluida).length;
+        const atrasados = agenda.filter(t => t.atrasado && !t.concluida).length;
+        const pendentes = agenda.filter(t => !t.concluida && !t.atrasado).length;
+        const total = agenda.length;
+
+        document.getElementById('countConcluidos').innerText = concluidos;
+        document.getElementById('countAtrasados').innerText = atrasados;
+        document.getElementById('countPendentes').innerText = pendentes;
+        document.getElementById('countTodos').innerText = total;
+
+        const progresso = total === 0 ? 0 : (concluidos / total) * 100;
+        document.getElementById('progressBar').style.width = progresso + "%";
+    }
+
+    function salvarERenderizar() {
+        try {
+            localStorage.setItem('zenilson_agenda_pro', JSON.stringify(agenda));
+        } catch (e) {
+            alert("⚠️ ERRO CRÍTICO: O ARMAZENAMENTO DO NAVEGADOR LOTOU! LIMPE AS TAREFAS CONCLUÍDAS (INBOX ZERO) PARA LIBERAR ESPAÇO.");
+            return;
+        }
+        
+        agenda.sort((a, b) => {
+            if (a.data !== b.data) return a.data.localeCompare(b.data);
+            const pesos = { "urgente": 1, "normal": 2, "baixa": 3 };
+            return pesos[a.prioridade] - pesos[b.prioridade];
+        });
+
+        atualizarEstatisticas();
+        renderizarInterface();
+    }
+
+    function renderizarInterface() {
+        const container = document.getElementById('listaTarefas');
+        const termoBusca = document.getElementById('inputBusca').value.toLowerCase();
+        container.innerHTML = "";
+
+        let listaFiltrada = agenda;
+        if (filtroAtual === 'pendentes') listaFiltrada = agenda.filter(t => !t.concluida && !t.atrasado);
+        if (filtroAtual === 'atrasados') listaFiltrada = agenda.filter(t => t.atrasado && !t.concluida);
+        if (filtroAtual === 'concluidos') listaFiltrada = agenda.filter(t => t.concluida);
+
+        if (termoBusca) {
+            listaFiltrada = listaFiltrada.filter(t => t.tarefa.toLowerCase().includes(termoBusca) || (t.hora && t.hora.toLowerCase().includes(termoBusca)));
+        }
+
+        if (listaFiltrada.length === 0) {
+            container.innerHTML = "<p style='text-align:center; color:#777; margin-top: 50px;'>NADA ENCONTRADO PARA ESTA SELEÇÃO.</p>";
+            return;
+        }
+
+        listaFiltrada.forEach(item => {
+            const dataBR = item.data.split('-').reverse().join('/');
+            const infoHora = item.hora ? ` • 🕒 ${item.hora.toUpperCase()}` : ''; 
+            let statusClass = item.concluida ? "concluido" : "";
+            if (item.atrasado) statusClass += " atrasado";
+            const iconeCheck = item.concluida ? "✔️" : "⚪";
+            const prioClass = `prio-${item.prioridade || 'normal'}`;
+            const tagAtraso = item.atrasado ? `<span class="tag-atrasado">⚠️ MUDOU P/ HOJE</span>` : "";
+            
+            // Renderiza múltiplos botões de anexo
+            let botoesAnexosHtml = "";
+            if (item.anexos && item.anexos.length > 0 && !item.concluida) {
+                item.anexos.forEach((anexo, i) => {
+                    // Corta o nome do arquivo se for muito grande
+                    let nomeCurto = anexo.nome.length > 15 ? anexo.nome.substring(0,12) + "..." : anexo.nome;
+                    botoesAnexosHtml += `<button class="btn-anexo" onclick="abrirAnexo(${item.id}, ${i})" title="BAIXAR ${anexo.nome}">📎 ${nomeCurto}</button>`;
+                });
+            }
+
+            container.innerHTML += `
+            <div class="card ${statusClass}">
+                <div class="card-info">
+                    <div class="card-header-info">
+                        <span class="card-data">📅 ${dataBR}${infoHora}</span>
+                        <span class="tag-prio ${prioClass}">${item.prioridade || 'normal'}</span>
+                        ${tagAtraso}
+                    </div>
+                    <p class="card-tarefa">${item.tarefa}</p>
+                    <div class="anexos-container">${botoesAnexosHtml}</div>
+                </div>
+                <div class="card-acoes">
+                    <button class="btn-acao btn-check" onclick="alternarStatus(${item.id})" title="MARCAR CONCLUÍDO">${iconeCheck}</button>
+                    <button class="btn-acao" onclick="editarTarefa(${item.id})" title="EDITAR">✏️</button>
+                    <button class="btn-acao" style="color:#ff8a80;" onclick="excluirTarefa(${item.id})" title="EXCLUIR">🗑️</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    function sincronizarDoCelular(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const idsConcluidos = JSON.parse(e.target.result);
+                if (Array.isArray(idsConcluidos)) {
+                    let qtdMarcada = 0;
+                    agenda.forEach(tarefa => {
+                        if (idsConcluidos.includes(tarefa.id) && !tarefa.concluida) {
+                            tarefa.concluida = true;
+                            tarefa.atrasado = false;
+                            qtdMarcada++;
+                        }
+                    });
+                    processarAtrasos();
+                    alert(`✅ SINCRONIZAÇÃO PERFEITA! ${qtdMarcada} TAREFAS MARCADAS COMO CONCLUÍDAS.`);
+                }
+            } catch (error) { alert("❌ ARQUIVO DE SINCRONIZAÇÃO INVÁLIDO."); }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function exportarJSON() {
+        if (agenda.length === 0) return alert("AGENDA VAZIA.");
+        const blob = new Blob([JSON.stringify(agenda, null, 2)], { type: "application/json" });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Backup_Master_TI_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+    }
+
+    function importarJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const dados = JSON.parse(e.target.result);
+                if (Array.isArray(dados)) { agenda = dados; processarAtrasos(); alert("✅ BACKUP RESTAURADO!"); }
+            } catch (error) { alert("❌ ARQUIVO INVÁLIDO."); }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function gerarRelatorioZap() {
+        const hojeISO = new Date().toISOString().split('T')[0];
+        const tarefasHoje = agenda.filter(t => t.data === hojeISO);
+        if(tarefasHoje.length === 0) return alert("NENHUMA TAREFA PARA RELATAR HOJE!");
+        let relatorio = `*RESUMO DE MANUTENÇÕES (${new Date().toLocaleDateString('pt-BR').toUpperCase()})* 🚀\n\n`;
+        const feitas = tarefasHoje.filter(t => t.concluida);
+        const pendentes = tarefasHoje.filter(t => !t.concluida);
+        if(feitas.length > 0) {
+            relatorio += `✅ *CONCLUÍDAS:*\n`;
+            feitas.forEach(t => relatorio += `- ~${t.tarefa}~\n`);
+            relatorio += `\n`;
+        }
+        if(pendentes.length > 0) {
+            relatorio += `⏳ *PENDENTES:*\n`;
+            pendentes.forEach(t => relatorio += `- ${t.tarefa} ${t.hora ? '('+t.hora.toUpperCase()+')' : ''}\n`);
+        }
+        navigator.clipboard.writeText(relatorio).then(() => { alert("✅ COPIADO PRO WHATSAPP."); });
+    }
+
+    function exportarAppMobile() {
+        const tarefasPendentes = agenda.filter(t => !t.concluida);
+        if(tarefasPendentes.length === 0) return alert("TUDO CONCLUÍDO! NÃO HÁ PENDÊNCIAS PARA MANDAR PRO CELULAR.");
+
+        const htmlMobile = `<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>APP MANUTENÇÃO</title>
+    <style>
+        * { text-transform: uppercase !important; }
+        ::placeholder { text-transform: uppercase !important; }
+        :root { --p: #3498db; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --s: #27ae60; --danger: #e74c3c; --warning: #f39c12; --purple: #9b59b6; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); padding: 15px; margin: 0; padding-bottom: 80px; }
+        h2 { text-align: center; color: var(--p); margin-bottom: 20px; text-transform: uppercase; }
+        
+        .btn-sync-back { background: var(--warning); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--p); box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
+        .card.removendo { opacity: 0; transform: translateX(100%); }
+        
+        .data { font-size: 0.8rem; color: #8ab4f8; font-weight: bold; }
+        .urgente { color: var(--danger); font-weight: bold; font-size: 0.75rem; text-transform: uppercase; border: 1px solid var(--danger); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-left: 10px; }
+        .tarefa { font-size: 1.1rem; margin: 0; line-height: 1.4; }
+        
+        .anexos-container { display: flex; gap: 5px; flex-wrap: wrap; }
+        .btn-anexo { background: transparent; border: 1px solid var(--purple); color: var(--purple); padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; text-align: center; margin-bottom: 5px; }
+        .btn-concluir { background: var(--s); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .empty { text-align: center; color: #777; margin-top: 50px; font-size: 1.1rem; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <h2>📱 APP DE CAMPO</h2>
+    <button class="btn-sync-back" onclick="gerarSincronizacaoRetorno()">🔄 GERAR ARQUIVO DE RETORNO</button>
+    <div id="listaMobile"></div>
+
+    <script>
+        const tarefasInjetadas = ${JSON.stringify(tarefasPendentes)};
+        let concluidasMobile = JSON.parse(localStorage.getItem('zenilson_mobile_concluidas')) || [];
+
+        function renderizar() {
+            const container = document.getElementById('listaMobile');
+            container.innerHTML = "";
+            const tarefasVisiveis = tarefasInjetadas.filter(t => !concluidasMobile.includes(t.id));
+
+            if(tarefasVisiveis.length === 0) {
+                container.innerHTML = "<div class='empty'>🎉 TUDO LIMPO!<br><br>NÃO SE ESQUEÇA DE CLICAR EM <b>GERAR ARQUIVO DE RETORNO</b> LÁ NO TOPO E ENVIAR PARA O PC.</div>";
+                return;
+            }
+
+            tarefasVisiveis.forEach(item => {
+                const dataBR = item.data.split('-').reverse().join('/');
+                const infoHora = item.hora ? \` • 🕒 \${item.hora.toUpperCase()}\` : '';
+                const tagUrgente = item.prioridade === 'urgente' ? "<span class='urgente'>URGENTE</span>" : "";
+                
+                let botoesAnexosHtml = "";
+                if (item.anexos && item.anexos.length > 0) {
+                    item.anexos.forEach((anexo, i) => {
+                        let nomeCurto = anexo.nome.length > 15 ? anexo.nome.substring(0,12) + "..." : anexo.nome;
+                        botoesAnexosHtml += \`<button class="btn-anexo" onclick="abrirAnexoMobile(\${item.id}, \${i})">📎 \${nomeCurto}</button>\`;
+                    });
+                }
+
+                container.innerHTML += \`
+                <div class="card" id="card-\${item.id}">
+                    <div><span class="data">📅 \${dataBR}\${infoHora}</span>\${tagUrgente}</div>
+                    <p class="tarefa">\${item.tarefa}</p>
+                    <div class="anexos-container">\${botoesAnexosHtml}</div>
+                    <button class="btn-concluir" onclick="concluirMobile(\${item.id})">✔️ FINALIZAR TAREFA</button>
+                </div>\`;
+            });
+        }
+
+        function abrirAnexoMobile(id, indexArquivo) {
+            const item = tarefasInjetadas.find(t => t.id === id);
+            if (!item || !item.anexos || !item.anexos[indexArquivo]) return;
+            const anexo = item.anexos[indexArquivo];
+            const a = document.createElement('a');
+            a.href = anexo.dados;
+            a.download = anexo.nome;
+            a.click();
+        }
+
+        function concluirMobile(id) {
+            const card = document.getElementById('card-' + id);
+            card.classList.add('removendo'); 
+            setTimeout(() => {
+                concluidasMobile.push(id);
+                localStorage.setItem('zenilson_mobile_concluidas', JSON.stringify(concluidasMobile));
+                renderizar();
+            }, 300); 
+        }
+
+        function gerarSincronizacaoRetorno() {
+            if(concluidasMobile.length === 0) return alert("VOCÊ AINDA NÃO CONCLUIU NADA NO CELULAR HOJE!");
+            const blob = new Blob([JSON.stringify(concluidasMobile)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = \`Retorno_Sincronizacao_TI_\${new Date().toISOString().split('T')[0]}.json\`;
+            a.click();
+            localStorage.removeItem('zenilson_mobile_concluidas');
+            alert("✅ ARQUIVO DE RETORNO GERADO! MANDE ESTE ARQUIVO PARA O COMPUTADOR E USE O BOTÃO '🔄 SYNC MOBILE' PARA ATUALIZAR A TELA PRINCIPAL.");
+        }
+
+        window.onload = renderizar;
+    <\/script>
+</body>
+</html>`;
+
+        const blob = new Blob([htmlMobile], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `App_Mobile_TI_${new Date().toISOString().split('T')[0]}.html`;
+        a.click();
+    }
+</script>
+
+</body>
+</html>
