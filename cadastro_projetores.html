@@ -5,15 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mapeamento de Projetores - Bom Jesus Porto Belo</title>
 
+    <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
+    <!-- Tesseract (OCR) -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
+    <!-- jsPDF (PDF Export) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
+    <!-- Cropper.js (Recorte de Imagem) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
@@ -42,12 +47,10 @@
             overflow: hidden;
         }
         
-        /* Ajustes do Cropper para Mobile */
         .cropper-container {
             max-height: 100%;
         }
         
-        /* 1. Previne o menu de contexto do navegador ao segurar o dedo na imagem */
         .cropper-container,
         .cropper-drag-box,
         .cropper-crop-box,
@@ -58,16 +61,14 @@
             -webkit-user-select: none;
         }
 
-        /* 2. Aumenta as bolinhas de redimensionamento para facilitar o toque no celular */
         .cropper-point {
             width: 24px !important;
             height: 24px !important;
-            background-color: #16a34a !important; /* Verde mais visível */
+            background-color: #16a34a !important;
             border-radius: 50% !important;
             opacity: 0.9 !important;
         }
         
-        /* Centraliza as bolinhas maiores em seus respectivos eixos */
         .cropper-point.e { top: calc(50% - 12px); right: -12px; }
         .cropper-point.n { left: calc(50% - 12px); top: -12px; }
         .cropper-point.w { top: calc(50% - 12px); left: -12px; }
@@ -77,7 +78,6 @@
         .cropper-point.sw { left: -12px; bottom: -12px; }
         .cropper-point.se { right: -12px; bottom: -12px; }
 
-        /* Acessibilidade: foco visível */
         button:focus-visible,
         input:focus-visible {
             outline: 2px solid #14532d;
@@ -170,10 +170,12 @@
                 </div>
             </div>
             <ul id="registrosList" class="space-y-2 text-sm max-h-60 overflow-y-auto pr-1">
-                </ul>
+                <!-- Renderizado via JS -->
+            </ul>
         </div>
     </div>
 
+    <!-- MODAL DO CROPPER.JS -->
     <div id="imagePreviewModal" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-50 hidden flex flex-col items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <h3 id="modalTitle" class="text-white font-bold mb-2 text-center text-sm">Isole SOMENTE o serial e alinhe a imagem</h3>
 
@@ -203,12 +205,10 @@
         (function() {
             'use strict';
 
-            // ---------- CONSTANTES ----------
             const OCR_LANG = 'eng';
             const STORAGE_KEY = 'projetores_db';
-            const IMAGE_QUALITY = 0.4; // Menos memória
+            const IMAGE_QUALITY = 0.4;
 
-            // ---------- ELEMENTOS DOM ----------
             const DOM = {
                 form: document.getElementById('projectorForm'),
                 sala: document.getElementById('sala'),
@@ -230,22 +230,20 @@
                 btnClearImage: document.getElementById('btnClearImage'),
                 modal: document.getElementById('imagePreviewModal'),
                 imageToCrop: document.getElementById('imageToCrop'),
-                fineRotation: document.getElementById('fineRotation'), // Mapeando o slider
+                fineRotation: document.getElementById('fineRotation'),
                 btnRotate: document.getElementById('btnRotate'),
                 btnConfirmCrop: document.getElementById('btnConfirmCrop'),
                 btnCancelModal: document.getElementById('btnCancelModal'),
             };
 
-            // ---------- ESTADO ----------
             let projetores = [];
             let editIndex = -1;
             let isProcessingOCR = false;
             let cropperInstance = null;
             let currentImageBase64 = null;
             let currentObjectUrl = null;
-            let currentBaseRotation = 0; // Armazena a rotação bruta de 90 em 90 graus
+            let currentBaseRotation = 0;
 
-            // ---------- APP OBJECT ----------
             const App = {
                 loadData() {
                     const stored = localStorage.getItem(STORAGE_KEY);
@@ -268,7 +266,7 @@
                     DOM.registrosList.innerHTML = '';
                     DOM.count.textContent = projetores.length;
 
-                    sorted.forEach((p, idx) => {
+                    sorted.forEach((p) => {
                         const originalIndex = projetores.indexOf(p);
                         const li = document.createElement('li');
                         li.className =
@@ -297,13 +295,13 @@
                     });
 
                     DOM.registrosList.querySelectorAll('.btn-edit').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
+                        btn.addEventListener('click', () => {
                             const idx = parseInt(btn.dataset.index, 10);
                             this.editItem(idx);
                         });
                     });
                     DOM.registrosList.querySelectorAll('.btn-delete').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
+                        btn.addEventListener('click', () => {
                             const idx = parseInt(btn.dataset.index, 10);
                             this.deleteItem(idx);
                         });
@@ -360,7 +358,6 @@
                     DOM.croppedPreview.src = '';
                 },
 
-                // ---------- OCR E CROPPER ----------
                 showOcrFeedback(message, progress = 0) {
                     DOM.ocrFeedback.classList.remove('hidden');
                     DOM.ocrMessage.innerHTML = message;
@@ -397,7 +394,6 @@
                     DOM.imageToCrop.classList.remove('hidden');
                     DOM.modal.classList.remove('hidden');
                     
-                    // Zera os valores de rotação sempre que uma foto nova entra
                     currentBaseRotation = 0;
                     DOM.fineRotation.value = 0;
 
@@ -478,7 +474,6 @@
                     }
                 },
 
-                // ---------- EXPORT / IMPORT ----------
                 exportJSON() {
                     if (projetores.length === 0) return alert('Nenhum dado para exportar.');
                     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(projetores, null, 2));
@@ -514,6 +509,7 @@
                     if (projetores.length === 0) return alert('Nenhum dado para exportar.');
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF();
+                    
                     doc.setFontSize(18);
                     doc.setTextColor(20, 83, 45);
                     doc.text('Relatório de Mapeamento de Projetores', 14, 22);
@@ -522,6 +518,7 @@
                     doc.text('Colégio Bom Jesus Porto Belo', 14, 30);
                     doc.text(`Data da vistoria: ${new Date().toLocaleDateString('pt-BR')}`, 14, 36);
 
+                    // Ordena por Patrimônio > Serial > Sala
                     const sorted = [...projetores].sort((a, b) => {
                         let cmpPat = a.patrimonio.localeCompare(b.patrimonio, undefined, { numeric: true, sensitivity: 'base' });
                         if (cmpPat !== 0) return cmpPat;
@@ -530,18 +527,28 @@
                         return a.sala.localeCompare(b.sala, undefined, { numeric: true, sensitivity: 'base' });
                     });
 
-                    const rows = sorted.map(p => [p.patrimonio || '—', p.serial || '—', p.sala || '—']);
+                    // Insere a numeração sequencial como 1ª coluna (1, 2, 3...)
+                    const rows = sorted.map((p, index) => [
+                        (index + 1).toString(),
+                        p.patrimonio || '—', 
+                        p.serial || '—', 
+                        p.sala || '—'
+                    ]);
+
                     doc.autoTable({
                         startY: 45,
-                        head: [['Patrimônio', 'Número de Série', 'Sala']],
+                        head: [['Nº', 'Patrimônio', 'Número de Série', 'Sala']],
                         body: rows,
                         theme: 'striped',
                         headStyles: { fillColor: [20, 83, 45] },
+                        columnStyles: {
+                            0: { halign: 'center', cellWidth: 15 } // Coluna Nº compacta e centralizada
+                        }
                     });
+                    
                     doc.save('Mapeamento_Projetores_BomJesus_PortoBelo.pdf');
                 },
 
-                // ---------- INICIALIZAÇÃO ----------
                 init() {
                     this.loadData();
 
@@ -594,7 +601,6 @@
                         DOM.cameraInput.value = ''; 
                     });
 
-                    // Lógica de Rotação Combinada (Botão + Slider)
                     DOM.btnRotate.addEventListener('click', () => {
                         if (cropperInstance) {
                             currentBaseRotation += 90;
