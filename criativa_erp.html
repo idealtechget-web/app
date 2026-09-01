@@ -435,6 +435,14 @@
                 justify-content: center;
             }
         }
+        .shopee-parser-box textarea {
+            background: white;
+            border-color: #fdba74;
+        }
+        .shopee-parser-box textarea:focus {
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, .15);
+        }
     </style>
 </head>
 <body>
@@ -529,7 +537,6 @@
 
                 <!-- Navegação -->
                 <nav id="sidebar-nav" class="p-3 flex-1 overflow-y-auto">
-                    <!-- Botões Backup e Config movidos para o topo -->
                     <div class="flex gap-2 mb-4">
                         <button onclick="App.backup.abrirModal()" class="flex-1 btn-primary text-xs py-2 text-center flex items-center justify-center gap-1">
                             <i class="ph ph-database"></i> Backup
@@ -585,8 +592,6 @@
                         <i class="ph ph-users"></i> Clientes
                     </button>
                 </nav>
-
-                <!-- Os botões foram movidos para o topo, esta div é removida -->
             </aside>
 
             <!-- CONTEÚDO PRINCIPAL -->
@@ -887,6 +892,20 @@
                 <h3 class="text-xl font-bold text-indigo-600"><i class="ph ph-file-text"></i> Orçamento</h3>
                 <button onclick="App.orcamentos.fecharModal()" class="text-slate-400 text-2xl leading-none hover:text-red-500">&times;</button>
             </div>
+
+            <!-- 🟢 BLOCO SHOPEE PARSER (ORÇAMENTO) -->
+            <div class="shopee-parser-box bg-orange-50 p-3 rounded-xl border border-orange-200">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-robot text-orange-600"></i>
+                    <span class="font-bold text-orange-700 text-sm">Parser Shopee</span>
+                    <span class="text-xs text-orange-500 ml-auto">Cole o texto da venda</span>
+                </div>
+                <textarea id="shopeeTextoOrc" rows="2" placeholder="Cole aqui o resumo da venda da Shopee..." class="w-full text-sm border-orange-200 focus:border-orange-400"></textarea>
+                <button onclick="App.shopeeParser.processar('orc')" class="mt-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition flex items-center gap-1">
+                    <i class="ph ph-arrow-bend-down-left"></i> Extrair Dados
+                </button>
+            </div>
+
             <input type="hidden" id="orcId">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -958,20 +977,37 @@
                 <h3 class="text-xl font-bold text-indigo-600"><i class="ph ph-package"></i> Pedido</h3>
                 <button onclick="App.pedidos.fecharModal()" class="text-slate-400 text-2xl leading-none">&times;</button>
             </div>
+
+            <!-- 🟢 BLOCO SHOPEE PARSER (PEDIDO) -->
+            <div class="shopee-parser-box bg-orange-50 p-3 rounded-xl border border-orange-200">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="ph ph-robot text-orange-600"></i>
+                    <span class="font-bold text-orange-700 text-sm">Parser Shopee</span>
+                    <span class="text-xs text-orange-500 ml-auto">Cole o texto da venda</span>
+                </div>
+                <textarea id="shopeeTextoPed" rows="2" placeholder="Cole aqui o resumo da venda da Shopee..." class="w-full text-sm border-orange-200 focus:border-orange-400"></textarea>
+                <button onclick="App.shopeeParser.processar('ped')" class="mt-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-1.5 px-4 rounded-lg text-sm transition flex items-center gap-1">
+                    <i class="ph ph-arrow-bend-down-left"></i> Extrair Dados
+                </button>
+            </div>
+
             <input type="hidden" id="pedidoId">
             <div class="grid grid-cols-2 gap-4">
                 <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Cliente</label><input type="text" id="pedidoCliente" readonly class="bg-slate-50"></div>
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">WhatsApp</label><input type="text" id="pedidoWhatsApp" placeholder="(48) 99999-9999" oninput="App.utils.maskFone(this)"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
                 <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Status</label><select id="pedidoStatus" class="w-full"><option>Aguardando arte</option><option>Arte aprovada</option><option>Em produção</option><option>Finalizado</option><option>Entregue</option><option>Cancelado</option></select></div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
                 <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Forma Pagamento</label><select id="pedidoFormaPag" class="w-full"><option value="">-- Selecionar --</option><option>Pix</option><option>Dinheiro</option><option>Cartão Débito</option><option>Cartão Crédito</option><option>Transferência</option></select></div>
-                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Parcelas</label><select id="pedidoParcelas" class="w-full"><option value="1">À vista</option><option value="2">2x</option><option value="3">3x</option><option value="4">4x</option><option value="5">5x</option><option value="6">6x</option></select></div>
             </div>
             <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Parcelas</label><select id="pedidoParcelas" class="w-full"><option value="1">À vista</option><option value="2">2x</option><option value="3">3x</option><option value="4">4x</option><option value="5">5x</option><option value="6">6x</option></select></div>
                 <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Prazo</label><input type="date" id="pedidoPrazo"></div>
-                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Frete</label><input type="text" id="pedidoFrete" placeholder="R$ 0,00" class="money"></div>
             </div>
-            <div class="flex items-center gap-2"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="pedidoArteAprovada" class="w-4 h-4"><span class="text-sm font-bold">Arte Aprovada ✅</span></label></div>
+            <div class="grid grid-cols-2 gap-4">
+                <div><label class="block text-xs font-bold text-slate-400 uppercase mb-1">Frete</label><input type="text" id="pedidoFrete" placeholder="R$ 0,00" class="money"></div>
+                <div class="flex items-center gap-2"><label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="pedidoArteAprovada" class="w-4 h-4"><span class="text-sm font-bold">Arte Aprovada ✅</span></label></div>
+            </div>
             <div><label class="block text-xs font-bold text-indigo-600 uppercase mb-2">Itens</label><div id="pedidoItens" class="bg-slate-50 rounded-xl p-3 border border-slate-200 max-h-48 overflow-auto space-y-1"></div></div>
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center">
                 <span class="font-bold text-slate-500">Total</span>
@@ -1369,6 +1405,198 @@
             _tempItensPlan: [],
             _filtroFinanceiro: '',
 
+            // ─── SHOPEE PARSER ─── (ATUALIZADO PARA O PRINT)
+            shopeeParser: {
+                processar(tipo) {
+                    const textareaId = tipo === 'orc' ? 'shopeeTextoOrc' : 'shopeeTextoPed';
+                    const texto = document.getElementById(textareaId).value.trim();
+                    if (!texto) {
+                        App.ui.toast('Cole o texto da venda primeiro.', 'erro');
+                        return;
+                    }
+
+                    let nome = '';
+                    let endereco = '';
+                    let cpf = '';
+                    let telefone = '';
+                    let cep = '';
+                    let idPedido = '';
+                    let valorTotal = '';
+
+                    const linhas = texto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+                    // -- Extração específica para o formato "Endereço de entrega" e "CPF"
+                    let idxEndereco = -1;
+                    let idxCPF = -1;
+                    for (let i = 0; i < linhas.length; i++) {
+                        if (/endereço de entrega/i.test(linhas[i])) idxEndereco = i;
+                        if (/^cpf$/i.test(linhas[i])) idxCPF = i;
+                    }
+
+                    if (idxEndereco !== -1) {
+                        let nextIdx = idxEndereco + 1;
+                        if (nextIdx < linhas.length && /copiar/i.test(linhas[nextIdx])) nextIdx++;
+
+                        if (nextIdx < linhas.length) {
+                            const possibleName = linhas[nextIdx];
+                            if (!/^[\d\*\-]+$/.test(possibleName) && !/\d{5}/.test(possibleName)) {
+                                nome = possibleName;
+                                nextIdx++;
+                            }
+                        }
+
+                        let enderecoLines = [];
+                        let count = 0;
+                        while (nextIdx < linhas.length && count < 3) {
+                            const line = linhas[nextIdx];
+                            if (!/^[\d\*\-]+$/.test(line) && !/copiar/i.test(line)) {
+                                enderecoLines.push(line);
+                                if (/\d{5}/.test(line)) break;
+                                count++;
+                            }
+                            nextIdx++;
+                        }
+                        endereco = enderecoLines.join(', ');
+
+                        const cepMatch = endereco.match(/\b(\d{5}-\d{3})\b|\b(\d{8})\b/);
+                        if (cepMatch) {
+                            let c = cepMatch[0].replace(/\D/g, '');
+                            if (c.length === 8) c = c.replace(/(\d{5})(\d{3})/, '$1-$2');
+                            cep = c;
+                        }
+                    }
+
+                    if (idxCPF !== -1) {
+                        let nextIdx = idxCPF + 1;
+                        if (nextIdx < linhas.length && /copiar/i.test(linhas[nextIdx])) nextIdx++;
+                        if (nextIdx < linhas.length) {
+                            const possibleCPF = linhas[nextIdx].replace(/\D/g, '');
+                            if (possibleCPF.length === 11) {
+                                cpf = possibleCPF.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                            }
+                        }
+                    }
+
+                    // ID do pedido
+                    const idMatch = texto.match(/ID do pedido\s*#?([A-Z0-9]+)/i);
+                    if (idMatch) idPedido = idMatch[1];
+
+                    // Valor total
+                    const valorMatch = texto.match(/R\$\s*([\d,]+)/);
+                    if (valorMatch) valorTotal = valorMatch[1].replace(',', '.');
+
+                    // -- Fallback para outros padrões --
+                    if (!nome) {
+                        const nomeRegex = /(?:Destinat[áa]rio|Nome|Comprador):\s*([^\n]+)/i;
+                        const matchNome = texto.match(nomeRegex);
+                        if (matchNome) nome = matchNome[1].trim();
+                    }
+                    if (!nome) {
+                        for (const linha of linhas) {
+                            const limpa = linha.replace(/^\d+\s*-\s*/, '').trim();
+                            if (limpa.match(/^([A-Za-zÀ-ÖØ-öø-ÿ\s]{3,})$/)) {
+                                nome = limpa;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!endereco) {
+                        const enderecoRegex = /(?:Endere[çc]o|Endereço de entrega):\s*([^\n]+)/i;
+                        const matchEnd = texto.match(enderecoRegex);
+                        if (matchEnd) endereco = matchEnd[1].trim();
+                    }
+                    if (!endereco) {
+                        for (const linha of linhas) {
+                            if (linha.match(/^([A-Za-zÀ-ÖØ-öø-ÿ0-9\s,.-]{8,})$/) && !linha.match(/\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/) && !linha.match(/\b\(\d{2}\)\s?\d{4,5}-\d{4}\b/)) {
+                                endereco = linha;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Telefone
+                    const telefoneRegex = /\b(\(\d{2}\)\s?\d{4,5}-\d{4})\b|\b(\d{10,11})\b/;
+                    const matchTel = texto.match(telefoneRegex);
+                    if (matchTel) {
+                        let tel = matchTel[1] || matchTel[2];
+                        tel = tel.replace(/\D/g, '');
+                        if (tel.length === 11) tel = tel.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                        else if (tel.length === 10) tel = tel.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                        telefone = tel;
+                    }
+
+                    if (!cpf) {
+                        const cpfRegex = /\b(\d{3}\.\d{3}\.\d{3}-\d{2})\b|\b(\d{11})\b/;
+                        const matchCpf = texto.match(cpfRegex);
+                        if (matchCpf) {
+                            let c = matchCpf[1] || matchCpf[2];
+                            c = c.replace(/\D/g, '');
+                            if (c.length === 11) c = c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                            cpf = c;
+                        }
+                    }
+
+                    // Monta observações
+                    let obs = '';
+                    if (cpf) obs += `CPF: ${cpf}\n`;
+                    if (cep) obs += `CEP: ${cep}\n`;
+                    if (endereco) obs += `Endereço: ${endereco}\n`;
+                    if (idPedido) obs += `ID Pedido: ${idPedido}\n`;
+                    if (valorTotal) obs += `Valor total: R$ ${valorTotal}\n`;
+
+                    // Preenche campos
+                    if (tipo === 'orc') {
+                        const clienteNome = document.getElementById('orcClienteNome');
+                        const whatsapp = document.getElementById('orcWhatsApp');
+                        const obsField = document.getElementById('orcObs');
+
+                        if (nome) clienteNome.value = nome;
+                        if (telefone) whatsapp.value = telefone;
+                        if (obs) {
+                            const currentObs = obsField.value.trim();
+                            obsField.value = currentObs ? currentObs + '\n\n' + obs : obs;
+                        }
+
+                        if (!nome && !clienteNome.value) {
+                            const primeirasLinhas = texto.split('\n').filter(l => l.trim().length > 0);
+                            if (primeirasLinhas.length > 0) {
+                                const possivelNome = primeirasLinhas[0].replace(/^\d+\s*-\s*/, '').trim();
+                                if (possivelNome && !possivelNome.match(/\d/)) {
+                                    clienteNome.value = possivelNome;
+                                }
+                            }
+                        }
+
+                        App.ui.toast('Dados extraídos com sucesso!', 'sucesso');
+
+                    } else if (tipo === 'ped') {
+                        const clienteNome = document.getElementById('pedidoCliente');
+                        const whatsapp = document.getElementById('pedidoWhatsApp');
+                        const obsField = document.getElementById('pedidoObs');
+
+                        if (nome) clienteNome.value = nome;
+                        if (telefone) whatsapp.value = telefone;
+                        if (obs) {
+                            const currentObs = obsField.value.trim();
+                            obsField.value = currentObs ? currentObs + '\n\n' + obs : obs;
+                        }
+
+                        if (!nome && !clienteNome.value) {
+                            const primeirasLinhas = texto.split('\n').filter(l => l.trim().length > 0);
+                            if (primeirasLinhas.length > 0) {
+                                const possivelNome = primeirasLinhas[0].replace(/^\d+\s*-\s*/, '').trim();
+                                if (possivelNome && !possivelNome.match(/\d/)) {
+                                    clienteNome.value = possivelNome;
+                                }
+                            }
+                        }
+
+                        App.ui.toast('Dados extraídos com sucesso!', 'sucesso');
+                    }
+                }
+            },
+
             // ─── AUTH ───
             auth: {
                 async fazerLogin(e) {
@@ -1433,7 +1661,6 @@
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-ativo'));
                     const btn = document.getElementById('btn-' + id);
                     if (btn) btn.classList.add('tab-ativo');
-                    // Fecha sidebar em mobile
                     if (window.innerWidth < 768) App.sidebar.fechar();
                     App._abaAtual = id;
                     const map = {
@@ -1457,7 +1684,6 @@
                     if (map[id]) map[id]();
                 },
                 atualizarAbaAtual() {
-                    // Re-renderiza a aba atual ao mudar mês/ano
                     const id = App._abaAtual;
                     if (!id) return;
                     const map = {
@@ -1510,13 +1736,11 @@
                     const qtdRecs = recs.filter(r => r.status === 'recebido').length;
                     document.getElementById('dashTicket').innerText = money.formatBR(qtdRecs ? totalRec / qtdRecs : 0);
                     document.getElementById('dashTotalClientes').innerText = App.state.clientes.length;
-                    // Conversão
                     const totalOrc = App.state.orcamentos.length;
                     const convertidos = App.state.orcamentos.filter(o => o.status === 'Convertido em Pedido' || o.status ===
                         'Aprovado').length;
                     document.getElementById('dashConversao').innerText = totalOrc > 0 ? Math.round(convertidos / totalOrc *
                         100) : 0;
-                    // Melhor mês
                     let melhorMes = '',
                         melhorVal = 0;
                     for (let m = 0; m < 12; m++) {
@@ -1529,7 +1753,6 @@
                             ][m]; }
                     }
                     document.getElementById('dashMelhorMes').innerText = melhorMes || '—';
-                    // MEI
                     const fatAno = App.state.recebimentos.filter(r => r.status === 'recebido' && (r.data || '').startsWith(
                         String(ano))).reduce((a, b) => a + (Number(b.valor) || 0), 0);
                     const percMEI = Math.min(fatAno / 81000 * 100, 100);
@@ -1539,7 +1762,6 @@
                         percMEI > 70 ? 'linear-gradient(90deg,#f59e0b,#d97706)' :
                         'linear-gradient(90deg,#4f46e5,#6d28d9)';
                     document.getElementById('dashPercMEI').innerText = percMEI.toFixed(1) + '% utilizado';
-                    // Top produtos
                     const pm = new Map();
                     App.state.recebimentos.filter(r => (r.data || '').startsWith(mes) && r.itens).forEach(r =>
                         (r.itens || []).forEach(i => pm.set(i.descricao || 'Item', (pm.get(i.descricao || 'Item') || 0) +
@@ -1549,7 +1771,6 @@
                     document.getElementById('dashTopProd').innerHTML = top.map(([n, v]) =>
                         `<div class="flex justify-between text-sm py-1 border-b border-slate-200"><span class="truncate">${App.utils.esc(n)}</span><span class="text-emerald-600 font-bold ml-2">R$ ${money.formatBR(v)}</span></div>`
                     ).join('') || '<p class="text-slate-500 text-sm text-center py-4">Sem dados no mês.</p>';
-                    // Alertas
                     const alertas = [];
                     const hoje = new Date().toISOString().slice(0, 10);
                     App.state.materiais.filter(m => m.estoqueMin > 0 && m.estoque <= m.estoqueMin).forEach(m =>
@@ -1693,6 +1914,7 @@
                     if (qtdInput) qtdInput.value = 1;
                     this._renderItens();
                     bindMoney();
+                    document.getElementById('shopeeTextoOrc').value = '';
                 },
                 importarPlanilha() {
                     const sel = document.getElementById('orcPlanilhaSelect');
@@ -1768,12 +1990,9 @@
                 _build() {
                     const cliente = document.getElementById('orcClienteNome').value.trim();
                     if (!cliente) { App.ui.toast('Cliente é obrigatório', 'erro'); return null; }
-                    
-                    // NOVAS VALIDAÇÕES SOLICITADAS
                     if (!document.getElementById('orcWhatsApp').value.trim()) { App.ui.toast('O WhatsApp do cliente é obrigatório', 'erro'); return null; }
                     if (!document.getElementById('orcPrazo').value) { App.ui.toast('A previsão de entrega é obrigatória', 'erro'); return null; }
                     if (!document.getElementById('orcValidade').value) { App.ui.toast('A validade do orçamento é obrigatória', 'erro'); return null; }
-
                     if (!App._tempItensOrc.length) { App.ui.toast('Adicione pelo menos um item', 'erro'); return null; }
                     const subtotal = App._tempItensOrc.reduce((a, b) => a + (b.subtotal || 0), 0);
                     const desconto = money.parseBR(document.getElementById('orcDescontoValor')?.value) || 0;
@@ -2040,6 +2259,7 @@
                         if (p) {
                             document.getElementById('pedidoId').value = id;
                             document.getElementById('pedidoCliente').value = p.cliente || '';
+                            document.getElementById('pedidoWhatsApp').value = p.whatsapp || '';
                             document.getElementById('pedidoStatus').value = p.status || 'Aguardando arte';
                             document.getElementById('pedidoPrazo').value = p.prazo || '';
                             document.getElementById('pedidoArteAprovada').checked = !!p.arteAprovada;
@@ -2057,8 +2277,15 @@
                                 `<div class="flex justify-between text-sm py-1 border-b border-slate-200"><span>${App.utils.esc(i.descricao)} (${i.quantidade}x)</span><span class="font-bold text-indigo-600">R$ ${money.formatBR(i.subtotal)}</span></div>`
                             ).join('');
                         }
+                    } else {
+                        document.getElementById('pedidoCliente').value = '';
+                        document.getElementById('pedidoWhatsApp').value = '';
+                        document.getElementById('pedidoObs').value = '';
+                        document.getElementById('pedidoFrete').value = '';
+                        document.getElementById('pedidoArteAprovada').checked = false;
                     }
                     bindMoney();
+                    document.getElementById('shopeeTextoPed').value = '';
                 },
                 fecharModal() { document.getElementById('modalPedido').classList.add('hidden');
                     this._id = null; },
@@ -2075,6 +2302,7 @@
                     p.frete = money.parseBR(document.getElementById('pedidoFrete').value);
                     p.formaPagamento = document.getElementById('pedidoFormaPag').value;
                     p.parcelas = parseInt(document.getElementById('pedidoParcelas').value) || 1;
+                    p.whatsapp = document.getElementById('pedidoWhatsApp').value.trim();
                     App.ui.loading(true);
                     try {
                         const ref = doc(db, 'pedidos', id);
@@ -2086,6 +2314,7 @@
                             frete: p.frete,
                             formaPagamento: p.formaPagamento,
                             parcelas: p.parcelas,
+                            whatsapp: p.whatsapp,
                             updatedAt: new Date().toISOString()
                         });
                         this.fecharModal();
@@ -2183,7 +2412,7 @@
                             </div>
                             <h3 class="font-bold text-lg">${App.utils.esc(p.cliente)}</h3>
                             <p class="text-sm text-slate-500">📅 ${App.utils.fmtData(p.data)}${p.prazo?' · Entrega: '+App.utils.fmtData(p.prazo):''}</p>
-                            <p class="text-xs text-slate-400">${(p.itens||[]).length} itens${p.arteAprovada?' · <span class="text-emerald-600">✅ Arte aprovada</span>':' · <span class="text-amber-600">🎨 Arte pendente</span>'}${p.lancadoFinanceiro?' · <span class="text-emerald-600">💰 Lançado</span>':''}${p.formaPagamento?' · '+p.formaPagamento+(p.parcelas>1?' '+p.parcelas+'x':''):''}</p>
+                            <p class="text-xs text-slate-400">${(p.itens||[]).length} itens${p.arteAprovada?' · <span class="text-emerald-600">✅ Arte aprovada</span>':' · <span class="text-amber-600">🎨 Arte pendente</span>'}${p.lancadoFinanceiro?' · <span class="text-emerald-600">💰 Lançado</span>':''}${p.formaPagamento?' · '+p.formaPagamento+(p.parcelas>1?' '+p.parcelas+'x':''):''}${p.whatsapp?' · 📞 '+p.whatsapp:''}</p>
                             <div class="mt-3 pt-3 border-t border-slate-200 flex justify-between items-center">
                                 <div><span class="text-emerald-600 font-bold text-lg">R$ ${money.formatBR(p.total)}</span>${p.frete>0?`<span class="text-xs text-slate-500 ml-1">+frete R$ ${money.formatBR(p.frete)}</span>`:''}</div>
                                 <select onchange="App.pedidos._mudarStatus('${p.id}',this.value)" class="text-xs border border-slate-200 rounded-lg px-2 py-1">
@@ -2279,6 +2508,7 @@
                     <div style="display:flex;justify-content:space-between"><span>Data: ${hoje}</span><span>#${(p.id||'').slice(-6).toUpperCase()}</span></div>
                     ${linha}
                     <div><b>Cliente:</b> ${esc(p.cliente)}</div>
+                    ${p.whatsapp?`<div><b>WhatsApp:</b> ${esc(p.whatsapp)}</div>`:''}
                     ${p.prazo?`<div><b>Prazo:</b> ${App.utils.fmtData(p.prazo)}</div>`:''}
                     <div><b>Status:</b> ${esc(p.status)}</div>
                     <div><b>Arte:</b> ${p.arteAprovada?'APROVADA ✓':'Pendente'}</div>
@@ -2556,7 +2786,6 @@
                 abrirModalReceita(id = null) {
                     document.getElementById('modalReceita').classList.remove('hidden');
                     document.getElementById('receitaId').value = id || '';
-                    // popular select de clientes
                     const sel = document.getElementById('receitaClienteSelect');
                     if (sel) {
                         const cur = sel.value;
@@ -2575,7 +2804,6 @@
                             document.getElementById('receitaForma').value = r.formaPagamento || 'Pix';
                             document.getElementById('receitaStatus').value = r.status || 'recebido';
                             document.getElementById('receitaObs').value = r.obs || '';
-                            // tentar selecionar cliente no select
                             if (r.cliente) {
                                 const opt = sel?.querySelector(`option[text="${r.cliente}"]`);
                                 if (opt) sel.value = opt.value;
@@ -3922,7 +4150,6 @@
                         App.state[key] = data;
                     });
 
-                    // Carrega configurações
                     try {
                         const cfgSnap = await getDocs(collection(db, 'configuracoes'));
                         if (!cfgSnap.empty) {
@@ -3931,7 +4158,6 @@
                         }
                     } catch (e) { console.warn('Config não encontrada'); }
 
-                    // Atualiza UI
                     App.dashboard.atualizar();
                     App.orcamentos.renderizar();
                     App.pedidos.renderizar();
@@ -3961,7 +4187,6 @@
 
             // ─── INIT ───
             init() {
-                // Gera anos no select da sidebar
                 const yearSel = document.getElementById('yearSelect');
                 if (yearSel) {
                     const y = new Date().getFullYear();
@@ -3974,7 +4199,6 @@
                         yearSel.appendChild(opt);
                     }
                 }
-                // Gera anos no select do DRE
                 const dreAno = document.getElementById('dreAno');
                 if (dreAno) {
                     const y = new Date().getFullYear();
@@ -3987,10 +4211,8 @@
                         dreAno.appendChild(opt);
                     }
                 }
-                // Sincroniza dreAno com yearSelect
                 App.sync.dreAno();
 
-                // Seta mês e ano atuais
                 const hoje = new Date();
                 const mEl = document.getElementById('monthSelect');
                 if (mEl) mEl.value = String(hoje.getMonth());
