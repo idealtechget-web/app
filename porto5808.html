@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IdealTech ⎯ Vinheta Pro</title>
     
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpolygon points='128,20 236,82 236,174 128,236 20,174 20,82' fill='none' stroke='%23ffffff' stroke-width='24' stroke-linejoin='round'/%3E%3Crect x='70' y='76' width='26' height='104' fill='%23ffffff' rx='4'/%3E%3Crect x='110' y='76' width='76' height='26' fill='%23ffffff' rx='4'/%3E%3Crect x='135' y='102' width='26' height='78' fill='%23ffffff' rx='4'/%3E%3C/svg%3E">
     
-    <!-- Fontes e Ícones -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
@@ -40,7 +38,6 @@
             overflow: hidden;
         }
 
-        /* ===== BACKGROUND ANIMADO ===== */
         .bg-animation {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
             background: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08), transparent 25%),
@@ -49,7 +46,6 @@
         }
         @keyframes bgDrift { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
 
-        /* ===== ONBOARDING ===== */
         #onboarding {
             position: fixed; inset: 0; background: var(--bg-body); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -77,11 +73,9 @@
         }
         .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-        /* ===== LAYOUT PRINCIPAL ===== */
         #app { display: none; width: 100%; height: 100vh; }
         #app.visible { display: flex; }
 
-        /* --- SIDEBAR --- */
         .sidebar {
             width: 280px; background: rgba(10, 15, 29, 0.85); backdrop-filter: blur(12px);
             border-right: 1px solid var(--border-color); display: flex; flex-direction: column;
@@ -100,7 +94,6 @@
         .nav-item.active { color: #fff; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); }
         .nav-item.active i { color: var(--primary); }
 
-        /* Widget Rádio */
         .radio-widget {
             background: var(--bg-card-solid); border: 1px solid var(--border-color);
             border-radius: 12px; padding: 16px; margin-top: auto;
@@ -124,7 +117,6 @@
             -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; cursor: pointer;
         }
 
-        /* --- MAIN CONTENT AREA --- */
         .main-content {
             flex-grow: 1; display: flex; flex-direction: column; height: 100%; overflow-y: auto; position: relative;
         }
@@ -145,7 +137,6 @@
 
         .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; backdrop-filter: blur(6px); }
 
-        /* --- DASHBOARD VIEW --- */
         .dash-grid { display: grid; grid-template-columns: 1fr 300px; gap: 24px; }
         
         .status-hero { text-align: center; padding: 40px 20px; }
@@ -180,12 +171,7 @@
         .info-item span:first-child { color: var(--text-muted); }
         .info-item span:last-child { font-weight: 600; }
 
-        /* --- AUDIOS VIEW (NOVO LAYOUT SPLIT) --- */
-        .audios-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;
-        }
-
-        /* Lado Esquerdo: Filtros e Upload Fixo */
+        .audios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
         .audios-left { position: sticky; top: 100px; }
         
         .cat-selector { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -205,7 +191,6 @@
         .upload-zone h3 { margin-bottom: 5px; font-size: 1.1rem; }
         .upload-zone p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; }
 
-        /* Lado Direito: Lista com Scroll */
         .audios-right {
             background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius);
             padding: 24px; max-height: calc(100vh - 180px); overflow-y: auto; backdrop-filter: blur(6px);
@@ -213,7 +198,7 @@
         
         .file-list { display: flex; flex-direction: column; gap: 8px; }
         .file-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-card-solid);
+            display: flex; align-items: center; gap: 8px; padding: 12px 14px; background: var(--bg-card-solid);
             border: 1px solid var(--border-color); border-radius: 10px; transition: var(--transition);
         }
         .file-item:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
@@ -221,19 +206,23 @@
         .btn-action { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; transition: var(--transition); padding: 4px;}
         .btn-action:hover { color: #fff; }
         .btn-action.del:hover { color: var(--danger); }
+        .btn-action.move { font-size: 1rem; padding: 2px 4px; }
+        .btn-action.move:disabled { opacity: 0.2; cursor: not-allowed; }
+        .btn-action.move:disabled:hover { color: var(--text-muted); }
 
-        /* Custom Scrollbar for Right side */
         .audios-right::-webkit-scrollbar { width: 6px; }
         .audios-right::-webkit-scrollbar-track { background: transparent; }
         .audios-right::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         .audios-right::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-        /* --- SETTINGS VIEW --- */
         .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
         .settings-section { background: var(--bg-card-solid); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; }
         .settings-section h3 { margin-bottom: 20px; font-size: 1.1rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
-        /* --- TOAST --- */
+        .vol-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+        .vol-row .vol-slider { flex: 1; }
+        .vol-value { font-size: 0.85rem; font-weight: 700; color: var(--primary); min-width: 45px; text-align: right; font-variant-numeric: tabular-nums; }
+
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
             background: var(--bg-card-solid); border: 1px solid var(--border-color); border-radius: 50px;
@@ -300,7 +289,6 @@
     <!-- APP PRINCIPAL -->
     <div id="app">
         
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="logo-area">
                 <div class="logo" style="font-size: 1.6rem;">IDEAL<span>TECH</span></div>
@@ -319,7 +307,6 @@
                 </a>
             </nav>
 
-            <!-- Player Rádio -->
             <div class="radio-widget">
                 <div class="radio-header">
                     <div class="radio-title"><i class="ph ph-radio"></i> Rádio Ambiente</div>
@@ -329,13 +316,12 @@
                     <button class="btn-radio-play" id="btnRadioToggle" title="Play/Pause Rádio">
                         <i class="ph ph-play" id="radioPlayIcon"></i>
                     </button>
-                    <input type="range" class="vol-slider" id="radioVolSlider" min="0" max="100" value="80" title="Volume da Rádio">
+                    <input type="range" class="vol-slider" id="radioVolSlider" min="0" max="100" value="25" title="Volume da Rádio">
                 </div>
                 <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 8px; text-align: center;">Antena 1 (Fundo)</div>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main-content">
             
             <header class="topbar">
@@ -350,7 +336,6 @@
                 <h2 class="section-title"><i class="ph ph-gauge"></i> Controle do Sistema</h2>
                 
                 <div class="dash-grid">
-                    <!-- Status Principal -->
                     <div class="card status-hero">
                         <div class="status-dot" id="statusDot"></div>
                         <div class="status-text" id="statusText">Sistema Parado</div>
@@ -378,9 +363,7 @@
                         </div>
                     </div>
 
-                    <!-- Side Info -->
                     <div style="display: flex; flex-direction: column; gap: 24px;">
-                        <!-- Now Playing -->
                         <div class="card np-card">
                             <div class="np-icon" id="npDisc"><i class="ph ph-speaker-hifi"></i></div>
                             <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Último Reproduzido</div>
@@ -392,7 +375,6 @@
                             </button>
                         </div>
 
-                        <!-- Info Loja -->
                         <div class="card">
                             <h3 style="font-size: 0.9rem; color: var(--primary); margin-bottom: 10px;"><i class="ph ph-info"></i> Resumo de Hoje</h3>
                             <div class="info-list">
@@ -406,26 +388,23 @@
                 </div>
             </section>
 
-            <!-- 2. AUDIOS (GRID SPLIT VIEW) -->
+            <!-- 2. AUDIOS -->
             <section id="view-audios" class="view-section">
                 <h2 class="section-title"><i class="ph ph-folder-open"></i> Gerenciar Áudios</h2>
                 
                 <div class="audios-grid">
                     
-                    <!-- Lado Esquerdo: Categorias e Upload Fixo -->
                     <div class="audios-left">
                         <div class="card">
                             <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 0.9rem;">
                                 Selecione a categoria abaixo. A lista ao lado mostrará apenas os arquivos dessa categoria.
                             </p>
                             
-                            <div class="cat-selector" id="catSelector">
-                                <!-- Botões gerados via JS -->
-                            </div>
+                            <div class="cat-selector" id="catSelector"></div>
 
                             <div class="upload-zone" id="uploadZone">
                                 <i class="ph ph-upload-simple"></i>
-                                <h3 id="uploadTitle">Adicionar em Promoções</h3>
+                                <h3 id="uploadTitle">Adicionar em Anúncios & Promoções</h3>
                                 <p>Formatos: MP3, WAV. Máx: 50MB.</p>
                                 <button class="btn-primary" id="uploadBtn" style="width: auto; margin: 0 auto; padding: 10px 20px;">
                                     Selecionar Arquivos
@@ -433,27 +412,23 @@
                                 <input type="file" id="fileInput" accept="audio/*" multiple style="display:none;">
                             </div>
                             
-                            <!-- Dica dinâmica para a categoria Fechamento -->
                             <div id="fechamentoTip" style="display:none; font-size: 0.8rem; color: var(--warning); margin-top: 15px; background: rgba(245, 158, 11, 0.1); padding: 10px; border-radius: 8px;">
-                                <i class="ph ph-warning-circle"></i> <strong>Dica Importante:</strong> Para que o sistema toque na hora certa, coloque o número de minutos no nome do arquivo (ex: <code>aviso_30.mp3</code> ou <code>falta_15_minutos.mp3</code>).
+                                <i class="ph ph-warning-circle"></i> <strong>Dica Importante:</strong> Nomeie o arquivo com o número de minutos antes do fechamento (ex: <code>aviso_30.mp3</code>, <code>aviso_15.mp3</code>, <code>aviso_5.mp3</code>). O sistema busca pelo número no nome do arquivo.
                             </div>
                         </div>
                     </div>
 
-                    <!-- Lado Direito: Lista de Áudios (Com Scroll) -->
                     <div class="audios-right">
                         <h3 style="font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
                             <span style="display: flex; align-items: center; gap: 8px;">
-                                <i class="ph ph-playlist"></i> <span id="listTitleCategory">Promoções</span>
+                                <i class="ph ph-playlist"></i> <span id="listTitleCategory">Anúncios & Promoções</span>
                             </span>
                             <span style="font-size: 0.85rem; background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 50px;">
                                 <span id="fileCountDisplay">0</span> arquivo(s)
                             </span>
                         </h3>
                         
-                        <div class="file-list" id="fileList">
-                            <!-- Lista gerada via JS -->
-                        </div>
+                        <div class="file-list" id="fileList"></div>
                     </div>
 
                 </div>
@@ -464,7 +439,6 @@
                 <h2 class="section-title"><i class="ph ph-gear"></i> Configurações do Sistema</h2>
                 
                 <div class="settings-grid">
-                    <!-- Config Loja -->
                     <div class="settings-section">
                         <h3><i class="ph ph-storefront"></i> Dados da Loja</h3>
                         <div class="onb-field">
@@ -483,7 +457,6 @@
                         </div>
                     </div>
 
-                    <!-- Config Reprodução -->
                     <div class="settings-section">
                         <h3><i class="ph ph-sliders"></i> Regras de Reprodução</h3>
                         <div class="onb-field">
@@ -497,20 +470,57 @@
                                 <option value="random">Aleatório</option>
                             </select>
                         </div>
-                        <div class="onb-field">
-                            <label>Volume das Vinhetas (<span id="cfgVolLabel">80</span>%)</label>
-                            <input type="range" class="vol-slider" id="cfgVolSlider" min="0" max="100" value="80" style="width: 100%; margin-top: 10px;">
-                        </div>
                     </div>
 
-                    <!-- Config Fechamento -->
+                    <!-- ÁUDIO: VOLUMES E MIXAGEM -->
+                    <div class="settings-section" style="grid-column: 1 / -1;">
+                        <h3><i class="ph ph-speaker-high"></i> Volumes e Mixagem</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+                            Ajuste o volume dos anúncios e do aviso de fechamento até <strong>150%</strong> para ficarem acima da rádio. Quando um anúncio toca, a rádio desce <strong>suavemente</strong> até o nível escolhido — sem cortes bruscos — e volta ao normal quando o anúncio termina.
+                        </p>
+                        
+                        <div class="onb-field">
+                            <label>Volume dos Anúncios</label>
+                            <div class="vol-row">
+                                <input type="range" class="vol-slider" id="cfgVolAnunciosSlider" min="0" max="150" value="100">
+                                <span class="vol-value" id="cfgVolAnunciosLabel">100%</span>
+                            </div>
+                        </div>
+
+                        <div class="onb-field">
+                            <label>Volume do Aviso de Fechamento</label>
+                            <div class="vol-row">
+                                <input type="range" class="vol-slider" id="cfgVolFechamentoSlider" min="0" max="150" value="120">
+                                <span class="vol-value" id="cfgVolFechamentoLabel">120%</span>
+                            </div>
+                        </div>
+
+                        <div class="onb-field">
+                            <label>Ducking: quanto a rádio abaixa durante anúncio?</label>
+                            <select class="input-base" id="cfgDucking">
+                                <option value="0.25" selected>Suave (rádio a 25%) — recomendado</option>
+                                <option value="0.15">Médio (rádio a 15%)</option>
+                                <option value="0.08">Forte (rádio a 8%)</option>
+                                <option value="0.03">Muito forte (rádio a 3%)</option>
+                                <option value="0">Silenciar a rádio durante o anúncio</option>
+                            </select>
+                            <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">
+                                💡 A transição leva ~1s caindo e ~1.2s subindo, para soar natural.
+                            </p>
+                        </div>
+
+                        <button class="btn-primary" id="testMixBtn" style="width: auto; padding: 10px 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: #fff;">
+                            <i class="ph ph-play"></i> Testar mixagem agora
+                        </button>
+                    </div>
+
                     <div class="settings-section" style="grid-column: 1 / -1;">
                         <h3><i class="ph ph-bell-ringing"></i> Alertas de Fechamento de Loja</h3>
                         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
-                            O sistema diminuirá a música e avisará os clientes automaticamente nos minutos configurados antes do fechamento. O áudio correto será buscado na categoria "Aviso de Fechamento" pelo número no nome. Se não encontrar, usará uma voz automática.
+                            Os avisos são buscados na categoria <strong>"Aviso de Fechamento"</strong> pelo número no nome do arquivo (ex: <code>aviso_30.mp3</code> para 30 minutos antes). O aviso <strong>interrompe</strong> qualquer anúncio em andamento para tocar no horário exato.
                         </p>
                         <div class="onb-field">
-                            <label>Avisar faltando quantos minutos? (Selecione o padrão)</label>
+                            <label>Avisar faltando quantos minutos?</label>
                             <select class="input-base" id="cfgClosingAlerts">
                                 <option value="30,15,5">Avisar aos 30, 15 e 5 minutos antes</option>
                                 <option value="60,30,10">Avisar aos 60, 30 e 10 minutos antes</option>
@@ -518,6 +528,26 @@
                                 <option value="5">Avisar apenas 5 minutos antes</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- BACKUP -->
+                    <div class="settings-section" style="grid-column: 1 / -1;">
+                        <h3><i class="ph ph-database"></i> Backup e Restauração</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">
+                            Exporte um arquivo <strong>.json</strong> contendo suas configurações e todos os áudios. Se precisar zerar o navegador ou trocar de PC, basta importar o arquivo para restaurar tudo.
+                        </p>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn-primary" id="exportBtn" style="width: auto; padding: 10px 20px;">
+                                <i class="ph ph-download-simple"></i> Exportar Backup
+                            </button>
+                            <button class="btn-primary" id="importBtn" style="width: auto; padding: 10px 20px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);">
+                                <i class="ph ph-upload-simple"></i> Importar Backup
+                            </button>
+                            <input type="file" id="importInput" accept=".json,application/json" style="display:none;">
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 12px;">
+                            ⚠️ A importação substituirá todos os áudios e configurações atuais.
+                        </p>
                     </div>
                 </div>
 
@@ -529,20 +559,21 @@
         </main>
     </div>
 
-    <!-- TOAST ALERTS -->
     <div class="toast" id="toast"></div>
 
 <script>
 (function() {
-    // ─── CONFIGURAÇÕES & ESTADO ───
+    // ─── CONFIG ───
     const config = {
         storeName: 'Minha Loja',
         openingTime: '09:00',
         closingTime: '18:00',
-        volume: 0.8,
         interval: 10,
         closingAlerts: [30, 15, 5],
-        playMode: 'sequential'
+        playMode: 'sequential',
+        volumeAnuncios: 1.0,      // 0 a 1.5
+        volumeFechamento: 1.2,    // 0 a 1.5
+        duckingLevel: 0.25        // 0 a 1
     };
 
     const state = {
@@ -552,25 +583,22 @@
         progressTimer: null,
         nextExpectedPlay: 0,
         closingTimers: [],
-        activeCategory: 'promocoes', // Categoria atual na tela de áudios
+        activeCategory: 'anuncios',
         stats: { played: 0, alerts: 0 }
     };
 
-    // Categorias Unificadas
     const CAT_NAMES = {
-        'promocoes': 'Promoções', 
-        'produtos': 'Produtos', 
-        'servicos': 'Serviços Institucionais',
+        'anuncios': 'Anúncios & Promoções',
         'fechamento': 'Aviso de Fechamento'
     };
+    const LEGACY_CATS = ['promocoes', 'produtos', 'servicos'];
 
-    // ─── DOM ELEMENTS ───
+    // ─── DOM ───
     const $ = id => document.getElementById(id);
     const el = {
         app: $('app'), onboarding: $('onboarding'),
         storeNameDisplay: $('storeNameDisplay'), clockDisplay: $('clockDisplay'),
         
-        // Dashboard
         statusDot: $('statusDot'), statusText: $('statusText'),
         startBtn: $('startBtn'), stopBtn: $('stopBtn'),
         nextTimeDisplay: $('nextTimeDisplay'), intervalDisplay: $('intervalDisplay'),
@@ -579,26 +607,26 @@
         statTotal: $('statTotal'), statAlerts: $('statAlerts'),
         schedOpen: $('schedOpen'), schedClose: $('schedClose'),
         
-        // Audios (Split View)
         uploadZone: $('uploadZone'), uploadBtn: $('uploadBtn'), fileInput: $('fileInput'),
         catSelector: $('catSelector'), fileList: $('fileList'), fileCountDisplay: $('fileCountDisplay'),
         uploadTitle: $('uploadTitle'), listTitleCategory: $('listTitleCategory'), fechamentoTip: $('fechamentoTip'),
         
-        // Settings
         cfgStoreName: $('cfgStoreName'), cfgOpening: $('cfgOpening'), cfgClosing: $('cfgClosing'),
         cfgInterval: $('cfgInterval'), cfgPlayOrder: $('cfgPlayOrder'),
-        cfgVolSlider: $('cfgVolSlider'), cfgVolLabel: $('cfgVolLabel'),
+        cfgVolAnunciosSlider: $('cfgVolAnunciosSlider'), cfgVolAnunciosLabel: $('cfgVolAnunciosLabel'),
+        cfgVolFechamentoSlider: $('cfgVolFechamentoSlider'), cfgVolFechamentoLabel: $('cfgVolFechamentoLabel'),
+        cfgDucking: $('cfgDucking'), testMixBtn: $('testMixBtn'),
         cfgClosingAlerts: $('cfgClosingAlerts'),
+
+        exportBtn: $('exportBtn'), importBtn: $('importBtn'), importInput: $('importInput'),
         
-        // Radio
         btnRadioToggle: $('btnRadioToggle'), radioPlayIcon: $('radioPlayIcon'),
         radioStatus: $('radioStatus'), radioVolSlider: $('radioVolSlider'),
         
-        // Geral
         toast: $('toast'), navItems: document.querySelectorAll('.nav-item'), viewSections: document.querySelectorAll('.view-section')
     };
 
-    // ─── NAVEGAÇÃO DE ABAS ───
+    // ─── NAVEGAÇÃO ───
     el.navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -611,14 +639,71 @@
         });
     });
 
-    // ─── RÁDIO E AUTO-PLAY (DUCKING) ───
+    // ─── WEB AUDIO API (BOOST) ───
+    let audioCtx = null;
+    function getAudioCtx() {
+        if (!audioCtx) {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch(e) {
+                console.warn('Web Audio API não disponível, usando fallback volume padrão.', e);
+                audioCtx = null;
+            }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+        }
+        return audioCtx;
+    }
+
+    // ─── RÁDIO + DUCKING SUAVE ───
     const bgRadio = new Audio('https://antenaone.crossradio.com.br/stream/1/');
     let isRadioPlaying = false;
-    let radioUserVolume = 0.8;
+    let radioUserVolume = 0.25;  // padrão: 25%
     let isAnnouncementPlaying = false;
-    let radioUserPaused = false; 
+    let radioUserPaused = false;
+    let radioFadeInterval = null;
+
+    // Carrega volume da rádio salvo (persiste entre sessões)
+    try {
+        const savedRadioVol = localStorage.getItem('IdealTechRadioVol');
+        if (savedRadioVol !== null) {
+            const v = parseFloat(savedRadioVol);
+            if (!isNaN(v) && v >= 0 && v <= 1) radioUserVolume = v;
+            el.radioVolSlider.value = Math.round(radioUserVolume * 100);
+        }
+    } catch(e) {}
 
     bgRadio.volume = radioUserVolume;
+
+    // Fade suave do volume da rádio (com easing quadrático in/out)
+    function fadeRadioTo(targetVol, durationMs = 1000) {
+        if (radioFadeInterval) { clearInterval(radioFadeInterval); radioFadeInterval = null; }
+        if (!isRadioPlaying) return;
+
+        const startVol = bgRadio.volume;
+        const diff = targetVol - startVol;
+        if (Math.abs(diff) < 0.005) {
+            bgRadio.volume = Math.max(0, Math.min(1, targetVol));
+            return;
+        }
+
+        const stepMs = 30;
+        const totalSteps = Math.max(1, Math.round(durationMs / stepMs));
+        let step = 0;
+
+        radioFadeInterval = setInterval(() => {
+            step++;
+            const t = step / totalSteps;
+            const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            bgRadio.volume = Math.max(0, Math.min(1, startVol + diff * eased));
+            if (step >= totalSteps) {
+                bgRadio.volume = Math.max(0, Math.min(1, targetVol));
+                clearInterval(radioFadeInterval);
+                radioFadeInterval = null;
+            }
+        }, stepMs);
+    }
 
     el.btnRadioToggle.addEventListener('click', () => {
         if (isRadioPlaying) {
@@ -635,6 +720,8 @@
     });
 
     const iniciarRadioAmbient = () => {
+        getAudioCtx();
+        bgRadio.volume = radioUserVolume;
         bgRadio.play().then(() => {
             isRadioPlaying = true;
             el.radioPlayIcon.className = 'ph ph-pause';
@@ -645,7 +732,8 @@
 
     el.radioVolSlider.addEventListener('input', () => {
         radioUserVolume = el.radioVolSlider.value / 100;
-        if(!isAnnouncementPlaying) bgRadio.volume = radioUserVolume;
+        if (!isAnnouncementPlaying && !radioFadeInterval) bgRadio.volume = radioUserVolume;
+        try { localStorage.setItem('IdealTechRadioVol', String(radioUserVolume)); } catch(e) {}
     });
 
     const eventosInteracao = ['click', 'touchstart', 'keydown', 'mousemove', 'wheel'];
@@ -676,6 +764,7 @@
     function dbSave(data) { return new Promise((res) => { const tx = db.transaction([STORE], 'readwrite'); tx.objectStore(STORE).add(data).onsuccess = e => res(e.target.result); }); }
     function dbLoadAll() { return new Promise((res) => { const tx = db.transaction([STORE], 'readonly'); tx.objectStore(STORE).getAll().onsuccess = e => res(e.target.result); }); }
     function dbDelete(id) { return new Promise((res) => { const tx = db.transaction([STORE], 'readwrite'); tx.objectStore(STORE).delete(id).onsuccess = () => res(); }); }
+    function dbClear() { return new Promise((res) => { const tx = db.transaction([STORE], 'readwrite'); tx.objectStore(STORE).clear().onsuccess = () => res(); }); }
 
     // ─── UTILITÁRIOS ───
     function toastMsg(msg, type = 'info') {
@@ -690,7 +779,45 @@
 
     function getCatName(id) { return CAT_NAMES[id] || 'Outros'; }
 
-    // ─── RENDERIZAÇÃO ───
+    // ─── PERSISTÊNCIA DA ORDEM ───
+    function saveAudioOrder() {
+        try {
+            localStorage.setItem('IdealTechAudioOrder', JSON.stringify(state.audioFiles.map(f => f.id)));
+        } catch(e) {}
+    }
+    function loadAudioOrder() {
+        try {
+            const raw = localStorage.getItem('IdealTechAudioOrder');
+            if (!raw) return;
+            const order = JSON.parse(raw);
+            if (!Array.isArray(order)) return;
+            state.audioFiles.sort((a, b) => {
+                const ia = order.indexOf(a.id);
+                const ib = order.indexOf(b.id);
+                if (ia === -1 && ib === -1) return 0;
+                if (ia === -1) return 1;
+                if (ib === -1) return -1;
+                return ia - ib;
+            });
+        } catch(e) {}
+    }
+
+    // ─── MIGRAÇÃO DE CATEGORIAS ───
+    async function migrateLegacyCategories() {
+        for (const f of state.audioFiles) {
+            if (LEGACY_CATS.includes(f.category)) {
+                f.category = 'anuncios';
+                try {
+                    await new Promise(res => {
+                        const tx = db.transaction([STORE], 'readwrite');
+                        tx.objectStore(STORE).put(f).onsuccess = () => res();
+                    });
+                } catch(e) {}
+            }
+        }
+    }
+
+    // ─── RENDER ───
     function renderCatSelector() {
         let html = '';
         Object.entries(CAT_NAMES).forEach(([id, name]) => {
@@ -702,20 +829,20 @@
         el.catSelector.querySelectorAll('.cat-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 state.activeCategory = btn.getAttribute('data-cat');
-                
-                // Atualiza Textos visuais
-                el.uploadTitle.textContent = `Adicionar em ${getCatName(state.activeCategory)}`;
-                el.listTitleCategory.textContent = getCatName(state.activeCategory);
-                el.fechamentoTip.style.display = (state.activeCategory === 'fechamento') ? 'block' : 'none';
-                
-                renderCatSelector(); // Re-render botões para estado 'active'
-                renderFiles();       // Filtra a lista da direita
+                updateCategoryTexts();
+                renderCatSelector();
+                renderFiles();
             });
         });
     }
 
+    function updateCategoryTexts() {
+        el.uploadTitle.textContent = `Adicionar em ${getCatName(state.activeCategory)}`;
+        el.listTitleCategory.textContent = getCatName(state.activeCategory);
+        el.fechamentoTip.style.display = (state.activeCategory === 'fechamento') ? 'block' : 'none';
+    }
+
     function renderFiles() {
-        // FILTRO: Mostrar apenas arquivos da categoria selecionada
         const filteredFiles = state.audioFiles.filter(f => f.category === state.activeCategory);
         el.fileCountDisplay.textContent = filteredFiles.length;
         
@@ -727,15 +854,17 @@
             return;
         }
         
-        el.fileList.innerHTML = filteredFiles.map((f) => {
-            // Precisamos encontrar o index REAL no array state.audioFiles para deletar/tocar certo
-            const realIndex = state.audioFiles.findIndex(audio => audio.id === f.id);
+        el.fileList.innerHTML = filteredFiles.map((f, i) => {
+            const isFirst = i === 0;
+            const isLast = i === filteredFiles.length - 1;
             return `
             <div class="file-item">
                 <i class="ph ph-file-audio" style="color:var(--primary); font-size:1.4rem;"></i>
                 <div class="file-name" title="${f.name}">${f.name}</div>
-                <button class="btn-action" data-play="${realIndex}" title="Ouvir"><i class="ph ph-play"></i></button>
-                <button class="btn-action del" data-del="${realIndex}" data-id="${f.id}" title="Remover"><i class="ph ph-trash"></i></button>
+                <button class="btn-action move" data-move="up" data-id="${f.id}" title="Mover para cima" ${isFirst ? 'disabled' : ''}><i class="ph ph-caret-up"></i></button>
+                <button class="btn-action move" data-move="down" data-id="${f.id}" title="Mover para baixo" ${isLast ? 'disabled' : ''}><i class="ph ph-caret-down"></i></button>
+                <button class="btn-action" data-play="${f.id}" title="Ouvir"><i class="ph ph-play"></i></button>
+                <button class="btn-action del" data-del="${f.id}" title="Remover"><i class="ph ph-trash"></i></button>
             </div>
         `}).join('');
     }
@@ -750,20 +879,76 @@
         el.statAlerts.textContent = state.stats.alerts;
     }
 
-    // ─── LÓGICA DE ÁUDIO ───
-    function playAudio(file) {
+    // ─── DUCKING (fade suave) ───
+    function applyDucking() {
+        if (isRadioPlaying) fadeRadioTo(radioUserVolume * config.duckingLevel, 1000);
+    }
+    function releaseDucking() {
+        if (isRadioPlaying) fadeRadioTo(radioUserVolume, 1200);
+    }
+
+    // ─── REPRODUÇÃO COM PREEMPÇÃO + BOOST ───
+    let currentAudioEl = null;
+
+    function stopCurrentAnnouncement(silent = false) {
+        if (currentAudioEl) {
+            try { currentAudioEl.pause(); currentAudioEl.currentTime = 0; } catch(e) {}
+            currentAudioEl.onended = null;
+            currentAudioEl.onerror = null;
+            if (currentAudioEl._url) URL.revokeObjectURL(currentAudioEl._url);
+            if (currentAudioEl._source) { try { currentAudioEl._source.disconnect(); } catch(e) {} }
+            if (currentAudioEl._gain) { try { currentAudioEl._gain.disconnect(); } catch(e) {} }
+            currentAudioEl = null;
+        }
+        isAnnouncementPlaying = false;
+        if (!silent) releaseDucking();
+    }
+
+    function playAudio(file, opts = {}) {
+        if (currentAudioEl) {
+            if (opts.priority) {
+                stopCurrentAnnouncement(true);
+            } else {
+                return;
+            }
+        }
+
         const url = URL.createObjectURL(file);
         const audio = new Audio(url);
-        audio.volume = config.volume;
+        audio._url = url;
+        audio.preload = 'auto';
 
-        // Ducking
+        const targetVol = opts.priority ? config.volumeFechamento : config.volumeAnuncios;
+
+        const ctx = getAudioCtx();
+        if (ctx) {
+            try {
+                const sourceNode = ctx.createMediaElementSource(audio);
+                const gainNode = ctx.createGain();
+                gainNode.gain.value = targetVol;
+                sourceNode.connect(gainNode).connect(ctx.destination);
+                audio.volume = 1.0;
+                audio._source = sourceNode;
+                audio._gain = gainNode;
+            } catch (err) {
+                console.warn('GainNode indisponível, usando volume padrão.', err);
+                audio.volume = Math.min(targetVol, 1.0);
+            }
+        } else {
+            audio.volume = Math.min(targetVol, 1.0);
+        }
+
+        currentAudioEl = audio;
         isAnnouncementPlaying = true;
-        if (isRadioPlaying) bgRadio.volume = radioUserVolume * 0.15;
+        applyDucking();
 
         const finalize = () => {
             URL.revokeObjectURL(url);
+            if (audio._source) { try { audio._source.disconnect(); } catch(e) {} }
+            if (audio._gain) { try { audio._gain.disconnect(); } catch(e) {} }
+            currentAudioEl = null;
             isAnnouncementPlaying = false;
-            if (isRadioPlaying) bgRadio.volume = radioUserVolume;
+            releaseDucking();
         };
 
         audio.onended = finalize;
@@ -771,8 +956,10 @@
         audio.play().catch(e => { console.error(e); finalize(); });
     }
 
+    // ─── ANÚNCIOS NORMAIS ───
     function playNextAnnouncement() {
-        // Ignora a categoria fechamento na roleta normal
+        if (secondsUntilNextClosingAlert() < 30) return;
+
         const pool = state.audioFiles.filter(f => f.category !== 'fechamento');
         if (pool.length === 0) return;
 
@@ -794,6 +981,19 @@
         setTimeout(() => el.npDisc.classList.remove('spinning'), 5000);
         
         updateUI();
+    }
+
+    function secondsUntilNextClosingAlert() {
+        const [h, m] = config.closingTime.split(':').map(Number);
+        const closing = new Date(); closing.setHours(h, m, 0, 0);
+        const now = Date.now();
+        let min = Infinity;
+        config.closingAlerts.forEach(mins => {
+            const alertAt = closing.getTime() - mins * 60000;
+            const diff = (alertAt - now) / 1000;
+            if (diff >= 0 && diff < min) min = diff;
+        });
+        return min;
     }
 
     function startTimer() {
@@ -821,6 +1021,7 @@
         }, 1000);
     }
 
+    // ─── AVISOS DE FECHAMENTO ───
     function setupClosingAlerts() {
         state.closingTimers.forEach(t => clearTimeout(t));
         state.closingTimers = [];
@@ -837,38 +1038,40 @@
                     playClosingAlert(mins);
                     state.stats.alerts++;
                     updateUI();
+                    if (state.isRunning) setupClosingAlerts();
                 }, delay);
                 state.closingTimers.push(timer);
             }
         });
     }
 
-    function playClosingAlert(mins) {
-        // Busca na categoria 'fechamento' se algum nome de arquivo tem o número
+    function findClosingAudio(mins) {
         const fechamentoFiles = state.audioFiles.filter(f => f.category === 'fechamento');
-        
-        // Match regex simples para buscar o número isolado no nome do arquivo ou o numero string
-        const match = fechamentoFiles.find(f => {
-            const regex = new RegExp(`\\b${mins}\\b`);
-            return regex.test(f.name) || f.name.includes(mins.toString());
+        const target = String(mins);
+        return fechamentoFiles.find(f => {
+            const base = f.name.replace(/\.[^.]+$/, '');
+            const nums = base.match(/\d+/g) || [];
+            return nums.includes(target);
         });
-        
+    }
+
+    function playClosingAlert(mins) {
+        const match = findClosingAudio(mins);
         if (match) {
-            playAudio(match.file);
-        } else if ('speechSynthesis' in window) {
-            const utter = new SpeechSynthesisUtterance(`Atenção! A loja encerrará suas atividades em ${mins} minutos. Agradecemos a preferência!`);
-            utter.lang = 'pt-BR'; utter.volume = config.volume;
-            
-            isAnnouncementPlaying = true;
-            if (isRadioPlaying) bgRadio.volume = radioUserVolume * 0.15;
-            utter.onend = () => { isAnnouncementPlaying = false; if (isRadioPlaying) bgRadio.volume = radioUserVolume; };
-            speechSynthesis.speak(utter);
+            playAudio(match.file, { priority: true });
+            el.npTitle.textContent = match.name;
+            el.npCat.textContent = getCatName(match.category);
+        } else {
+            toastMsg(`Áudio do aviso de ${mins} min não encontrado.`, 'error');
         }
     }
 
     // ─── CONTROLES PRINCIPAIS ───
     el.startBtn.addEventListener('click', () => {
-        if (state.audioFiles.length === 0) { toastMsg('Adicione áudios na aba "Gerenciar Áudios" primeiro.', 'error'); return; }
+        if (state.audioFiles.filter(f => f.category !== 'fechamento').length === 0) {
+            toastMsg('Adicione áudios em "Anúncios & Promoções" primeiro.', 'error');
+            return;
+        }
         
         state.isRunning = true;
         el.startBtn.disabled = true; el.stopBtn.disabled = false;
@@ -887,6 +1090,7 @@
         state.isRunning = false;
         clearInterval(state.progressTimer);
         state.closingTimers.forEach(t => clearTimeout(t)); state.closingTimers = [];
+        stopCurrentAnnouncement();
         
         el.startBtn.disabled = false; el.stopBtn.disabled = true;
         el.statusDot.classList.remove('active'); el.statusText.textContent = 'Sistema Parado';
@@ -908,8 +1112,12 @@
 
         for (const file of valid) {
             const data = { file, name: file.name, category: state.activeCategory };
-            try { data.id = await dbSave(data); state.audioFiles.push(data); } catch(e) {}
+            try { 
+                data.id = await dbSave(data); 
+                state.audioFiles.push(data); 
+            } catch(e) {}
         }
+        saveAudioOrder();
         renderFiles(); updateUI(); toastMsg(`${valid.length} arquivo(s) salvo(s).`, 'success');
     }
 
@@ -922,16 +1130,46 @@
     el.fileList.addEventListener('click', async e => {
         const delBtn = e.target.closest('[data-del]');
         const playBtn = e.target.closest('[data-play]');
+        const moveBtn = e.target.closest('[data-move]');
+
         if (delBtn) {
-            const idx = parseInt(delBtn.dataset.del);
-            await dbDelete(Number(delBtn.dataset.id));
-            state.audioFiles.splice(idx, 1);
+            const id = Number(delBtn.dataset.del);
+            await dbDelete(id);
+            const idx = state.audioFiles.findIndex(f => f.id === id);
+            if (idx >= 0) state.audioFiles.splice(idx, 1);
+            saveAudioOrder();
             renderFiles(); updateUI(); toastMsg('Áudio removido.', 'info');
         }
-        if (playBtn) playAudio(state.audioFiles[parseInt(playBtn.dataset.play)].file);
+        if (playBtn) {
+            const id = Number(playBtn.dataset.play);
+            const f = state.audioFiles.find(a => a.id === id);
+            if (f) {
+                const isClosing = f.category === 'fechamento';
+                playAudio(f.file, isClosing ? { priority: true } : {});
+            }
+        }
+        if (moveBtn) {
+            moveFile(Number(moveBtn.dataset.id), moveBtn.dataset.move);
+        }
     });
 
-    // ─── CONFIGURAÇÕES & LOCALSTORAGE ───
+    function moveFile(id, direction) {
+        const filtered = state.audioFiles.filter(f => f.category === state.activeCategory);
+        const idx = filtered.findIndex(f => f.id === id);
+        if (idx < 0) return;
+        const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+        if (swapIdx < 0 || swapIdx >= filtered.length) return;
+
+        const swapId = filtered[swapIdx].id;
+        const aIdx = state.audioFiles.findIndex(f => f.id === id);
+        const bIdx = state.audioFiles.findIndex(f => f.id === swapId);
+        [state.audioFiles[aIdx], state.audioFiles[bIdx]] = [state.audioFiles[bIdx], state.audioFiles[aIdx]];
+
+        saveAudioOrder();
+        renderFiles();
+    }
+
+    // ─── CONFIG + LOCALSTORAGE ───
     window.finishOnboarding = () => {
         config.storeName = $('onbStoreName').value || 'Minha Loja';
         config.openingTime = $('onbOpening').value;
@@ -949,6 +1187,9 @@
         config.interval = parseInt(el.cfgInterval.value) || 10;
         config.playMode = el.cfgPlayOrder.value;
         config.closingAlerts = el.cfgClosingAlerts.value.split(',').map(Number);
+        config.volumeAnuncios = parseInt(el.cfgVolAnunciosSlider.value) / 100;
+        config.volumeFechamento = parseInt(el.cfgVolFechamentoSlider.value) / 100;
+        config.duckingLevel = parseFloat(el.cfgDucking.value);
         
         saveLocal(); updateUI();
         if (state.isRunning) { startTimer(); setupClosingAlerts(); }
@@ -957,17 +1198,44 @@
         el.navItems[0].click();
     };
 
-    el.cfgVolSlider.addEventListener('input', () => {
-        config.volume = el.cfgVolSlider.value / 100;
-        el.cfgVolLabel.textContent = el.cfgVolSlider.value;
+    el.cfgVolAnunciosSlider.addEventListener('input', () => {
+        el.cfgVolAnunciosLabel.textContent = el.cfgVolAnunciosSlider.value + '%';
+        config.volumeAnuncios = parseInt(el.cfgVolAnunciosSlider.value) / 100;
         saveLocal();
+    });
+    el.cfgVolFechamentoSlider.addEventListener('input', () => {
+        el.cfgVolFechamentoLabel.textContent = el.cfgVolFechamentoSlider.value + '%';
+        config.volumeFechamento = parseInt(el.cfgVolFechamentoSlider.value) / 100;
+        saveLocal();
+    });
+    el.cfgDucking.addEventListener('change', () => {
+        config.duckingLevel = parseFloat(el.cfgDucking.value);
+        saveLocal();
+    });
+
+    el.testMixBtn.addEventListener('click', () => {
+        const pool = state.audioFiles.filter(f => f.category !== 'fechamento');
+        if (!pool.length) { toastMsg('Sem áudios normais para testar.', 'error'); return; }
+        playAudio(pool[0].file);
     });
 
     function saveLocal() { localStorage.setItem('IdealTechVP', JSON.stringify(config)); }
     
     function loadLocal() {
         const saved = localStorage.getItem('IdealTechVP');
-        if (saved) { Object.assign(config, JSON.parse(saved)); return true; }
+        if (saved) { 
+            const parsed = JSON.parse(saved);
+            if (parsed.volume !== undefined && parsed.volumeAnuncios === undefined) {
+                parsed.volumeAnuncios = parsed.volume;
+                parsed.volumeFechamento = Math.min(parsed.volume * 1.2, 1.5);
+                delete parsed.volume;
+            }
+            if (parsed.duckingLevel === 0.15) {
+                parsed.duckingLevel = 0.25;
+            }
+            Object.assign(config, parsed); 
+            return true; 
+        }
         return false;
     }
 
@@ -978,11 +1246,169 @@
         el.cfgInterval.value = config.interval;
         el.cfgPlayOrder.value = config.playMode;
         el.cfgClosingAlerts.value = config.closingAlerts.join(',');
-        el.cfgVolSlider.value = config.volume * 100;
-        el.cfgVolLabel.textContent = config.volume * 100;
+        if (!el.cfgClosingAlerts.value) el.cfgClosingAlerts.selectedIndex = 0;
+        
+        const volAn = Math.round((config.volumeAnuncios ?? 1.0) * 100);
+        const volFe = Math.round((config.volumeFechamento ?? 1.2) * 100);
+        el.cfgVolAnunciosSlider.value = volAn;
+        el.cfgVolAnunciosLabel.textContent = volAn + '%';
+        el.cfgVolFechamentoSlider.value = volFe;
+        el.cfgVolFechamentoLabel.textContent = volFe + '%';
+        
+        const d = String(config.duckingLevel ?? 0.25);
+        if ([...el.cfgDucking.options].some(o => o.value === d)) {
+            el.cfgDucking.value = d;
+        } else {
+            el.cfgDucking.value = '0.25';
+        }
     }
 
-    // ─── INITIALIZATION ───
+    // ─── EXPORT / IMPORT ───
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => {
+                const result = r.result;
+                const comma = result.indexOf(',');
+                resolve(comma >= 0 ? result.substring(comma + 1) : result);
+            };
+            r.onerror = reject;
+            r.readAsDataURL(blob);
+        });
+    }
+
+    function base64ToFile(base64, name, type) {
+        const bin = atob(base64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return new File([bytes], name, { type: type || 'audio/mpeg' });
+    }
+
+    async function exportBackup() {
+        if (state.audioFiles.length === 0) {
+            toastMsg('Nenhum áudio para exportar.', 'error');
+            return;
+        }
+        el.exportBtn.disabled = true;
+        const originalHtml = el.exportBtn.innerHTML;
+        el.exportBtn.innerHTML = '<i class="ph ph-spinner"></i> Preparando...';
+
+        try {
+            const audios = [];
+            for (const f of state.audioFiles) {
+                const data = await blobToBase64(f.file);
+                audios.push({
+                    name: f.name,
+                    category: f.category,
+                    type: f.file.type || 'audio/mpeg',
+                    data: data
+                });
+            }
+
+            const backup = {
+                app: 'IdealTech Vinheta Pro',
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                config: config,
+                audios: audios
+            };
+
+            const json = JSON.stringify(backup, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+            a.href = url;
+            a.download = `idealtech-backup-${ts}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+            toastMsg('Backup exportado com sucesso!', 'success');
+        } catch (err) {
+            console.error(err);
+            toastMsg('Falha ao exportar backup.', 'error');
+        } finally {
+            el.exportBtn.disabled = false;
+            el.exportBtn.innerHTML = originalHtml;
+        }
+    }
+
+    async function importBackup(file) {
+        let data;
+        try {
+            const text = await file.text();
+            data = JSON.parse(text);
+        } catch (err) {
+            toastMsg('Arquivo JSON inválido.', 'error');
+            return;
+        }
+
+        if (!data || !Array.isArray(data.audios)) {
+            toastMsg('Estrutura de backup não reconhecida.', 'error');
+            return;
+        }
+
+        if (!confirm(`Isso substituirá TODOS os áudios e configurações atuais por ${data.audios.length} arquivo(s) do backup. Continuar?`)) {
+            return;
+        }
+
+        try {
+            await dbClear();
+            state.audioFiles = [];
+
+            for (const item of data.audios) {
+                try {
+                    const blob = base64ToFile(item.data, item.name, item.type);
+                    const rec = { file: blob, name: item.name, category: item.category };
+                    if (LEGACY_CATS.includes(rec.category)) rec.category = 'anuncios';
+                    if (!CAT_NAMES[rec.category]) rec.category = 'anuncios';
+                    rec.id = await dbSave(rec);
+                    state.audioFiles.push(rec);
+                } catch (e) {
+                    console.warn('Falha ao importar áudio:', item.name, e);
+                }
+            }
+
+            if (data.config && typeof data.config === 'object') {
+                const imported = { ...data.config };
+                if (imported.volume !== undefined && imported.volumeAnuncios === undefined) {
+                    imported.volumeAnuncios = imported.volume;
+                    imported.volumeFechamento = Math.min(imported.volume * 1.2, 1.5);
+                    delete imported.volume;
+                }
+                Object.assign(config, imported);
+                if (!Array.isArray(config.closingAlerts)) config.closingAlerts = [30, 15, 5];
+                if (typeof config.volumeAnuncios !== 'number') config.volumeAnuncios = 1.0;
+                if (typeof config.volumeFechamento !== 'number') config.volumeFechamento = 1.2;
+                if (typeof config.duckingLevel !== 'number') config.duckingLevel = 0.25;
+                saveLocal();
+            }
+
+            saveAudioOrder();
+            loadSettingsView();
+            updateUI();
+            renderCatSelector();
+            updateCategoryTexts();
+            renderFiles();
+
+            toastMsg(`Backup importado: ${state.audioFiles.length} áudio(s).`, 'success');
+        } catch (err) {
+            console.error(err);
+            toastMsg('Erro ao importar backup.', 'error');
+        }
+    }
+
+    el.exportBtn.addEventListener('click', exportBackup);
+    el.importBtn.addEventListener('click', () => el.importInput.click());
+    el.importInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        el.importInput.value = '';
+        if (file) importBackup(file);
+    });
+
+    // ─── INIT ───
     async function init() {
         if (loadLocal()) {
             el.onboarding.style.display = 'none';
@@ -991,10 +1417,13 @@
         
         loadSettingsView();
         renderCatSelector();
+        updateCategoryTexts();
         updateUI();
 
         await initDB();
         state.audioFiles = await dbLoadAll();
+        await migrateLegacyCategories();
+        loadAudioOrder();
         renderFiles();
     }
 
