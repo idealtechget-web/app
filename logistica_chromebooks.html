@@ -43,7 +43,7 @@
             display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; letter-spacing: 0.5px;
         }
         
-        /* Borda padrão cinza e elegante para as aulas que estão em espera */
+        /* Borda padrão cinza para as aulas */
         .card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); border-left: 6px solid #cbd5e1; transition: 0.3s; scroll-margin-top: 20px; border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
         
         /* Destaque da Aula Atual (AGORA) */
@@ -95,7 +95,8 @@
             <h2 class="sub-title"><i class="ph-fill ph-calendar-blank"></i> Data: 23/10/2026</h2>
         </div>
         
-        <div class="turno-title"><i class="ph-fill ph-sun" style="color: #f59e0b;"></i> MANHÃ</div>
+        <div id="cronogramaLista">
+            <div class="turno-title"><i class="ph-fill ph-sun" style="color: #f59e0b;"></i> MANHÃ</div>
         <div class="card">
             <div class="card-header">
                 <span class="horario">08:10 às 09:00</span>
@@ -211,9 +212,10 @@
                 <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 26</span>
             </div>
         </div>
+        </div>
         
         <div class="footer-branding">
-            <i class="ph-fill ph-code"></i> Zenilson Lacerda | IdealTech — Gestão e Tecnologia
+            <i class="ph-fill ph-code"></i> Zenilson Lacerda | IdealTech
         </div>
     </div>
 
@@ -229,7 +231,7 @@
                 const day = String(today.getDate()).padStart(2, '0');
                 const todayISO = year + '-' + month + '-' + day;
 
-                // 1. VERIFICAÇÃO DE DATA
+                // 1. VERIFICAÇÃO DE DATA (CRONOGRAMA ANTIGO/OUTDATED)
                 if (dataDoArquivo && todayISO > dataDoArquivo) {
                     document.getElementById('outdatedWarning').style.display = 'flex';
                     document.getElementById('appContent').style.display = 'none';
@@ -237,7 +239,7 @@
                 }
 
                 const currentTimeStr = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0');
-                const cards = document.querySelectorAll('.card');
+                const cards = document.querySelectorAll('#cronogramaLista .card');
                 
                 cards.forEach(card => {
                     card.classList.remove('atual', 'proxima', 'passada');
@@ -248,17 +250,25 @@
                 let statusTipo = null; 
                 let targetStartTime = null;
                 let targetCards = [];
+                let ultimoHorarioFim = "00:00";
+                let possuiAulasValidas = false;
 
+                // 2. AVALIAR CARDS DE AULAS E VERIFICAR O ÚLTIMO HORÁRIO DE TÉRMINO
                 for (let card of cards) {
                     const timeEl = card.querySelector('.horario');
-                    if (!timeEl) continue; // Pula o card de "Sem Programação"
+                    if (!timeEl) continue; // Pula cards informativos que não têm horário
 
+                    possuiAulasValidas = true;
                     const timeText = timeEl.textContent;
                     const match = timeText.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
                     if (match) {
                         const start = match[1];
                         const end = match[2];
                         
+                        if (end > ultimoHorarioFim) {
+                            ultimoHorarioFim = end;
+                        }
+
                         if (currentTimeStr > end) {
                             card.classList.add('passada');
                         } else if (currentTimeStr >= start && currentTimeStr <= end) {
@@ -269,6 +279,20 @@
                     }
                 }
 
+                // 3. SE TODOS OS HORÁRIOS DO DIA JÁ PASSARAM, EXIBIR O CARD DE DIA FINALIZADO
+                if (possuiAulasValidas && currentTimeStr > ultimoHorarioFim && todayISO === dataDoArquivo) {
+                    const cronogramaLista = document.getElementById('cronogramaLista');
+                    cronogramaLista.innerHTML = `
+                        <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #10b981; background: #f0fdf4;">
+                            <i class="ph-fill ph-check-circle" style="font-size: 56px; color: #10b981; margin-bottom: 12px;"></i>
+                            <h3 style="margin: 0 0 8px 0; color: #166534; font-size: 19px; font-weight: 800; text-transform: uppercase;">AGENDA DO DIA FINALIZADA</h3>
+                            <p style="margin: 0; color: #15803d; font-size: 14px; font-weight: 600; line-height: 1.5;">Todos os agendamentos para o dia de hoje foram concluídos. Não há mais horários pendentes.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // 4. DESTACAR A PRÓXIMA AULA SE NENHUMA ESTIVER OCORRENDO AGORA
                 if (!statusTipo) {
                     for (let card of cards) {
                         if (card.classList.contains('passada')) continue;
@@ -289,6 +313,7 @@
                     }
                 }
 
+                // 5. MARCAR OS BADGES E ROLAR A TELA SE HOUVER AULA ATIVA
                 if (targetCards.length > 0) {
                     targetCards.forEach(card => {
                         const horarioSpan = card.querySelector('.horario');
