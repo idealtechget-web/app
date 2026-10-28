@@ -33,18 +33,14 @@
             display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 16px; letter-spacing: 0.5px;
         }
         
-        /* Borda padrão cinza para as aulas */
         .card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); border-left: 6px solid #cbd5e1; transition: 0.3s; scroll-margin-top: 20px; border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
         
-        /* Destaque da Aula Atual (AGORA) */
         .card.atual { box-shadow: 0 0 0 2px var(--warning), 0 8px 24px rgba(245, 158, 11, 0.2); border-left-color: var(--warning) !important; border-top: none; border-right: none; border-bottom: none; }
         .badge-atual { background: var(--warning); color: white; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; vertical-align: middle; margin-left: 8px; animation: piscar 2s infinite; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px; }
 
-        /* Destaque da PRÓXIMA Aula */
         .card.proxima { box-shadow: 0 0 0 2px var(--accent), 0 8px 20px rgba(59, 130, 246, 0.15); border-left-color: var(--accent) !important; border-top: none; border-right: none; border-bottom: none; }
         .badge-proxima { background: #3b82f6; color: white; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; vertical-align: middle; margin-left: 8px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px; }
 
-        /* Destaque de Aulas PASSADAS */
         .card.passada { opacity: 0.45; filter: grayscale(100%); background: #f1f5f9; box-shadow: none; border-left-color: #e2e8f0 !important; }
         .card.passada .horario { color: var(--text-muted); }
 
@@ -70,7 +66,6 @@
 </head>
 <body>
 
-    <!-- CONTEÚDO PRINCIPAL DO APP -->
     <div id="appContent">
         <div class="app-header">
             <h1 class="main-title"><i class="ph-fill ph-laptop"></i> Controle de Chromebooks</h1>
@@ -85,7 +80,7 @@
     </div>
 
     <script>
-        const BANCO_AGENDAMENTOS = [{"id":1793217471288,"hora":"07:20","hora_fim":"08:10","serie":"7º ANO","turma":"1","local":"401","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 01"},{"hora":"07:20","hora_fim":"08:10","serie":"8º ANO","turma":"2","local":"404","prof":"GLAUCIA CARVALHO FURTADO","qtd":"30","_data":"2026-10-28","_ts":1793217566948,"id":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217455761,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"1","local":"303","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"28","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"id":1793217471289,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"28","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 01"},{"id":1793217455762,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217471290,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 02"},{"id":1793217455763,"hora":"09:00","hora_fim":"09:50","serie":"6º ANO","turma":"1","local":"303","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"27","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"hora":"09:00","hora_fim":"09:50","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217485155,"id":1793217471291,"cartName":"CARRINHO 01"},{"id":1793217455764,"hora":"09:00","hora_fim":"09:50","serie":"7º ANO","turma":"2","local":"402","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217471292,"hora":"09:00","hora_fim":"09:50","serie":"7º ANO","turma":"2","local":"402","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 02"},{"hora":"10:10","hora_fim":"11:00","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217491980,"id":1793217471293,"cartName":"CARRINHO 01"},{"id":1793217455765,"hora":"10:10","hora_fim":"11:00","serie":"7º ANO","turma":"2","local":"402","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217455766,"hora":"11:00","hora_fim":"11:50","serie":"7º ANO","turma":"1","local":"401","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"hora":"11:00","hora_fim":"11:50","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217501781,"id":1793217471294,"cartName":"CARRINHO 01"},{"id":1793217455767,"hora":"11:00","hora_fim":"11:50","serie":"6º ANO","turma":"2","local":"304","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217455768,"hora":"11:50","hora_fim":"12:40","serie":"7º ANO","turma":"1","local":"401","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"id":1793217471295,"hora":"11:50","hora_fim":"12:40","serie":"1º ANO","turma":"1","local":"204","prof":"SAMUEL AMBONI DAL MORO","qtd":"30","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 01"},{"hora":"11:50","hora_fim":"12:40","serie":"8º ANO","turma":"2","local":"404","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793217574765,"id":1793217455769,"cartName":"CARRINHO 02"},{"id":1793217455770,"hora":"17:00","hora_fim":"17:50","serie":"4º ANO","turma":"1","local":"305","prof":"CRISTIANO KERBER","qtd":"4","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"id":1793217471296,"hora":"17:00","hora_fim":"17:50","serie":"6º ANO","turma":"","local":"303","prof":"NATIELE COSTA ROCHA FERREIRA  DESCRIÇÃO:  QUANTIDADE DE CHROMEBOOKS 10","qtd":"10","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 01"}];
+        const BANCO_AGENDAMENTOS = [{"id":1793219642325,"hora":"07:20","hora_fim":"08:10","serie":"7º ANO","turma":"1","local":"401","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793219642325,"cartName":"CARRINHO 01"},{"hora":"07:20","hora_fim":"08:10","serie":"8º ANO","turma":"2","local":"404","prof":"GLAUCIA CARVALHO FURTADO","qtd":"30","_data":"2026-10-28","_ts":1793219679852,"id":1793219632111,"cartName":"CARRINHO 02"},{"id":1793219632112,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"1","local":"303","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"28","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 01"},{"id":1793219642326,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"28","_data":"2026-10-29","_ts":1793219642325,"cartName":"CARRINHO 01"},{"id":1793219632113,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 02"},{"id":1793219642327,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793219642325,"cartName":"CARRINHO 02"},{"id":1793219632114,"hora":"09:00","hora_fim":"09:50","serie":"6º ANO","turma":"1","local":"303","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"27","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 01"},{"hora":"09:00","hora_fim":"09:50","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793219651374,"id":1793219642328,"cartName":"CARRINHO 01"},{"id":1793219632115,"hora":"09:00","hora_fim":"09:50","serie":"7º ANO","turma":"2","local":"402","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 02"},{"id":1793219642329,"hora":"09:00","hora_fim":"09:50","serie":"7º ANO","turma":"2","local":"402","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793219642325,"cartName":"CARRINHO 02"},{"hora":"10:10","hora_fim":"11:00","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793219658529,"id":1793219642330,"cartName":"CARRINHO 01"},{"id":1793219632116,"hora":"10:10","hora_fim":"11:00","serie":"7º ANO","turma":"2","local":"402","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 02"},{"id":1793219632117,"hora":"11:00","hora_fim":"11:50","serie":"7º ANO","turma":"1","local":"401","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 01"},{"hora":"11:00","hora_fim":"11:50","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793219664371,"id":1793219642331,"cartName":"CARRINHO 01"},{"id":1793219632118,"hora":"11:00","hora_fim":"11:50","serie":"6º ANO","turma":"2","local":"304","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 02"},{"id":1793219632119,"hora":"11:50","hora_fim":"12:40","serie":"7º ANO","turma":"1","local":"401","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 01"},{"id":1793219642332,"hora":"11:50","hora_fim":"12:40","serie":"1º ANO","turma":"1","local":"204","prof":"SAMUEL AMBONI DAL MORO","qtd":"30","_data":"2026-10-29","_ts":1793219642325,"cartName":"CARRINHO 01"},{"hora":"11:50","hora_fim":"12:40","serie":"8º ANO","turma":"2","local":"404","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793219684949,"id":1793219632120,"cartName":"CARRINHO 02"},{"id":1793219632121,"hora":"17:00","hora_fim":"17:50","serie":"4º ANO","turma":"1","local":"305","prof":"CRISTIANO KERBER","qtd":"4","_data":"2026-10-28","_ts":1793219632111,"cartName":"CARRINHO 01"},{"id":1793219642333,"hora":"17:00","hora_fim":"17:50","serie":"6º ANO","turma":"","local":"303","prof":"NATIELE COSTA ROCHA FERREIRA  DESCRIÇÃO:  QUANTIDADE DE CHROMEBOOKS 10","qtd":"10","_data":"2026-10-29","_ts":1793219642325,"cartName":"CARRINHO 01"}];
         let ultimoHorarioAtivo = null;
 
         function formatarDataBR(iso) {
@@ -96,19 +91,26 @@
 
         function gerarCardHTML(item) {
             const sala = item.local ? `<span class="sala-value">${item.local}</span>` : `<span class="sala-pendente"><i class="ph-bold ph-warning"></i> ADD SALA</span>`;
-            const corCarrinho = item.cartName === 'CARRINHO 01' ? '#2563eb' : '#7c3aed';
-            const bgCarrinho = item.cartName === 'CARRINHO 01' ? '#eff6ff' : '#f5f3ff';
-            const borderCarrinho = item.cartName === 'CARRINHO 01' ? '#bfdbfe' : '#ddd6fe';
+            
+            let corCarrinho = '#2563eb';
+            let bgCarrinho = '#eff6ff';
+            let borderCarrinho = '#bfdbfe';
+
+            if (item.cartName === 'CARRINHO 02') {
+                corCarrinho = '#7c3aed'; bgCarrinho = '#f5f3ff'; borderCarrinho = '#ddd6fe';
+            } else if (item.cartName === 'COLABORADOR') {
+                corCarrinho = '#ea580c'; bgCarrinho = '#fff7ed'; borderCarrinho = '#ffedd5';
+            }
 
             return `
             <div class="card">
                 <div class="card-header">
                     <span class="horario">${item.hora} às ${item.hora_fim || '??:??'}</span>
-                    <span class="badge-carrinho" style="background:${bgCarrinho}; color:${corCarrinho}; border:1px solid ${borderCarrinho};"><i class="ph-bold ph-laptop"></i> ${item.cartName}</span>
+                    <span class="badge-carrinho" style="background:${bgCarrinho}; color:${corCarrinho}; border:1px solid ${borderCarrinho};"><i class="ph-bold ph-user-check"></i> ${item.cartName}</span>
                 </div>
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
+                        <span class="label"><i class="ph-bold ph-users"></i> Série/Setor</span>
                         <span class="value">${item.serie} ${item.turma}</span>
                     </div>
                     <div class="info-item">
@@ -118,7 +120,7 @@
                 </div>
                 <div class="prof-row">
                     <div class="info-item">
-                        <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
+                        <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Solicitante</span>
                         <span class="value">${item.prof}</span>
                     </div>
                     <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: ${item.qtd}</span>
@@ -137,7 +139,6 @@
 
             const cronogramaLista = document.getElementById('cronogramaLista');
             
-            // FILTRA AGENDAMENTOS DO DIA DE HOJE
             const aulasHoje = BANCO_AGENDAMENTOS.filter(item => item._data === todayISO);
 
             if (aulasHoje.length === 0) {
@@ -158,7 +159,7 @@
                 if (fim > ultimoHorarioFim) ultimoHorarioFim = fim;
             });
 
-            // 1. CHECAGEM SE TODAS AS AULAS DO DIA JÁ PASSARAM
+            // AJUSTE: SÓ EXIBE "AGENDA FINALIZADA" APÓS ULTRAPASSAR O HORÁRIO FINAL DA ÚLTIMA AULA
             if (currentTimeStr > ultimoHorarioFim) {
                 cronogramaLista.innerHTML = `
                     <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #10b981; background: #f0fdf4;">
@@ -169,7 +170,6 @@
                 return;
             }
 
-            // 2. MONTAGEM DOS CARDS POR TURNO (MANHÃ E TARDE)
             const manha = aulasHoje.filter(i => i.hora < "12:00");
             const tarde = aulasHoje.filter(i => i.hora >= "12:00");
 
@@ -185,7 +185,6 @@
             
             cronogramaLista.innerHTML = conteudoHTML;
 
-            // 3. IDENTIFICAÇÃO E DESTAQUE DAS AULAS PASSADAS, AGORA E PRÓXIMAS
             const cards = cronogramaLista.querySelectorAll('.card');
             let statusTipo = null;
             let targetStartTime = null;
@@ -251,7 +250,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             atualizarCronograma();
-            setInterval(atualizarCronograma, 30000); // ATUALIZA A CADA 30 SEGUNDOS
+            setInterval(atualizarCronograma, 30000);
 
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
