@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chromebooks - 28/10/2026</title>
+    <title>Chromebooks - Programação Diária</title>
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Phosphor Icons -->
@@ -22,16 +22,6 @@
         }
         
         body { font-family: 'Inter', sans-serif; background: var(--bg-main); margin: 0; padding: 16px; color: var(--text-dark); -webkit-font-smoothing: antialiased; }
-        
-        /* TELA DE ALERTA DESATUALIZADO */
-        .outdated-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #fef2f2; z-index: 99999; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 24px; text-align: center;
-        }
-        .outdated-overlay i { color: var(--danger); font-size: 72px; margin-bottom: 16px; }
-        .outdated-overlay h2 { color: #991b1b; font-size: 24px; margin: 0 0 12px 0; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; }
-        .outdated-overlay p { color: #7f1d1d; font-size: 15px; font-weight: 500; margin-bottom: 8px; line-height: 1.5; }
 
         .app-header { text-align: center; margin-bottom: 24px; margin-top: 10px; }
         h1.main-title { font-size: 22px; font-weight: 800; color: var(--text-dark); margin: 0 0 4px 0; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; letter-spacing: -0.5px; }
@@ -80,277 +70,14 @@
 </head>
 <body>
 
-    <!-- OVERLAY DESATUALIZADO -->
-    <div id="outdatedWarning" class="outdated-overlay" style="display: none;">
-        <i class="ph-fill ph-warning-circle"></i>
-        <h2>Cronograma Desatualizado</h2>
-        <p>Este cronograma é referente ao dia <strong>28/10/2026</strong>.</p>
-        <p style="margin-top: 16px; font-weight: 500; color: #991b1b;">O TI ainda não subiu a atualização de hoje. Aguarde e atualize a página em alguns minutos.</p>
-    </div>
-
     <!-- CONTEÚDO PRINCIPAL DO APP -->
     <div id="appContent">
         <div class="app-header">
             <h1 class="main-title"><i class="ph-fill ph-laptop"></i> Controle de Chromebooks</h1>
-            <h2 class="sub-title"><i class="ph-fill ph-calendar-blank"></i> Data: 28/10/2026</h2>
+            <h2 class="sub-title" id="dataDisplayHeader"><i class="ph-fill ph-calendar-blank"></i> Data: --/--/----</h2>
         </div>
         
-        <div id="cronogramaLista">
-            <div class="turno-title"><i class="ph-fill ph-sun" style="color: #f59e0b;"></i> MANHÃ</div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">07:20 às 08:10</span>
-                <span class="badge-carrinho" style="background:#f5f3ff; color:#7c3aed; border:1px solid #ddd6fe;"><i class="ph-bold ph-laptop"></i> CARRINHO 02</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">8º ANO 2</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">404</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">GLAUCIA CARVALHO FURTADO</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 30</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">08:10 às 09:00</span>
-                <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">6º ANO 1</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">303</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 28</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">08:10 às 09:00</span>
-                <span class="badge-carrinho" style="background:#f5f3ff; color:#7c3aed; border:1px solid #ddd6fe;"><i class="ph-bold ph-laptop"></i> CARRINHO 02</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">6º ANO 2</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">304</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">CRISTIANO KERBER</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 31</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">09:00 às 09:50</span>
-                <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">6º ANO 1</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">303</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 27</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">09:00 às 09:50</span>
-                <span class="badge-carrinho" style="background:#f5f3ff; color:#7c3aed; border:1px solid #ddd6fe;"><i class="ph-bold ph-laptop"></i> CARRINHO 02</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">7º ANO 2</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">402</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">ESMAEL AURINO DA SILVA</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 15</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">10:10 às 11:00</span>
-                <span class="badge-carrinho" style="background:#f5f3ff; color:#7c3aed; border:1px solid #ddd6fe;"><i class="ph-bold ph-laptop"></i> CARRINHO 02</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">7º ANO 2</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">402</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">CRISTIANO KERBER</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 31</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">11:00 às 11:50</span>
-                <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">7º ANO 1</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">401</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">ESMAEL AURINO DA SILVA</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 15</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">11:00 às 11:50</span>
-                <span class="badge-carrinho" style="background:#f5f3ff; color:#7c3aed; border:1px solid #ddd6fe;"><i class="ph-bold ph-laptop"></i> CARRINHO 02</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">6º ANO 2</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">304</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">CRISTIANO KERBER</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 31</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">11:50 às 12:40</span>
-                <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">7º ANO 1</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">401</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">ESMAEL AURINO DA SILVA</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 15</span>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">11:50 às 12:40</span>
-                <span class="badge-carrinho" style="background:#f5f3ff; color:#7c3aed; border:1px solid #ddd6fe;"><i class="ph-bold ph-laptop"></i> CARRINHO 02</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">8º ANO 2</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">404</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">CRISTIANO KERBER</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 31</span>
-            </div>
-        </div><div class="turno-title"><i class="ph-fill ph-cloud-sun" style="color: #f97316;"></i> TARDE</div>
-        <div class="card">
-            <div class="card-header">
-                <span class="horario">17:00 às 17:50</span>
-                <span class="badge-carrinho" style="background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><i class="ph-bold ph-laptop"></i> CARRINHO 01</span>
-            </div>
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
-                    <span class="value">4º ANO 1</span>
-                </div>
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
-                    <span class="sala-value">305</span>
-                </div>
-            </div>
-            <div class="prof-row">
-                <div class="info-item">
-                    <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
-                    <span class="value">CRISTIANO KERBER</span>
-                </div>
-                <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: 4</span>
-            </div>
-        </div>
-        </div>
+        <div id="cronogramaLista"></div>
         
         <div class="footer-branding">
             <i class="ph-fill ph-code"></i> Zenilson Lacerda | IdealTech
@@ -358,127 +85,177 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const dataDoArquivo = "2026-10-28"; 
-            let ultimoHorarioAtivo = null; 
+        const BANCO_AGENDAMENTOS = [{"id":1793217471288,"hora":"07:20","hora_fim":"08:10","serie":"7º ANO","turma":"1","local":"401","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 01"},{"hora":"07:20","hora_fim":"08:10","serie":"8º ANO","turma":"2","local":"404","prof":"GLAUCIA CARVALHO FURTADO","qtd":"30","_data":"2026-10-28","_ts":1793217566948,"id":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217455761,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"1","local":"303","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"28","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"id":1793217471289,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"28","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 01"},{"id":1793217455762,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217471290,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"2","local":"304","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 02"},{"id":1793217455763,"hora":"09:00","hora_fim":"09:50","serie":"6º ANO","turma":"1","local":"303","prof":"MICHELLE ALMEIDA DA SILVEIRA MICHELE.SILVEIRA","qtd":"27","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"hora":"09:00","hora_fim":"09:50","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217485155,"id":1793217471291,"cartName":"CARRINHO 01"},{"id":1793217455764,"hora":"09:00","hora_fim":"09:50","serie":"7º ANO","turma":"2","local":"402","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217471292,"hora":"09:00","hora_fim":"09:50","serie":"7º ANO","turma":"2","local":"402","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 02"},{"hora":"10:10","hora_fim":"11:00","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217491980,"id":1793217471293,"cartName":"CARRINHO 01"},{"id":1793217455765,"hora":"10:10","hora_fim":"11:00","serie":"7º ANO","turma":"2","local":"402","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217455766,"hora":"11:00","hora_fim":"11:50","serie":"7º ANO","turma":"1","local":"401","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"hora":"11:00","hora_fim":"11:50","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-10-29","_ts":1793217501781,"id":1793217471294,"cartName":"CARRINHO 01"},{"id":1793217455767,"hora":"11:00","hora_fim":"11:50","serie":"6º ANO","turma":"2","local":"304","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 02"},{"id":1793217455768,"hora":"11:50","hora_fim":"12:40","serie":"7º ANO","turma":"1","local":"401","prof":"ESMAEL AURINO DA SILVA","qtd":"15","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"id":1793217471295,"hora":"11:50","hora_fim":"12:40","serie":"1º ANO","turma":"1","local":"204","prof":"SAMUEL AMBONI DAL MORO","qtd":"30","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 01"},{"hora":"11:50","hora_fim":"12:40","serie":"8º ANO","turma":"2","local":"404","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-10-28","_ts":1793217574765,"id":1793217455769,"cartName":"CARRINHO 02"},{"id":1793217455770,"hora":"17:00","hora_fim":"17:50","serie":"4º ANO","turma":"1","local":"305","prof":"CRISTIANO KERBER","qtd":"4","_data":"2026-10-28","_ts":1793217455760,"cartName":"CARRINHO 01"},{"id":1793217471296,"hora":"17:00","hora_fim":"17:50","serie":"6º ANO","turma":"","local":"303","prof":"NATIELE COSTA ROCHA FERREIRA  DESCRIÇÃO:  QUANTIDADE DE CHROMEBOOKS 10","qtd":"10","_data":"2026-10-29","_ts":1793217471288,"cartName":"CARRINHO 01"}];
+        let ultimoHorarioAtivo = null;
+
+        function formatarDataBR(iso) {
+            if(!iso) return '';
+            const [y, m, d] = iso.split('-');
+            return d + '/' + m + '/' + y;
+        }
+
+        function gerarCardHTML(item) {
+            const sala = item.local ? `<span class="sala-value">${item.local}</span>` : `<span class="sala-pendente"><i class="ph-bold ph-warning"></i> ADD SALA</span>`;
+            const corCarrinho = item.cartName === 'CARRINHO 01' ? '#2563eb' : '#7c3aed';
+            const bgCarrinho = item.cartName === 'CARRINHO 01' ? '#eff6ff' : '#f5f3ff';
+            const borderCarrinho = item.cartName === 'CARRINHO 01' ? '#bfdbfe' : '#ddd6fe';
+
+            return `
+            <div class="card">
+                <div class="card-header">
+                    <span class="horario">${item.hora} às ${item.hora_fim || '??:??'}</span>
+                    <span class="badge-carrinho" style="background:${bgCarrinho}; color:${corCarrinho}; border:1px solid ${borderCarrinho};"><i class="ph-bold ph-laptop"></i> ${item.cartName}</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label"><i class="ph-bold ph-users"></i> Série/Turma</span>
+                        <span class="value">${item.serie} ${item.turma}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
+                        ${sala}
+                    </div>
+                </div>
+                <div class="prof-row">
+                    <div class="info-item">
+                        <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Professor</span>
+                        <span class="value">${item.prof}</span>
+                    </div>
+                    <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: ${item.qtd}</span>
+                </div>
+            </div>`;
+        }
+
+        function atualizarCronograma() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayISO = year + '-' + month + '-' + day;
             
-            function atualizarStatusAulas() {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                const todayISO = year + '-' + month + '-' + day;
+            document.getElementById('dataDisplayHeader').innerHTML = `<i class="ph-fill ph-calendar-blank"></i> Data: ${formatarDataBR(todayISO)}`;
 
-                // 1. VERIFICAÇÃO DE DATA (CRONOGRAMA ANTIGO/OUTDATED)
-                if (dataDoArquivo && todayISO > dataDoArquivo) {
-                    document.getElementById('outdatedWarning').style.display = 'flex';
-                    document.getElementById('appContent').style.display = 'none';
-                    return; 
+            const cronogramaLista = document.getElementById('cronogramaLista');
+            
+            // FILTRA AGENDAMENTOS DO DIA DE HOJE
+            const aulasHoje = BANCO_AGENDAMENTOS.filter(item => item._data === todayISO);
+
+            if (aulasHoje.length === 0) {
+                cronogramaLista.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #64748b;">
+                        <i class="ph-fill ph-calendar-x" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;"></i>
+                        <h3 style="margin: 0 0 8px 0; color: var(--text-dark); font-size: 18px; font-weight: 800;">NENHUMA PROGRAMAÇÃO CADASTRADA</h3>
+                        <p style="margin: 0; color: var(--text-muted); font-size: 14px; font-weight: 500;">Não há agendamentos de Chromebooks registrados para o dia de hoje.</p>
+                    </div>`;
+                return;
+            }
+
+            const currentTimeStr = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0');
+            
+            let ultimoHorarioFim = "00:00";
+            aulasHoje.forEach(item => {
+                const fim = item.hora_fim || "00:00";
+                if (fim > ultimoHorarioFim) ultimoHorarioFim = fim;
+            });
+
+            // 1. CHECAGEM SE TODAS AS AULAS DO DIA JÁ PASSARAM
+            if (currentTimeStr > ultimoHorarioFim) {
+                cronogramaLista.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #10b981; background: #f0fdf4;">
+                        <i class="ph-fill ph-check-circle" style="font-size: 56px; color: #10b981; margin-bottom: 12px;"></i>
+                        <h3 style="margin: 0 0 8px 0; color: #166534; font-size: 19px; font-weight: 800; text-transform: uppercase;">AGENDA DO DIA FINALIZADA</h3>
+                        <p style="margin: 0; color: #15803d; font-size: 14px; font-weight: 600; line-height: 1.5;">Todos os agendamentos para o dia de hoje foram concluídos. Não há mais horários pendentes.</p>
+                    </div>`;
+                return;
+            }
+
+            // 2. MONTAGEM DOS CARDS POR TURNO (MANHÃ E TARDE)
+            const manha = aulasHoje.filter(i => i.hora < "12:00");
+            const tarde = aulasHoje.filter(i => i.hora >= "12:00");
+
+            let conteudoHTML = '';
+            if (manha.length > 0) {
+                conteudoHTML += `<div class="turno-title"><i class="ph-fill ph-sun" style="color: #f59e0b;"></i> MANHÃ</div>`;
+                manha.forEach(item => conteudoHTML += gerarCardHTML(item));
+            }
+            if (tarde.length > 0) {
+                conteudoHTML += `<div class="turno-title"><i class="ph-fill ph-cloud-sun" style="color: #f97316;"></i> TARDE</div>`;
+                tarde.forEach(item => conteudoHTML += gerarCardHTML(item));
+            }
+            
+            cronogramaLista.innerHTML = conteudoHTML;
+
+            // 3. IDENTIFICAÇÃO E DESTAQUE DAS AULAS PASSADAS, AGORA E PRÓXIMAS
+            const cards = cronogramaLista.querySelectorAll('.card');
+            let statusTipo = null;
+            let targetStartTime = null;
+            let targetCards = [];
+
+            for (let card of cards) {
+                const timeEl = card.querySelector('.horario');
+                if (!timeEl) continue;
+
+                const match = timeEl.textContent.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
+                if (match) {
+                    const start = match[1];
+                    const end = match[2];
+
+                    if (currentTimeStr > end) {
+                        card.classList.add('passada');
+                    } else if (currentTimeStr >= start && currentTimeStr <= end) {
+                        statusTipo = 'AGORA';
+                        if (!targetStartTime) targetStartTime = start;
+                        if (start === targetStartTime) targetCards.push(card);
+                    }
                 }
+            }
 
-                const currentTimeStr = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0');
-                const cards = document.querySelectorAll('#cronogramaLista .card');
-                
-                cards.forEach(card => {
-                    card.classList.remove('atual', 'proxima', 'passada');
-                    const badge = card.querySelector('.badge-atual, .badge-proxima');
-                    if(badge) badge.remove();
-                });
-
-                let statusTipo = null; 
-                let targetStartTime = null;
-                let targetCards = [];
-                let ultimoHorarioFim = "00:00";
-                let possuiAulasValidas = false;
-
-                // 2. AVALIAR CARDS DE AULAS E VERIFICAR O ÚLTIMO HORÁRIO DE TÉRMINO
+            if (!statusTipo) {
                 for (let card of cards) {
+                    if (card.classList.contains('passada')) continue;
                     const timeEl = card.querySelector('.horario');
-                    if (!timeEl) continue; // Pula cards informativos que não têm horário
+                    if (!timeEl) continue;
 
-                    possuiAulasValidas = true;
-                    const timeText = timeEl.textContent;
-                    const match = timeText.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
+                    const match = timeEl.textContent.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
                     if (match) {
                         const start = match[1];
-                        const end = match[2];
-                        
-                        if (end > ultimoHorarioFim) {
-                            ultimoHorarioFim = end;
-                        }
-
-                        if (currentTimeStr > end) {
-                            card.classList.add('passada');
-                        } else if (currentTimeStr >= start && currentTimeStr <= end) {
-                            statusTipo = 'AGORA';
+                        if (currentTimeStr < start) {
+                            statusTipo = 'PROXIMA';
                             if (!targetStartTime) targetStartTime = start;
                             if (start === targetStartTime) targetCards.push(card);
                         }
                     }
                 }
-
-                // 3. SE TODOS OS HORÁRIOS DO DIA JÁ PASSARAM, EXIBIR O CARD DE DIA FINALIZADO
-                if (possuiAulasValidas && currentTimeStr > ultimoHorarioFim && todayISO === dataDoArquivo) {
-                    const cronogramaLista = document.getElementById('cronogramaLista');
-                    cronogramaLista.innerHTML = `
-                        <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #10b981; background: #f0fdf4;">
-                            <i class="ph-fill ph-check-circle" style="font-size: 56px; color: #10b981; margin-bottom: 12px;"></i>
-                            <h3 style="margin: 0 0 8px 0; color: #166534; font-size: 19px; font-weight: 800; text-transform: uppercase;">AGENDA DO DIA FINALIZADA</h3>
-                            <p style="margin: 0; color: #15803d; font-size: 14px; font-weight: 600; line-height: 1.5;">Todos os agendamentos para o dia de hoje foram concluídos. Não há mais horários pendentes.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // 4. DESTACAR A PRÓXIMA AULA SE NENHUMA ESTIVER OCORRENDO AGORA
-                if (!statusTipo) {
-                    for (let card of cards) {
-                        if (card.classList.contains('passada')) continue;
-
-                        const timeEl = card.querySelector('.horario');
-                        if (!timeEl) continue;
-
-                        const timeText = timeEl.textContent;
-                        const match = timeText.match(/(\d{2}:\d{2})\s*às\s*(\d{2}:\d{2})/);
-                        if (match) {
-                            const start = match[1];
-                            if (currentTimeStr < start) {
-                                statusTipo = 'PROXIMA';
-                                if (!targetStartTime) targetStartTime = start;
-                                if (start === targetStartTime) targetCards.push(card);
-                            }
-                        }
-                    }
-                }
-
-                // 5. MARCAR OS BADGES E ROLAR A TELA SE HOUVER AULA ATIVA
-                if (targetCards.length > 0) {
-                    targetCards.forEach(card => {
-                        const horarioSpan = card.querySelector('.horario');
-                        if (statusTipo === 'AGORA') {
-                            card.classList.add('atual');
-                            horarioSpan.innerHTML += '<span class="badge-atual"><i class="ph-bold ph-clock"></i> AGORA</span>';
-                        } else if (statusTipo === 'PROXIMA') {
-                            card.classList.add('proxima');
-                            horarioSpan.innerHTML += '<span class="badge-proxima"><i class="ph-bold ph-hourglass-medium"></i> PRÓXIMA AULA</span>';
-                        }
-                    });
-                    
-                    if (targetStartTime !== ultimoHorarioAtivo) {
-                        setTimeout(() => {
-                            targetCards[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }, 600);
-                        ultimoHorarioAtivo = targetStartTime;
-                    }
-                }
             }
 
-            atualizarStatusAulas();
-            setInterval(atualizarStatusAulas, 60000);
+            if (targetCards.length > 0) {
+                targetCards.forEach(card => {
+                    const horarioSpan = card.querySelector('.horario');
+                    if (statusTipo === 'AGORA') {
+                        card.classList.add('atual');
+                        horarioSpan.innerHTML += '<span class="badge-atual"><i class="ph-bold ph-clock"></i> AGORA</span>';
+                    } else if (statusTipo === 'PROXIMA') {
+                        card.classList.add('proxima');
+                        horarioSpan.innerHTML += '<span class="badge-proxima"><i class="ph-bold ph-hourglass-medium"></i> PRÓXIMA AULA</span>';
+                    }
+                });
+
+                if (targetStartTime !== ultimoHorarioAtivo) {
+                    setTimeout(() => {
+                        targetCards[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 600);
+                    ultimoHorarioAtivo = targetStartTime;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            atualizarCronograma();
+            setInterval(atualizarCronograma, 30000); // ATUALIZA A CADA 30 SEGUNDOS
 
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
-                    atualizarStatusAulas();
+                    atualizarCronograma();
                 }
             });
         });
