@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zenilson Lacerda | Tecnologia &amp; Serviços — Ordem de Serviço &amp; Checklist</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @media print {
+      @page { size: A4 portrait; margin: 8mm; }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11px !important;
+      }
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        max-width: none !important;
+        margin: 0;
+        padding: 0;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .no-print { display: none !important; }
+    }
+
+    .pattern-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pattern-dot.active {
+      background-color: #0f172a;
+      border-color: #0f172a;
+      box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.2);
+    }
+    .card-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #334155;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .field-label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 0.25rem;
+    }
+    .field-input {
+      width: 100%;
+      font-size: 0.8rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.375rem;
+      padding: 0.4rem 0.5rem;
+      background: #fff;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field-input:focus { border-color: #334155; box-shadow: 0 0 0 2px rgba(51,65,85,.12); }
+    .field-input:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen pb-16">
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="bg-slate-900 text-white shadow-md border-b border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-4">
+        <div id="logoContainer" class="w-20 h-12 bg-slate-800 border border-slate-700 rounded flex items-center justify-center overflow-hidden">
+          <span class="text-[9px] text-slate-400 font-bold uppercase text-center px-1">Sem Logo</span>
+        </div>
+        <div>
+          <h1 class="text-xl font-black tracking-tight uppercase leading-none">Zenilson Lacerda</h1>
+          <p class="text-[10px] text-slate-400 font-semibold tracking-wider mt-1">TECNOLOGIA &amp; SERVIÇOS • ORDEM DE SERVIÇO &amp; CHECKLIST</p>
+        </div>
+      </div>
+      <div class="text-right text-xs text-slate-300">
+        <p class="font-bold text-slate-100"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> (47) 93384-4478</p>
+        <p class="text-[10px] text-slate-400">Atendimento Técnico Especializado</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="max-w-7xl mx-auto px-4 mt-6 no-print">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- ================= COLUNA FORMULÁRIO ================= -->
+      <div class="lg:col-span-8 space-y-6" id="formArea">
+
+        <!-- 1. IDENTIFICAÇÃO -->
+        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
+          <h2 class="card-title flex justify-between items-center">
+            <span>1. Identificação da Ordem de Serviço &amp; Equipamento</span>
+            <span id="badgeOSAtual" class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Nova OS</span>
+          </h2>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <div class="sm:col-span-2">
+              <label class="field-label">Nome do Cliente *</label>
+              <input type="text" id="clienteNome" placeholder="Nome completo" class="field-input">
+            </div>
+            <div>
+              <label class="field-label">Telefone / WhatsApp</label>
+              <input type="text" id="clienteFone" placeholder="(00) 00000-0000" class="field-input">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label class="field-label">Marca / Modelo</label>
+              <input type="text" id="aparelhoModelo" placeholder="Ex: Samsung A50" class="field-input">
+            </div>
+            <div>
+              <label class="field-label">Capacidade (GB)</label>
+              <input type="text" id="aparelhoGb" placeholder="Ex: 128GB" class="field-input">
+            </div>
+            <div>
+              <label class="field-label">IMEI / Série</label>
+              <input type="text" id="aparelhoSerie" placeholder="Número de IMEI" class="field-input">
+            </div>
+            <div>
+              <label class="field-label">Data Entrada</label>
+              <input type="date" id="dataEntrada" class="field-input">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label">Logomarca da Empresa (PNG/JPG)</label>
+              <div class="flex gap-2">
+                <input type="file" id="logoUpload" accept="image/*" class="w-full text-xs text-slate-500 border border-slate-300 rounded p-1.5 bg-slate-50">
+                <button type="button" onclick="removerLogo()" title="Remover logo" class="px-2 bg-rose-50 text-rose-600 border border-rose-200 rounded hover:bg-rose-100">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="field-label">Senha Numérica / Alfanumérica de Tela</label>
+              <input type="text" id="senhaNumerica" placeholder="PIN ou senha de texto" class="field-input">
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. CHECKLIST -->
+        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
+          <h2 class="card-title">2. Lista de Checagem Técnica &amp; Desbloqueio (Checklist)</h2>
+
+          <div class="mb-4 p-3 rounded border border-amber-300 bg-amber-50 flex items-center gap-3">
+            <input type="checkbox" id="inoperanteCheck" onchange="aplicarInoperante()" class="h-5 w-5 accent-amber-600 rounded border-amber-400 cursor-pointer">
+            <label for="inoperanteCheck" class="text-xs font-bold text-amber-900 cursor-pointer select-none flex-1">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+              Equipamento Inoperante / Não Liga
+              <span class="block text-[10px] font-normal text-amber-700">Itens <b>funcionais</b> passam automaticamente para N/A. Categoria <b>ESTADO FÍSICO / CARCAÇA</b> permanece editável.</span>
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div class="md:col-span-8">
+              <span class="block text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-wide">Condições dos Componentes <span class="text-slate-400 font-normal normal-case">— anote observações técnicas por item</span></span>
+              <div id="checklistContainer" class="space-y-3 text-xs"></div>
+            </div>
+
+            <div class="md:col-span-4 bg-slate-50 p-3 rounded border border-slate-200 flex flex-col items-center self-start">
+              <span class="block text-[10px] font-bold text-slate-700 mb-1 uppercase text-center">Desbloqueio de Tela</span>
+              <span class="text-[10px] text-slate-500 mb-3 text-center">Clique nos pontos para marcar o padrão</span>
+
+              <div class="grid grid-cols-3 gap-3 p-2 bg-white rounded border border-slate-300" id="patternGrid">
+                <div class="pattern-dot" data-id="1" onclick="togglePatternDot(this)"></div>
+                <div class="pattern-dot" data-id="2" onclick="togglePatternDot(this)"></div>
+                <div class="pattern-dot" data-id="3" onclick="togglePatternDot(this)"></div>
+                <div class="pattern-dot" data-id="4" onclick="togglePatternDot(this)"></div>
+                <div class="pattern-dot" data-id="5" onclick="togglePatternDot(this)"></div>
+                <div class="pattern-dot" data-id="6" onclick="togglePatternDot(this)"></div>
+                <div class="pattern-dot" data-id="7" onclick="togglePatternDot(this)"></div>
+                <div class="pattern-dot" data-id="8" onclick="togglePatternDot(this)"></div>
+                <div class="pattern-dot" data-id="9" onclick="togglePatternDot(this)"></div>
+              </div>
+              <button type="button" onclick="limparPadrao()" class="mt-3 text-[10px] text-slate-600 hover:text-slate-900 underline">Limpar Desenho</button>
+              <p id="padraoPreview" class="mt-2 text-[10px] text-slate-500 text-center break-words"></p>
+            </div>
+          </div>
+
+          <div class="mt-5 border-t border-slate-200 pt-4">
+            <label class="field-label">Avarias Visíveis Constatadas</label>
+            <input type="text" id="avariasTexto" class="field-input"
+                   placeholder="Ex: Riscos acentuados na tampa traseira, quina superior esquerda amassada...">
+            <p class="text-[10px] text-slate-400 mt-1">Descreva manualmente qualquer avaria estética ou estrutural observada na entrada.</p>
+          </div>
+        </div>
+
+        <!-- 3. DIAGNÓSTICO -->
+        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
+          <h2 class="card-title">3. Diagnóstico Técnico &amp; Insumos</h2>
+          <div class="space-y-3 mb-4">
+            <div>
+              <label class="field-label">Problema Relatado / Análise Técnica de Entrada</label>
+              <textarea id="defeitoRelatado" rows="2" class="field-input" placeholder="Ex: Aparelho caiu e a tela trincou, touch não responde..."></textarea>
+            </div>
+            <div>
+              <label class="field-label">Serviço Executado / Solução Técnica Proposta</label>
+              <textarea id="solucaoProposta" rows="2" class="field-input" placeholder="Ex: Substituição do conjunto display + teste de bancada..."></textarea>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label">Insumo Adicional (Ex: Cabo Flex, Cola UV)</label>
+              <input type="text" id="insumoNome" class="field-input" placeholder="Descrição do insumo">
+            </div>
+            <div>
+              <label class="field-label">Custo do Insumo (R$)</label>
+              <input type="number" id="insumoCusto" step="0.01" min="0" value="0.00" class="field-input">
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. OPÇÕES COMERCIAIS DINÂMICAS -->
+        <div class="bg-white p-5 rounded-lg shadow-sm border border-slate-200">
+          <h2 class="card-title flex justify-between items-center">
+            <span>4. Opções de Serviços &amp; Reparos</span>
+            <span class="text-[10px] font-normal text-slate-400 normal-case">Marque os módulos para incluir no orçamento</span>
+          </h2>
+
+          <!-- MÓDULO MESTRE: TROCA DE TELA -->
+          <div class="border border-slate-300 rounded overflow-hidden mb-3">
+            <label class="flex items-center gap-2 p-3 bg-slate-100 cursor-pointer hover:bg-slate-200 transition select-none">
+              <input type="checkbox" id="telaAtiva" onchange="toggleTela()" class="h-4 w-4 accent-slate-800 rounded border-slate-400 cursor-pointer">
+              <i class="fa-solid fa-mobile-screen-button text-slate-600"></i>
+              <span class="text-xs font-bold text-slate-800 uppercase flex-1">Troca de Tela / Display</span>
+              <span class="text-[10px] text-slate-500 font-semibold">3 opções</span>
+            </label>
+
+            <div id="telaPanel" class="hidden p-3 space-y-3 bg-white">
+              <!-- OPÇÃO 1 -->
+              <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                <div class="flex justify-between items-center mb-2">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="op1Ativa" class="h-4 w-4 accent-slate-800 rounded border-slate-300">
+                    <span class="text-[11px] font-bold text-slate-700 uppercase">Opção 1 — Intermediária / OLED</span>
+                  </label>
+                  <span id="op1_total" class="text-[11px] font-bold text-slate-700"></span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
+                  <div>
+                    <label class="field-label">Custo Peça (R$)</label>
+                    <input type="number" id="op1Peca" step="0.01" min="0" value="0.00" class="field-input">
+                  </div>
+                  <div>
+                    <label class="field-label">Mão de Obra (R$)</label>
+                    <input type="number" id="op1Mo" step="0.01" min="0" value="200.00" class="field-input">
+                  </div>
+                  <div>
+                    <label class="field-label">Biometria</label>
+                    <select id="op1Bio" class="field-input">
+                      <option value="Funciona">Funciona</option>
+                      <option value="Não Funciona">Não Funciona</option>
+                    </select>
+                  </div>
+                </div>
+                <input type="text" id="op1Desc" value="OLED Intermediária com excelente brilho, cores vivas e encaixe no aro." class="field-input text-[11px]">
+              </div>
+
+              <!-- OPÇÃO 2 -->
+              <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                <div class="flex justify-between items-center mb-2">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="op2Ativa" class="h-4 w-4 accent-slate-800 rounded border-slate-300">
+                    <span class="text-[11px] font-bold text-slate-700 uppercase">Opção 2 — Premium / Original</span>
+                  </label>
+                  <span id="op2_total" class="text-[11px] font-bold text-slate-700"></span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
+                  <div>
+                    <label class="field-label">Custo Peça (R$)</label>
+                    <input type="number" id="op2Peca" step="0.01" min="0" value="0.00" class="field-input">
+                  </div>
+                  <div>
+                    <label class="field-label">Mão de Obra (R$)</label>
+                    <input type="number" id="op2Mo" step="0.01" min="0" value="250.00" class="field-input">
+                  </div>
+                  <div>
+                    <label class="field-label">Biometria</label>
+                    <select id="op2Bio" class="field-input">
+                      <option value="Funciona">Funciona</option>
+                      <option value="Não Funciona">Não Funciona</option>
+                    </select>
+                  </div>
+                </div>
+                <input type="text" id="op2Desc" value="Componente padrão original de fábrica com máxima durabilidade." class="field-input text-[11px]">
+              </div>
+
+              <!-- OPÇÃO 3 -->
+              <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                <div class="flex justify-between items-center mb-2">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="op3Ativa" class="h-4 w-4 accent-slate-800 rounded border-slate-300">
+                    <span class="text-[11px] font-bold text-slate-700 uppercase">Opção 3 — Econômica / Incell</span>
+                  </label>
+                  <span id="op3_total" class="text-[11px] font-bold text-slate-700"></span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
+                  <div>
+                    <label class="field-label">Custo Peça (R$)</label>
+                    <input type="number" id="op3Peca" step="0.01" min="0" value="0.00" class="field-input">
+                  </div>
+                  <div>
+                    <label class="field-label">Mão de Obra (R$)</label>
+                    <input type="number" id="op3Mo" step="0.01" min="0" value="200.00" class="field-input">
+                  </div>
+                  <div>
+                    <label class="field-label">Biometria</label>
+                    <select id="op3Bio" class="field-input">
+                      <option value="Não Funciona" selected>Não Funciona</option>
+                      <option value="Funciona">Funciona</option>
+                    </select>
+                  </div>
+                </div>
+                <input type="text" id="op3Desc" value="Incell / LCD paralela. Restaura imagem e toque (sem biometria)." class="field-input text-[11px]">
+              </div>
+            </div>
+          </div>
+
+          <!-- DEMAIS MÓDULOS -->
+          <div id="servicosContainer" class="space-y-2"></div>
+        </div>
+
+      </div>
+
+      <!-- ================= COLUNA LATERAL ================= -->
+      <div class="lg:col-span-4 space-y-6">
+        <div class="sticky top-6 space-y-6">
+
+          <!-- AÇÕES -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+            <h2 class="card-title mb-3">Ações da OS</h2>
+            <div class="grid grid-cols-2 gap-2 mb-2">
+              <button onclick="novaOS()" class="col-span-2 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-circle-plus"></i> Nova OS
+              </button>
+              <button onclick="salvarOS()" class="col-span-2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-wide rounded shadow transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> Salvar / Atualizar OS
+              </button>
+              <button onclick="window.print()" class="col-span-2 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wide rounded shadow transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF (A4)
+              </button>
+              <button onclick="exportarHTMLCliente()" class="col-span-2 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold uppercase tracking-wide rounded shadow transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-code"></i> Exportar Orçamento Interativo (HTML)
+              </button>
+            </div>
+          </div>
+
+          <!-- RESUMO WHATSAPP -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2 mb-3">
+              <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600">Resumo WhatsApp</h2>
+              <button onclick="copiarTexto()" class="text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded transition font-bold flex items-center gap-1">
+                <i class="fa-solid fa-copy"></i> Copiar
+              </button>
+            </div>
+            <div id="resumoTotal" class="mb-3 text-[11px]"></div>
+            <textarea id="textoSaida" rows="18" readonly class="w-full text-[11px] font-mono bg-slate-50 p-3 border border-slate-200 rounded text-slate-800 leading-relaxed focus:outline-none scrollbar-thin"></textarea>
+          </div>
+
+          <!-- LISTA DE OS + BACKUP -->
+          <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2 mb-3">
+              <h2 class="text-xs font-bold uppercase tracking-wider text-slate-600">OS Salvas</h2>
+              <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-bold"><span id="totalOS">0</span> registros</span>
+            </div>
+            <div id="listaOS" class="space-y-2 max-h-[420px] overflow-y-auto scrollbar-thin pr-1"></div>
+
+            <!-- BACKUP / RESTAURAÇÃO -->
+            <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-100">
+              <button onclick="exportarBackup()" class="py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold uppercase tracking-wide rounded shadow transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-download"></i> Backup
+              </button>
+              <button onclick="document.getElementById('backupFile').click()" class="py-2 bg-teal-600 hover:bg-teal-700 text-white text-[10px] font-bold uppercase tracking-wide rounded shadow transition flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-upload"></i> Restaurar
+              </button>
+              <input type="file" id="backupFile" accept="application/json,.json" onchange="importarBackup(this)" class="hidden">
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 leading-snug text-center">
+              <i class="fa-solid fa-circle-info mr-0.5"></i>
+              Exporte periodicamente para não perder suas OS.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===================== ÁREA DE IMPRESSÃO A4 ===================== -->
+  <div id="printArea" class="bg-white text-slate-900 p-4 max-w-[800px] mx-auto text-xs leading-tight shadow-sm rounded no-print-preview">
+
+    <!-- Cabeçalho Oficial -->
+    <div class="flex justify-between items-center border-b-2 border-slate-900 pb-2 mb-2">
+      <div class="flex items-center gap-3">
+        <div id="pdfLogoContainer" class="w-24 h-12 flex items-center justify-center overflow-hidden">
+          <span class="text-[9px] text-slate-400 font-bold uppercase">Sem Logo</span>
+        </div>
+        <div>
+          <h1 class="text-lg font-black text-slate-900 tracking-tight uppercase leading-none">Zenilson Lacerda</h1>
+          <p class="text-[9px] font-bold text-slate-700 tracking-wider mt-0.5">TECNOLOGIA &amp; SERVIÇOS • ASSISTÊNCIA TÉCNICA</p>
+          <p class="text-[9px] text-slate-600">Contato / WhatsApp: (47) 93384-4478</p>
+        </div>
+      </div>
+      <div class="text-right border-l border-slate-300 pl-3">
+        <span class="inline-block bg-slate-900 text-white font-black text-[9px] uppercase px-2 py-0.5 rounded mb-1">Ordem de Serviço &amp; Checklist</span>
+        <p class="text-[9px] text-slate-600">Nº: <b id="pdfNumero" class="text-slate-900">NOVA OS</b></p>
+        <p class="text-[9px] text-slate-600">Entrada: <b id="pdfData" class="text-slate-900">--/--/----</b></p>
+      </div>
+    </div>
+
+    <!-- Cliente / Aparelho -->
+    <div class="border border-slate-900 rounded p-2 mb-2 bg-slate-50 grid grid-cols-3 gap-x-3 gap-y-0.5 text-[10px]">
+      <div class="col-span-2"><strong>Cliente:</strong> <span id="pdfCliente">—</span></div>
+      <div><strong>Telefone:</strong> <span id="pdfFone">—</span></div>
+      <div><strong>Modelo:</strong> <span id="pdfAparelho">—</span></div>
+      <div><strong>Capacidade:</strong> <span id="pdfGb">—</span></div>
+      <div><strong>IMEI/Série:</strong> <span id="pdfSerie">—</span></div>
+      <div><strong>Senha:</strong> <span id="pdfSenha">—</span></div>
+      <div class="col-span-2"><strong>Padrão de Tela:</strong> <span id="pdfPadraoGrid">Não informado</span></div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="border border-slate-900 rounded p-2 mb-2">
+      <h3 class="text-[9px] font-black uppercase text-slate-900 border-b border-slate-300 pb-1 mb-1.5">Lista de Checagem Técnica de Entrada (Checklist)</h3>
+      <div class="space-y-1 text-[9px]" id="pdfChecklistContainer"></div>
+      <div class="border-t border-slate-300 pt-1 mt-1 text-[9px]">
+        <strong>Avarias Visíveis Constatadas:</strong> <span id="pdfAvarias">Nenhuma marcação registrada</span>
+      </div>
+    </div>
+
+    <!-- Diagnóstico -->
+    <div class="border border-slate-900 rounded p-2 mb-2 space-y-0.5 text-[9px]">
+      <p><strong>Problema Relatado / Análise de Entrada:</strong> <span id="pdfDiagnostico">—</span></p>
+      <p><strong>Serviço Executado / Proposta Técnica:</strong> <span id="pdfSolucao">—</span></p>
+    </div>
+
+    <!-- Serviços / Orçamento -->
+    <div class="border border-slate-900 rounded p-2 mb-2">
+      <h3 class="text-[9px] font-black uppercase text-slate-900 border-b border-slate-300 pb-1 mb-1.5">Opções de Reparo &amp; Investimento (Valor Total Fechado)</h3>
+      <table class="w-full text-[9px] border-collapse">
+        <thead>
+          <tr class="bg-slate-200">
+            <th class="border border-slate-400 px-1 py-0.5 text-left font-bold">Serviço / Descrição</th>
+            <th class="border border-slate-400 px-1 py-0.5 text-right font-bold w-28">Valor Fechado</th>
+          </tr>
+        </thead>
+        <tbody id="pdfServicosTbody"></tbody>
+      </table>
+      <p id="pdfTotal" class="text-right text-[10px] font-black mt-1 text-slate-900"></p>
+    </div>
+
+    <!-- Termo -->
+    <div class="border border-slate-300 p-2 rounded text-[8px] text-slate-600 space-y-0.5 bg-slate-50 mb-5">
+      <p><b>Aviso:</b> Ao deixar seu aparelho para reparo, remova o cartão de memória e o chip da operadora. Não nos responsabilizamos por itens não discriminados nesta OS.</p>
+      <p><b>Garantia:</b> Os reparos realizados possuem garantia legal de 90 dias. A garantia não cobre mau uso, quedas, trincos, pressão, umidade ou abertura por terceiros.</p>
+      <p class="text-center font-bold text-slate-800 pt-1">Ciente e de acordo com as condições descritas acima.</p>
+    </div>
+
+    <!-- Assinaturas -->
+    <div class="flex justify-between items-end pt-1 text-[9px] text-slate-800">
+      <div class="text-center w-52 border-t border-slate-900 pt-1">
+        <p class="font-bold">Zenilson Lacerda</p>
+        <p class="text-[8px] text-slate-600">Tecnologia &amp; Serviços</p>
+      </div>
+      <div class="text-center w-52 border-t border-slate-900 pt-1">
+        <p class="font-bold">Assinatura do Cliente</p>
+        <p class="text-[8px] text-slate-600">Aprovação do Orçamento / OS</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* =====================================================================
+       CONSTANTES E ESTADO GLOBAL
+    ===================================================================== */
+    const LS_KEY_OS   = 'zenilson_os_v2';
+    const LS_KEY_LOGO = 'zenilson_logo_v2';
+
+    const nomesTela = ['Intermediária / OLED', 'Premium / Original', 'Econômica / Incell'];
+
+    /* =====================================================================
+       LISTA ENXUTA DE CHECKLIST CATEGORIZADA (v4)
+       - tipo: 'fis' = inspeção física (NÃO é afetado pelo botão Inoperante)
+       - tipo: 'func' = teste funcional (vira N/A quando Inoperante é marcado)
+    ===================================================================== */
+    const categoriasChecklist = [
+      {
+        categoria: 'ESTADO FÍSICO / CARCAÇA',
+        tipo: 'fis',
+        icone: 'fa-mobile-screen',
+        itens: [
+          'Carcaça / Aro',
+          'Tampa Traseira'
+        ]
+      },
+      {
+        categoria: 'BOTÕES FÍSICOS',
+        tipo: 'func',
+        icone: 'fa-toggle-on',
+        itens: [
+          'Botão Power',
+          'Botão Volume +',
+          'Botão Volume -',
+          'Botão Menu / Home'
+        ]
+      },
+      {
+        categoria: 'CONECTOR & CARREGAMENTO',
+        tipo: 'func',
+        icone: 'fa-plug',
+        itens: [
+          'Conector de Carga (Físico)',
+          'Carregamento (Status)'
+        ]
+      },
+      {
+        categoria: 'DISPLAY & TOUCHSCREEN',
+        tipo: 'func',
+        icone: 'fa-display',
+        itens: [
+          'Display (Imagem / Brilho)',
+          'Touchscreen (Toque)'
+        ]
+      },
+      {
+        categoria: 'CÂMERAS',
+        tipo: 'func',
+        icone: 'fa-camera',
+        itens: [
+          'Câmera Frontal',
+          'Câmera Traseira',
+          'Flash Câmera'
+        ]
+      },
+      {
+        categoria: 'ÁUDIO & MICROFONES',
+        tipo: 'func',
+        icone: 'fa-volume-high',
+        itens: [
+          'Alto-falante Viva-voz',
+          'Áudio Auricular (Ligações)',
+          'Microfones'
+        ]
+      },
+      {
+        categoria: 'CONECTIVIDADE',
+        tipo: 'func',
+        icone: 'fa-wifi',
+        itens: [
+          'Wi-Fi',
+          'Bluetooth',
+          'Sinal SIM / Chip'
+        ]
+      },
+      {
+        categoria: 'SENSORES & BIOMETRIA',
+        tipo: 'func',
+        icone: 'fa-fingerprint',
+        itens: [
+          'Face ID / Reconhecimento Facial',
+          'Leitor Digital (Biometria)',
+          'Sensor de Proximidade'
+        ]
+      }
+    ];
+
+    /* Flat para compatibilidade com código legado */
+    const itensChecklist = [];
+    categoriasChecklist.forEach(function (cat) {
+      cat.itens.forEach(function (nome) {
+        itensChecklist.push({ nome: nome, tipo: cat.tipo, categoria: cat.categoria, icone: cat.icone });
+      });
+    });
+
+    function getCategoriaDoItem(nome) {
+      for (var i = 0; i < categoriasChecklist.length; i++) {
+        if (categoriasChecklist[i].itens.indexOf(nome) > -1) return categoriasChecklist[i].categoria;
+      }
+      return 'OUTROS / LEGADO';
+    }
+
+    const modulosServico = [
+      { id: 'carga',   nome: 'Conector de Carga / Sub-placa',              icone: 'fa-plug' },
+      { id: 'bateria', nome: 'Substituição de Bateria',                    icone: 'fa-battery-full' },
+      { id: 'cameras', nome: 'Câmeras (Frontal / Traseira)',               icone: 'fa-camera' },
+      { id: 'botoes',  nome: 'Botões Físicos / Switches (Power e Volume)', icone: 'fa-toggle-on' },
+      { id: 'carcaca', nome: 'Carcaça / Aro / Tampa Traseira',             icone: 'fa-mobile-screen' },
+      { id: 'outro',   nome: 'Outro Serviço Personalizado',                icone: 'fa-wrench', custom: true }
+    ];
+
+    let padraoPontos    = [];
+    let logoBase64      = null;
+    let osAtualId       = null;
+    let osNumeroAtual   = null;
+    let listaOS         = [];
+
+    /* =====================================================================
+       HELPERS
+    ===================================================================== */
+    function esc(str) {
+      return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function numVal(id) {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      const v = parseFloat(String(el.value).replace(',', '.'));
+      return isNaN(v) ? 0 : v;
+    }
+    function txtVal(id) {
+      const el = document.getElementById(id);
+      return el ? String(el.value).trim() : '';
+    }
+    function money(v) {
+      return 'R$ ' + (Number(v) || 0).toFixed(2).replace('.', ',');
+    }
+
+    /* Normaliza um item de checklist para {status, obs} — retrocompatível */
+    function normalizarItemChecklist(raw) {
+      if (typeof raw === 'string') {
+        return { status: (raw === 'OK' || raw === 'DEFEITO' || raw === 'N/A') ? raw : 'OK', obs: '' };
+      }
+      if (raw && typeof raw === 'object') {
+        const s = (raw.status === 'OK' || raw.status === 'DEFEITO' || raw.status === 'N/A') ? raw.status : 'OK';
+        return { status: s, obs: typeof raw.obs === 'string' ? raw.obs : '' };
+      }
+      return { status: 'OK', obs: '' };
+    }
+
+    /* Normaliza avarias (string nova OU array legado) */
+    function normalizarAvarias(raw) {
+      if (typeof raw === 'string') return raw;
+      if (Array.isArray(raw)) return raw.join(', ');
+      return '';
+    }
+
+    /* =====================================================================
+       BANCO DE DADOS (localStorage)
+    ===================================================================== */
+    function dbCarregar() {
+      try {
+        const raw = localStorage.getItem(LS_KEY_OS);
+        listaOS = raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        listaOS = [];
+      }
+      if (!Array.isArray(listaOS)) listaOS = [];
+
+      /* Migração silenciosa: checklist string → {status, obs} e avarias array → string */
+      listaOS.forEach(function (o) {
+        if (!o || typeof o !== 'object') return;
+        if (o.checklist && typeof o.checklist === 'object' && o.checklist !== null) {
+          const novo = {};
+          Object.keys(o.checklist).forEach(function (k) {
+            novo[k] = normalizarItemChecklist(o.checklist[k]);
+          });
+          o.checklist = novo;
+        }
+        o.avarias = normalizarAvarias(o.avarias);
+      });
+      return listaOS;
+    }
+
+    function dbSalvar() {
+      try {
+        localStorage.setItem(LS_KEY_OS, JSON.stringify(listaOS));
+        return true;
+      } catch (e) {
+        alert('Não foi possível salvar no armazenamento local. Verifique o espaço disponível no navegador.');
+        return false;
+      }
+    }
+
+    /* =====================================================================
+       NOVA NUMERAÇÃO DE OS  →  YYMMDDRRRR (10 dígitos, sem colisão)
+    ===================================================================== */
+    function proximoNumero() {
+      const agora = new Date();
+      const yy = String(agora.getFullYear()).slice(-2);
+      const mm = String(agora.getMonth() + 1).padStart(2, '0');
+      const dd = String(agora.getDate()).padStart(2, '0');
+
+      let numero = '';
+      let tentativas = 0;
+      do {
+        const rrrr = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+        numero = yy + mm + dd + rrrr;
+        tentativas++;
+      } while (listaOS.some(function (o) { return o && o.numero === numero; }) && tentativas < 100);
+
+      return numero;
+    }
+
+    /* =====================================================================
+       LOGO
+    ===================================================================== */
+    function carregarLogo() {
+      const saved = localStorage.getItem(LS_KEY_LOGO);
+      if (saved) {
+        logoBase64 = saved;
+        aplicarLogo();
+      }
+    }
+
+    function aplicarLogo() {
+      const html = logoBase64
+        ? '<img src="' + logoBase64 + '" class="max-h-full max-w-full object-contain" alt="Logo">'
+        : '<span class="text-[9px] text-slate-400 font-bold uppercase text-center px-1">Sem Logo</span>';
+      const c1 = document.getElementById('logoContainer');
+      const c2 = document.getElementById('pdfLogoContainer');
+      if (c1) c1.innerHTML = html;
+      if (c2) c2.innerHTML = html;
+    }
+
+    function removerLogo() {
+      logoBase64 = null;
+      localStorage.removeItem(LS_KEY_LOGO);
+      aplicarLogo();
+    }
+
+    function processarLogo(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        alert('Selecione um arquivo de imagem (PNG ou JPG).');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        const img = new Image();
+        img.onload = function () {
+          const maxW = 420, maxH = 200;
+          let w = img.width, h = img.height;
+          const ratio = Math.min(maxW / w, maxH / h, 1);
+          w = Math.max(1, Math.round(w * ratio));
+          h = Math.max(1, Math.round(h * ratio));
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          logoBase64 = canvas.toDataURL('image/png');
+          try { localStorage.setItem(LS_KEY_LOGO, logoBase64); } catch (e) { /* ignora limite */ }
+          aplicarLogo();
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    /* =====================================================================
+       MONTAGEM DE COMPONENTES DINÂMICOS
+    ===================================================================== */
+    function montarChecklistForm() {
+      const container = document.getElementById('checklistContainer');
+      container.innerHTML = '';
+
+      categoriasChecklist.forEach(function (cat) {
+        const isFis = cat.tipo === 'fis';
+        const badgeCls = isFis
+          ? 'bg-amber-100 text-amber-700 border-amber-200'
+          : 'bg-sky-100 text-sky-700 border-sky-200';
+        const badgeTxt = isFis ? 'FÍSICO' : 'FUNCIONAL';
+
+        let itensHTML = '';
+        cat.itens.forEach(function (nome) {
+          itensHTML +=
+            '<div class="bg-slate-50 p-2 rounded border border-slate-200 space-y-1">' +
+              '<div class="flex items-center justify-between gap-2">' +
+                '<span class="font-medium text-slate-700 flex-1 truncate text-[11px]" title="' + esc(nome) + '">' + esc(nome) + '</span>' +
+                '<select class="check-item-select text-[11px] border border-slate-300 rounded p-0.5 bg-white flex-shrink-0" ' +
+                        'data-item="' + esc(nome) + '" data-tipo="' + cat.tipo + '" data-cat="' + esc(cat.categoria) + '">' +
+                  '<option value="OK" selected>OK</option>' +
+                  '<option value="DEFEITO">DEFEITO</option>' +
+                  '<option value="N/A">N/A</option>' +
+                '</select>' +
+              '</div>' +
+              '<input type="text" ' +
+                     'class="check-item-obs w-full text-[10px] border border-slate-200 rounded px-1.5 py-1 bg-white focus:outline-none focus:border-slate-400 placeholder:text-slate-400" ' +
+                     'data-item="' + esc(nome) + '" ' +
+                     'maxlength="120" ' +
+                     'placeholder="Obs. técnica / avaria (opcional)">' +
+            '</div>';
+        });
+
+        container.insertAdjacentHTML('beforeend',
+          '<div>' +
+            '<div class="flex items-center gap-2 mb-1.5 pb-1 border-b border-slate-200">' +
+              '<i class="fa-solid ' + cat.icone + ' text-[10px] text-slate-500"></i>' +
+              '<span class="text-[10px] font-black text-slate-600 uppercase tracking-wider flex-1">' + esc(cat.categoria) + '</span>' +
+              '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded border ' + badgeCls + '">' + badgeTxt + '</span>' +
+            '</div>' +
+            '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">' + itensHTML + '</div>' +
+          '</div>');
+      });
+    }
+
+    function montarServicos() {
+      const container = document.getElementById('servicosContainer');
+      container.innerHTML = '';
+      modulosServico.forEach(function (m) {
+        const camposDesc = m.custom
+          ? '<div class="sm:col-span-2">' +
+              '<label class="field-label">Descrição do Serviço Personalizado</label>' +
+              '<input type="text" id="svc_' + m.id + '_desc" placeholder="Ex: Recuperação de placa por oxidação" class="field-input">' +
+            '</div>'
+          : '';
+
+        container.insertAdjacentHTML('beforeend',
+          '<div class="border border-slate-200 rounded overflow-hidden">' +
+            '<label class="flex items-center gap-2 p-2.5 bg-slate-50 cursor-pointer hover:bg-slate-100 transition select-none">' +
+              '<input type="checkbox" id="svc_' + m.id + '_ativo" onchange="toggleServico(\'' + m.id + '\')" class="h-4 w-4 accent-slate-800 rounded border-slate-300 cursor-pointer">' +
+              '<i class="fa-solid ' + m.icone + ' text-slate-500 text-[11px]"></i>' +
+              '<span class="text-[11px] font-bold text-slate-700 uppercase flex-1">' + esc(m.nome) + '</span>' +
+              '<span id="svc_' + m.id + '_total" class="text-[10px] font-bold text-emerald-700"></span>' +
+            '</label>' +
+            '<div id="svc_' + m.id + '_panel" class="hidden p-3 bg-white grid grid-cols-1 sm:grid-cols-2 gap-3">' +
+              '<div>' +
+                '<label class="field-label">Custo da Peça (R$)</label>' +
+                '<input type="number" id="svc_' + m.id + '_peca" step="0.01" min="0" value="0.00" class="field-input">' +
+              '</div>' +
+              '<div>' +
+                '<label class="field-label">Mão de Obra (R$)</label>' +
+                '<input type="number" id="svc_' + m.id + '_mo" step="0.01" min="0" value="0.00" class="field-input">' +
+              '</div>' +
+              camposDesc +
+            '</div>' +
+          '</div>');
+      });
+    }
+
+    function toggleServico(id) {
+      const chk = document.getElementById('svc_' + id + '_ativo');
+      const panel = document.getElementById('svc_' + id + '_panel');
+      if (chk && panel) panel.classList.toggle('hidden', !chk.checked);
+    }
+
+    function toggleTela() {
+      const chk = document.getElementById('telaAtiva');
+      const panel = document.getElementById('telaPanel');
+      if (chk && panel) panel.classList.toggle('hidden', !chk.checked);
+    }
+
+    /* =====================================================================
+       PADRÃO DE DESBLOQUEIO
+    ===================================================================== */
+    function togglePatternDot(el) {
+      const id = el.getAttribute('data-id');
+      if (padraoPontos.includes(id)) {
+        padraoPontos = padraoPontos.filter(function (p) { return p !== id; });
+        el.classList.remove('active');
+      } else {
+        padraoPontos.push(id);
+        el.classList.add('active');
+      }
+      atualizarTudo();
+    }
+
+    function limparPadrao() {
+      padraoPontos = [];
+      document.querySelectorAll('.pattern-dot').forEach(function (d) { d.classList.remove('active'); });
+      atualizarTudo();
+    }
+
+    /* =====================================================================
+       INOPERANTE
+    ===================================================================== */
+    function aplicarInoperante() {
+      const on = document.getElementById('inoperanteCheck').checked;
+      document.querySelectorAll('.check-item-select').forEach(function (sel) {
+        if (sel.dataset.tipo !== 'func') return; /* Preserva itens 'fis' */
+        if (on) {
+          if (sel.value !== 'N/A') sel.dataset.prev = sel.value;
+          sel.value = 'N/A';
+          sel.disabled = true;
+          sel.classList.add('opacity-60');
+        } else {
+          sel.disabled = false;
+          sel.classList.remove('opacity-60');
+          if (sel.value === 'N/A' && sel.dataset.prev) sel.value = sel.dataset.prev;
+        }
+      });
+      atualizarTudo();
+    }
+
+    /* =====================================================================
+       LEITURA / ESCRITA DO FORMULÁRIO
+    ===================================================================== */
+    function lerFormulario() {
+      const dataVal = txtVal('dataEntrada');
+      let dataFmt = '--/--/----';
+      if (dataVal && dataVal.indexOf('-') > -1) {
+        const p = dataVal.split('-');
+        dataFmt = p[2] + '/' + p[1] + '/' + p[0];
+      }
+
+      /* Mapa de observações (por nome do item) */
+      const obsMap = {};
+      document.querySelectorAll('.check-item-obs').forEach(function (inp) {
+        obsMap[inp.dataset.item] = String(inp.value || '').trim();
+      });
+
+      /* Checklist estruturado: { item: { status, obs } } */
+      const checklist = {};
+      const domItems = {};
+      document.querySelectorAll('.check-item-select').forEach(function (s) {
+        const item = s.dataset.item;
+        domItems[item] = true;
+        checklist[item] = {
+          status: s.value,
+          obs: obsMap[item] || ''
+        };
+      });
+
+      /* PRESERVAÇÃO DE LEGADO: itens que existem na OS carregada mas não estão mais
+         na UI atual (ex: "Riscos", "Trincados", etc) são mantidos. */
+      if (osAtualId) {
+        const armazenada = listaOS.find(function (o) { return o.id === osAtualId; });
+        if (armazenada && armazenada.checklist && typeof armazenada.checklist === 'object') {
+          Object.keys(armazenada.checklist).forEach(function (k) {
+            if (!domItems[k]) {
+              checklist[k] = normalizarItemChecklist(armazenada.checklist[k]);
+            }
+          });
+        }
+      }
+
+      const avarias = txtVal('avariasTexto');
+
+      const telas = [1, 2, 3].map(function (n) {
+        return {
+          ativa: document.getElementById('op' + n + 'Ativa').checked,
+          peca: numVal('op' + n + 'Peca'),
+          mo: numVal('op' + n + 'Mo'),
+          bio: document.getElementById('op' + n + 'Bio').value,
+          desc: txtVal('op' + n + 'Desc')
+        };
+      });
+
+      const servicos = {};
+      modulosServico.forEach(function (m) {
+        servicos[m.id] = {
+          nome: m.nome,
+          ativo: document.getElementById('svc_' + m.id + '_ativo').checked,
+          peca: numVal('svc_' + m.id + '_peca'),
+          mo: numVal('svc_' + m.id + '_mo'),
+          desc: m.custom ? txtVal('svc_' + m.id + '_desc') : ''
+        };
+      });
+
+      return {
+        id: osAtualId,
+        numero: osNumeroAtual,
+        cliente: txtVal('clienteNome'),
+        fone: txtVal('clienteFone'),
+        modelo: txtVal('aparelhoModelo'),
+        gb: txtVal('aparelhoGb'),
+        imei: txtVal('aparelhoSerie'),
+        dataEntrada: dataVal,
+        dataFmt: dataFmt,
+        senha: txtVal('senhaNumerica'),
+        inoperante: document.getElementById('inoperanteCheck').checked,
+        checklist: checklist,
+        avarias: avarias,
+        padrao: padraoPontos.slice(),
+        defeito: txtVal('defeitoRelatado'),
+        solucao: txtVal('solucaoProposta'),
+        insumoNome: txtVal('insumoNome'),
+        insumoCusto: numVal('insumoCusto'),
+        telaAtiva: document.getElementById('telaAtiva').checked,
+        telas: telas,
+        servicos: servicos
+      };
+    }
+
+    function calcularTotais(d) {
+      const telasTotais = d.telaAtiva
+        ? d.telas.map(function (t) { return { ativa: t.ativa, total: t.peca + t.mo, bio: t.bio, desc: t.desc }; })
+        : [];
+
+      const outros = [];
+      modulosServico.forEach(function (m) {
+        const s = d.servicos[m.id];
+        if (s && s.ativo) {
+          outros.push({
+            id: m.id,
+            nome: s.desc ? s.desc : m.nome,
+            total: s.peca + s.mo
+          });
+        }
+      });
+
+      const totalOutros = outros.reduce(function (a, b) { return a + b.total; }, 0) + d.insumoCusto;
+
+      return { telasTotais: telasTotais, outros: outros, totalOutros: totalOutros };
+    }
+
+    /* Extrai itens da vistoria que merecem destaque (obs ou não-OK) */
+    function extrairVistoria(checklist) {
+      const vistoria = [];
+      Object.keys(checklist || {}).forEach(function (k) {
+        const item = normalizarItemChecklist(checklist[k]);
+        if (item.obs || item.status === 'DEFEITO' || item.status === 'N/A') {
+          vistoria.push({
+            nome: k,
+            status: item.status,
+            obs: item.obs,
+            categoria: getCategoriaDoItem(k)
+          });
+        }
+      });
+      return vistoria;
+    }
+
+    /* Agrupa vistoria por categoria — preserva ordem das categorias + OUTROS */
+    function agruparVistoriaPorCategoria(vistoria) {
+      const grupos = {};
+      const ordem = [];
+      vistoria.forEach(function (v) {
+        if (!grupos[v.categoria]) {
+          grupos[v.categoria] = [];
+          ordem.push(v.categoria);
+        }
+        grupos[v.categoria].push(v);
+      });
+      return ordem.map(function (cat) {
+        return { categoria: cat, itens: grupos[cat] };
+      });
+    }
+
+    /* =====================================================================
+       ATUALIZAÇÃO GERAL
+    ===================================================================== */
+    function atualizarTudo() {
+      const d = lerFormulario();
+      const t = calcularTotais(d);
+
+      modulosServico.forEach(function (m) {
+        const el = document.getElementById('svc_' + m.id + '_total');
+        if (!el) return;
+        const ativo = document.getElementById('svc_' + m.id + '_ativo').checked;
+        el.textContent = ativo ? money(numVal('svc_' + m.id + '_peca') + numVal('svc_' + m.id + '_mo')) : '';
+      });
+      [1, 2, 3].forEach(function (n) {
+        const el = document.getElementById('op' + n + '_total');
+        if (!el) return;
+        const ativo = document.getElementById('op' + n + 'Ativa').checked;
+        el.textContent = ativo ? money(numVal('op' + n + 'Peca') + numVal('op' + n + 'Mo')) : '';
+      });
+
+      const prev = document.getElementById('padraoPreview');
+      if (prev) prev.textContent = padraoPontos.length ? 'Padrão: ' + padraoPontos.join(' → ') : '';
+
+      document.getElementById('textoSaida').value = gerarTextoWhatsApp(d, t);
+
+      renderResumoTotal(d, t);
+      renderPDF(d, t);
+
+      const badge = document.getElementById('badgeOSAtual');
+      if (badge) badge.textContent = osNumeroAtual || 'Nova OS';
+    }
+
+    function renderResumoTotal(d, t) {
+      const box = document.getElementById('resumoTotal');
+      if (!box) return;
+
+      let html = '';
+      const temTela = d.telaAtiva && d.telas.some(function (x) { return x.ativa; });
+
+      if (temTela) {
+        html += '<div class="flex justify-between text-slate-600"><span>Opções de tela:</span><span class="font-bold">3 alternativas</span></div>';
+      }
+      if (t.outros.length) {
+        html += '<div class="flex justify-between text-slate-600"><span>Serviços adicionais:</span><span class="font-bold">' + t.outros.length + '</span></div>';
+      }
+      if (d.insumoCusto > 0) {
+        html += '<div class="flex justify-between text-slate-600"><span>Insumos:</span><span class="font-bold">' + money(d.insumoCusto) + '</span></div>';
+      }
+      const qtdVistoria = extrairVistoria(d.checklist).length;
+      if (qtdVistoria) {
+        html += '<div class="flex justify-between text-slate-600"><span>Itens em vistoria:</span><span class="font-bold">' + qtdVistoria + '</span></div>';
+      }
+      html += '<div class="flex justify-between border-t border-slate-200 mt-1.5 pt-1.5 text-slate-900">' +
+              '<span class="font-bold">' + (temTela ? 'Subtotal (sem tela):' : 'VALOR TOTAL:') + '</span>' +
+              '<span class="font-black text-emerald-700">' + money(t.totalOutros) + '</span></div>';
+
+      box.innerHTML = html;
+    }
+
+    /* =====================================================================
+       TEXTO WHATSAPP
+    ===================================================================== */
+    function gerarTextoWhatsApp(d, t) {
+      let s = '';
+      s += 'Olá, ' + (d.cliente || 'cliente') + '! Tudo bem?\n\n';
+      s += 'Segue o orçamento referente ao seu ' + (d.modelo || 'aparelho') +
+           (d.gb ? ' (' + d.gb + ')' : '') + '.\n\n';
+
+      if (d.defeito) s += '📋 Diagnóstico:\n' + d.defeito + '\n\n';
+      if (d.solucao) s += '🛠️ Serviço proposto:\n' + d.solucao + '\n\n';
+
+      /* 🔍 Vistoria agrupada por categoria */
+      const vistoria = extrairVistoria(d.checklist);
+      if (vistoria.length || d.avarias) {
+        s += '🔍 VISTORIA DE ENTRADA:\n';
+        agruparVistoriaPorCategoria(vistoria).forEach(function (grupo) {
+          s += '▸ ' + grupo.categoria + '\n';
+          grupo.itens.forEach(function (v) {
+            let linha = '   • ' + v.nome + ': ' + v.status;
+            if (v.obs) linha += ' — ' + v.obs;
+            s += linha + '\n';
+          });
+        });
+        if (d.avarias) {
+          s += '▸ AVARIAS VISÍVEIS\n';
+          s += '   • ' + d.avarias + '\n';
+        }
+        s += '\n';
+      }
+
+      const telasAtivas = t.telasTotais.filter(function (x) { return x.ativa; });
+      if (d.telaAtiva && telasAtivas.length) {
+        s += '📱 TROCA DE TELA / DISPLAY:\n';
+        t.telasTotais.forEach(function (x, i) {
+          if (!x.ativa) return;
+          s += '• Opção ' + (i + 1) + ' — ' + nomesTela[i] + ': ' + money(x.total) + '\n';
+          if (x.desc) s += '   ' + x.desc + '\n';
+          s += '   Biometria: ' + x.bio + '\n';
+        });
+        s += '\n';
+      }
+
+      if (t.outros.length) {
+        s += '🔧 DEMAIS SERVIÇOS:\n';
+        t.outros.forEach(function (o) {
+          s += '• ' + o.nome + ': ' + money(o.total) + '\n';
+        });
+        s += '\n';
+      }
+
+      if (d.insumoCusto > 0) {
+        s += '📦 Insumos' + (d.insumoNome ? ' (' + d.insumoNome + ')' : '') + ': ' + money(d.insumoCusto) + '\n\n';
+      }
+
+      const temTela = d.telaAtiva && telasAtivas.length > 0;
+
+      if (temTela && t.totalOutros > 0) {
+        s += '💰 Demais serviços + insumos: ' + money(t.totalOutros) + '\n';
+        s += '(some o valor da opção de tela escolhida para o total final)\n\n';
+      } else if (temTela) {
+        s += '👉 Escolha uma das opções de tela acima.\n\n';
+      } else if (t.totalOutros > 0) {
+        s += '💰 VALOR TOTAL: ' + money(t.totalOutros) + '\n\n';
+      } else {
+        s += 'Nenhum serviço selecionado no momento.\n\n';
+      }
+
+      s += 'Formas de pagamento: PIX, Cartão de Débito ou Crédito.\n';
+      s += 'Garantia de 90 dias nos serviços executados.\n\n';
+      s += 'Zenilson Lacerda | Tecnologia & Serviços\n(47) 93384-4478';
+      return s;
+    }
+
+    /* =====================================================================
+       RENDERIZAÇÃO DO PDF / IMPRESSÃO — agrupada por categoria
+    ===================================================================== */
+    function renderPDF(d, t) {
+      document.getElementById('pdfCliente').textContent  = d.cliente || '—';
+      document.getElementById('pdfFone').textContent     = d.fone || '—';
+      document.getElementById('pdfAparelho').textContent = d.modelo || '—';
+      document.getElementById('pdfGb').textContent       = d.gb || '—';
+      document.getElementById('pdfSerie').textContent    = d.imei || '—';
+      document.getElementById('pdfSenha').textContent    = d.senha || (d.padrao.length ? 'Padrão gráfico' : '—');
+      document.getElementById('pdfData').textContent     = d.dataFmt;
+      document.getElementById('pdfNumero').textContent   = osNumeroAtual || 'NOVA OS';
+
+      document.getElementById('pdfDiagnostico').textContent = d.defeito || 'Não informado';
+      document.getElementById('pdfSolucao').textContent     = d.solucao || 'Análise e testes funcionais gerais.';
+
+      /* ── Checklist agrupado por categoria ── */
+      const cont = document.getElementById('pdfChecklistContainer');
+      cont.innerHTML = '';
+
+      /* Blocos das categorias oficiais */
+      categoriasChecklist.forEach(function (cat) {
+        const itensPresentes = cat.itens.filter(function (nome) {
+          return d.checklist && d.checklist[nome];
+        });
+        if (!itensPresentes.length) return;
+
+        let linhas = '';
+        itensPresentes.forEach(function (nome) {
+          const item = normalizarItemChecklist(d.checklist[nome]);
+          const cls = item.status === 'OK'
+            ? 'text-emerald-700'
+            : (item.status === 'DEFEITO' ? 'text-rose-700 font-bold' : 'text-slate-500');
+          linhas += '<div><b>' + esc(nome) + ':</b> <span class="' + cls + '">' + esc(item.status) + '</span>' +
+                    (item.obs ? ' <i class="text-slate-500">(' + esc(item.obs) + ')</i>' : '') +
+                    '</div>';
+        });
+
+        cont.insertAdjacentHTML('beforeend',
+          '<div>' +
+            '<div class="text-[8px] font-black text-slate-800 uppercase border-b border-slate-300 pb-0.5 mb-0.5">' + esc(cat.categoria) + '</div>' +
+            '<div class="grid grid-cols-3 gap-x-3 gap-y-0.5">' + linhas + '</div>' +
+          '</div>');
+      });
+
+      /* Bloco OUTROS para itens legados que não pertencem às categorias oficiais */
+      const legados = Object.keys(d.checklist || {}).filter(function (k) {
+        return getCategoriaDoItem(k) === 'OUTROS / LEGADO';
+      });
+      if (legados.length) {
+        let linhas = '';
+        legados.forEach(function (nome) {
+          const item = normalizarItemChecklist(d.checklist[nome]);
+          const cls = item.status === 'OK'
+            ? 'text-emerald-700'
+            : (item.status === 'DEFEITO' ? 'text-rose-700 font-bold' : 'text-slate-500');
+          linhas += '<div><b>' + esc(nome) + ':</b> <span class="' + cls + '">' + esc(item.status) + '</span>' +
+                    (item.obs ? ' <i class="text-slate-500">(' + esc(item.obs) + ')</i>' : '') +
+                    '</div>';
+        });
+        cont.insertAdjacentHTML('beforeend',
+          '<div>' +
+            '<div class="text-[8px] font-black text-slate-800 uppercase border-b border-slate-300 pb-0.5 mb-0.5">OUTROS / LEGADO</div>' +
+            '<div class="grid grid-cols-3 gap-x-3 gap-y-0.5">' + linhas + '</div>' +
+          '</div>');
+      }
+
+      document.getElementById('pdfAvarias').textContent =
+        (d.avarias && String(d.avarias).trim()) ? d.avarias : 'Nenhuma marcação registrada';
+
+      document.getElementById('pdfPadraoGrid').textContent =
+        d.padrao.length
+          ? '[ ' + d.padrao.join(' → ') + ' ]'
+          : (d.senha ? 'Senha informada' : 'Não informado');
+
+      /* ── Serviços / Orçamento ── */
+      const tbody = document.getElementById('pdfServicosTbody');
+      let rows = '';
+      let temTela = false;
+
+      if (d.telaAtiva) {
+        d.telas.forEach(function (op, i) {
+          if (!op.ativa) return;
+          temTela = true;
+          rows += '<tr>' +
+            '<td class="border border-slate-400 px-1 py-0.5">Opção ' + (i + 1) + ' — ' + nomesTela[i] +
+              ' <span class="text-slate-600">(Biometria: ' + esc(op.bio) + ')</span>' +
+              (op.desc ? '<br><span class="text-slate-500">' + esc(op.desc) + '</span>' : '') +
+            '</td>' +
+            '<td class="border border-slate-400 px-1 py-0.5 text-right font-bold align-top">' + money(op.peca + op.mo) + '</td>' +
+          '</tr>';
+        });
+      }
+
+      t.outros.forEach(function (o) {
+        rows += '<tr>' +
+          '<td class="border border-slate-400 px-1 py-0.5">' + esc(o.nome) + '</td>' +
+          '<td class="border border-slate-400 px-1 py-0.5 text-right font-bold">' + money(o.total) + '</td>' +
+        '</tr>';
+      });
+
+      if (d.insumoCusto > 0) {
+        rows += '<tr>' +
+          '<td class="border border-slate-400 px-1 py-0.5">Insumos' + (d.insumoNome ? ' — ' + esc(d.insumoNome) : '') + '</td>' +
+          '<td class="border border-slate-400 px-1 py-0.5 text-right font-bold">' + money(d.insumoCusto) + '</td>' +
+        '</tr>';
+      }
+
+      if (!rows) {
+        rows = '<tr><td colspan="2" class="border border-slate-400 px-1 py-1 text-center text-slate-500">Nenhum serviço selecionado</td></tr>';
+      }
+      tbody.innerHTML = rows;
+
+      const totalEl = document.getElementById('pdfTotal');
+      if (temTela) {
+        totalEl.textContent = 'Subtotal (demais serviços + insumos): ' + money(t.totalOutros) +
+          '  —  Escolha uma das opções de tela acima.';
+      } else {
+        totalEl.textContent = 'VALOR TOTAL: ' + money(t.totalOutros);
+      }
+    }
+
+    /* =====================================================================
+       AÇÕES: NOVA / SALVAR / ABRIR / EDITAR / EXCLUIR
+    ===================================================================== */
+    function novaOS() {
+      if (osAtualId && !confirm('Iniciar uma nova OS? Os dados não salvos serão perdidos.')) return;
+      limparFormulario();
+      atualizarTudo();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function limparFormulario() {
+      document.querySelectorAll('#formArea input, #formArea textarea').forEach(function (el) {
+        if (el.type === 'checkbox' || el.type === 'radio') {
+          el.checked = false;
+        } else if (el.type !== 'file') {
+          el.value = '';
+        }
+      });
+      document.querySelectorAll('#formArea select').forEach(function (el) {
+        if (el.classList.contains('check-item-select')) return;
+        el.selectedIndex = 0;
+      });
+
+      padraoPontos = [];
+      document.querySelectorAll('.pattern-dot').forEach(function (d) { d.classList.remove('active'); });
+
+      document.querySelectorAll('.check-item-select').forEach(function (s) {
+        s.value = 'OK';
+        s.disabled = false;
+        s.classList.remove('opacity-60');
+        delete s.dataset.prev;
+      });
+      document.querySelectorAll('.check-item-obs').forEach(function (inp) { inp.value = ''; });
+      document.getElementById('inoperanteCheck').checked = false;
+
+      /* Campo único de avarias visíveis */
+      document.getElementById('avariasTexto').value = '';
+
+      document.getElementById('insumoCusto').value = '0.00';
+
+      document.getElementById('telaAtiva').checked = true;
+      toggleTela();
+
+      document.getElementById('op1Ativa').checked = true;
+      document.getElementById('op1Peca').value = '0.00';
+      document.getElementById('op1Mo').value = '200.00';
+      document.getElementById('op1Bio').value = 'Funciona';
+      document.getElementById('op1Desc').value = 'OLED Intermediária com excelente brilho, cores vivas e encaixe no aro.';
+
+      document.getElementById('op2Ativa').checked = true;
+      document.getElementById('op2Peca').value = '0.00';
+      document.getElementById('op2Mo').value = '250.00';
+      document.getElementById('op2Bio').value = 'Funciona';
+      document.getElementById('op2Desc').value = 'Componente padrão original de fábrica com máxima durabilidade.';
+
+      document.getElementById('op3Ativa').checked = true;
+      document.getElementById('op3Peca').value = '0.00';
+      document.getElementById('op3Mo').value = '200.00';
+      document.getElementById('op3Bio').value = 'Não Funciona';
+      document.getElementById('op3Desc').value = 'Incell / LCD paralela. Restaura imagem e toque (sem biometria).';
+
+      modulosServico.forEach(function (m) {
+        document.getElementById('svc_' + m.id + '_ativo').checked = false;
+        document.getElementById('svc_' + m.id + '_peca').value = '0.00';
+        document.getElementById('svc_' + m.id + '_mo').value = '0.00';
+        if (m.custom) document.getElementById('svc_' + m.id + '_desc').value = '';
+        toggleServico(m.id);
+      });
+
+      document.getElementById('dataEntrada').value = new Date().toISOString().split('T')[0];
+
+      osAtualId = null;
+      osNumeroAtual = null;
+      document.getElementById('badgeOSAtual').textContent = 'Nova OS';
+    }
+
+    function salvarOS() {
+      const d = lerFormulario();
+
+      if (!d.cliente) {
+        alert('Informe o nome do cliente para salvar a OS.');
+        document.getElementById('clienteNome').focus();
+        return;
+      }
+
+      dbCarregar();
+      const agora = new Date().toISOString();
+
+      if (osAtualId) {
+        const idx = listaOS.findIndex(function (o) { return o.id === osAtualId; });
+        if (idx >= 0) {
+          d.numero = listaOS[idx].numero;
+          d.criadoEm = listaOS[idx].criadoEm;
+          d.atualizadoEm = agora;
+          osNumeroAtual = d.numero;
+          listaOS[idx] = d;
+        } else {
+          d.id = osAtualId;
+          d.numero = osNumeroAtual || proximoNumero();
+          d.criadoEm = d.atualizadoEm = agora;
+          osNumeroAtual = d.numero;
+          listaOS.unshift(d);
+        }
+      } else {
+        d.id = 'os_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        osAtualId = d.id;
+        d.numero = proximoNumero();
+        osNumeroAtual = d.numero;
+        d.criadoEm = d.atualizadoEm = agora;
+        listaOS.unshift(d);
+      }
+
+      if (!dbSalvar()) return;
+
+      renderListaOS();
+      atualizarTudo();
+      alert('OS ' + (osNumeroAtual || '') + ' salva com sucesso!');
+    }
+
+    function carregarOS(id, destino) {
+      dbCarregar();
+      const o = listaOS.find(function (x) { return x.id === id; });
+      if (!o) { alert('OS não encontrada.'); return; }
+
+      osAtualId = o.id;
+      osNumeroAtual = o.numero || null;
+      preencherFormulario(o);
+      atualizarTudo();
+
+      if (destino === 'pdf') {
+        const el = document.getElementById('printArea');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function abrirOS(id) { carregarOS(id, 'pdf'); }
+    function editarOS(id) { carregarOS(id, 'form'); }
+
+    function excluirOS(id) {
+      dbCarregar();
+      const o = listaOS.find(function (x) { return x.id === id; });
+      if (!o) return;
+      if (!confirm('Excluir definitivamente a ' + (o.numero || 'OS') + ' de ' + (o.cliente || 'cliente') + '?')) return;
+
+      listaOS = listaOS.filter(function (x) { return x.id !== id; });
+      dbSalvar();
+
+      if (osAtualId === id) {
+        osAtualId = null;
+        osNumeroAtual = null;
+        limparFormulario();
+        atualizarTudo();
+      }
+      renderListaOS();
+    }
+
+    function preencherFormulario(o) {
+      document.getElementById('clienteNome').value   = o.cliente || '';
+      document.getElementById('clienteFone').value   = o.fone || '';
+      document.getElementById('aparelhoModelo').value = o.modelo || '';
+      document.getElementById('aparelhoGb').value    = o.gb || '';
+      document.getElementById('aparelhoSerie').value = o.imei || '';
+      document.getElementById('dataEntrada').value   = o.dataEntrada || '';
+      document.getElementById('senhaNumerica').value = o.senha || '';
+      document.getElementById('defeitoRelatado').value = o.defeito || '';
+      document.getElementById('solucaoProposta').value = o.solucao || '';
+      document.getElementById('insumoNome').value    = o.insumoNome || '';
+      document.getElementById('insumoCusto').value   = (Number(o.insumoCusto) || 0).toFixed(2);
+
+      document.getElementById('inoperanteCheck').checked = false;
+
+      /* Avarias (string nova OU array legado) */
+      document.getElementById('avariasTexto').value = normalizarAvarias(o.avarias);
+
+      /* Mapa dos inputs de obs */
+      const obsEls = {};
+      document.querySelectorAll('.check-item-obs').forEach(function (inp) {
+        obsEls[inp.dataset.item] = inp;
+      });
+
+      document.querySelectorAll('.check-item-select').forEach(function (sel) {
+        sel.disabled = false;
+        sel.classList.remove('opacity-60');
+        delete sel.dataset.prev;
+        const raw = o.checklist ? o.checklist[sel.dataset.item] : null;
+        const item = normalizarItemChecklist(raw);
+        sel.value = item.status;
+        if (obsEls[sel.dataset.item]) obsEls[sel.dataset.item].value = item.obs;
+      });
+
+      padraoPontos = Array.isArray(o.padrao) ? o.padrao.slice() : [];
+      document.querySelectorAll('.pattern-dot').forEach(function (d) {
+        d.classList.toggle('active', padraoPontos.indexOf(d.dataset.id) > -1);
+      });
+
+      document.getElementById('telaAtiva').checked = !!o.telaAtiva;
+      toggleTela();
+      [1, 2, 3].forEach(function (n, i) {
+        const t = (o.telas && o.telas[i]) ? o.telas[i] : { ativa: true, peca: 0, mo: 0, bio: 'Funciona', desc: '' };
+        document.getElementById('op' + n + 'Ativa').checked = t.ativa !== false;
+        document.getElementById('op' + n + 'Peca').value = (Number(t.peca) || 0).toFixed(2);
+        document.getElementById('op' + n + 'Mo').value = (Number(t.mo) || 0).toFixed(2);
+        document.getElementById('op' + n + 'Bio').value = t.bio || 'Funciona';
+        document.getElementById('op' + n + 'Desc').value = t.desc || '';
+      });
+
+      modulosServico.forEach(function (m) {
+        const s = (o.servicos && o.servicos[m.id]) ? o.servicos[m.id] : {};
+        document.getElementById('svc_' + m.id + '_ativo').checked = !!s.ativo;
+        document.getElementById('svc_' + m.id + '_peca').value = (Number(s.peca) || 0).toFixed(2);
+        document.getElementById('svc_' + m.id + '_mo').value = (Number(s.mo) || 0).toFixed(2);
+        if (m.custom) document.getElementById('svc_' + m.id + '_desc').value = s.desc || '';
+        toggleServico(m.id);
+      });
+
+      if (o.inoperante) {
+        document.getElementById('inoperanteCheck').checked = true;
+        aplicarInoperante();
+      }
+    }
+
+    /* =====================================================================
+       LISTA DE OS
+    ===================================================================== */
+    function renderListaOS() {
+      dbCarregar();
+      const cont = document.getElementById('listaOS');
+      const totalEl = document.getElementById('totalOS');
+      if (!cont) return;
+      if (totalEl) totalEl.textContent = listaOS.length;
+
+      if (!listaOS.length) {
+        cont.innerHTML = '<div class="text-center text-[11px] text-slate-400 py-6">' +
+                         '<i class="fa-regular fa-folder-open text-lg block mb-1"></i>Nenhuma OS salva ainda.</div>';
+        return;
+      }
+
+      cont.innerHTML = listaOS.map(function (o) {
+        const ativo = (o.id === osAtualId);
+        return '<div class="border rounded p-2 transition ' +
+                 (ativo ? 'border-emerald-400 bg-emerald-50' : 'border-slate-200 hover:bg-slate-50') + '">' +
+                 '<div class="flex justify-between items-start gap-2">' +
+                   '<div class="min-w-0 flex-1">' +
+                     '<p class="text-[11px] font-bold text-slate-800 truncate">' + (esc(o.cliente) || '—') + '</p>' +
+                     '<p class="text-[10px] text-slate-500 truncate">' + (esc(o.modelo) || '—') + '</p>' +
+                     '<p class="text-[9px] text-slate-400">' + esc(o.numero || '') + ' • ' + esc(o.dataFmt || '—') + '</p>' +
+                   '</div>' +
+                   '<div class="flex gap-1 shrink-0">' +
+                     '<button onclick="abrirOS(\'' + o.id + '\')" title="Abrir / Visualizar" ' +
+                       'class="w-7 h-7 rounded bg-sky-100 text-sky-700 hover:bg-sky-200 transition flex items-center justify-center">' +
+                       '<i class="fa-solid fa-eye text-[10px]"></i></button>' +
+                     '<button onclick="editarOS(\'' + o.id + '\')" title="Editar OS" ' +
+                       'class="w-7 h-7 rounded bg-amber-100 text-amber-700 hover:bg-amber-200 transition flex items-center justify-center">' +
+                       '<i class="fa-solid fa-pen text-[10px]"></i></button>' +
+                     '<button onclick="excluirOS(\'' + o.id + '\')" title="Excluir OS" ' +
+                       'class="w-7 h-7 rounded bg-rose-100 text-rose-700 hover:bg-rose-200 transition flex items-center justify-center">' +
+                       '<i class="fa-solid fa-trash text-[10px]"></i></button>' +
+                   '</div>' +
+                 '</div>' +
+               '</div>';
+      }).join('');
+    }
+
+    /* =====================================================================
+       COPIAR TEXTO
+    ===================================================================== */
+    function copiarTexto() {
+      const ta = document.getElementById('textoSaida');
+      if (!ta.value) return;
+      ta.select();
+      ta.setSelectionRange(0, 99999);
+      try {
+        document.execCommand('copy');
+        alert('Texto para WhatsApp copiado com sucesso!');
+      } catch (e) {
+        alert('Não foi possível copiar automaticamente. Selecione o texto e copie manualmente.');
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).catch(function () {});
+      }
+    }
+
+    /* =====================================================================
+       BACKUP / RESTAURAÇÃO EM JSON
+    ===================================================================== */
+    function exportarBackup() {
+      dbCarregar();
+      const logo = null;
+      try { var _l = localStorage.getItem(LS_KEY_LOGO); if (_l) logo = _l; } catch (e) { /* ignore */ }
+
+      const backup = {
+        versao: '4.0',
+        sistema: 'Zenilson Lacerda | Tecnologia & Serviços',
+        exportadoEm: new Date().toISOString(),
+        totalOS: listaOS.length,
+        logoBase64: logo,
+        ordensServico: listaOS
+      };
+
+      const agora = new Date();
+      const dataStr = agora.getFullYear() + '-' +
+                      String(agora.getMonth() + 1).padStart(2, '0') + '-' +
+                      String(agora.getDate()).padStart(2, '0');
+      const nomeArquivo = 'backup_ordens_servico_' + dataStr + '.json';
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = nomeArquivo;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+
+      alert(
+        'Backup exportado com sucesso!\n\n' +
+        'Arquivo: ' + nomeArquivo + '\n' +
+        'Total de OS no backup: ' + listaOS.length + '\n' +
+        (logo ? 'Logo incluída no backup: Sim' : 'Logo incluída no backup: Não')
+      );
+    }
+
+    function importarBackup(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+
+      if (!/\.json$/i.test(file.name)) {
+        alert('Selecione um arquivo .json válido.');
+        input.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        let dados;
+        try {
+          dados = JSON.parse(e.target.result);
+        } catch (err) {
+          alert('Arquivo JSON inválido ou corrompido.');
+          input.value = '';
+          return;
+        }
+
+        let osImportadas = [];
+        let logoImportado = null;
+
+        if (Array.isArray(dados)) {
+          osImportadas = dados;
+        } else if (dados && Array.isArray(dados.ordensServico)) {
+          osImportadas = dados.ordensServico;
+          logoImportado = dados.logoBase64 || null;
+        } else {
+          alert('Formato de backup não reconhecido.\n\nEsperado: { "ordensServico": [...] } ou array direto.');
+          input.value = '';
+          return;
+        }
+
+        osImportadas = osImportadas.filter(function (o) { return o && typeof o === 'object'; });
+        if (!osImportadas.length) {
+          alert('Nenhuma OS válida encontrada no arquivo.');
+          input.value = '';
+          return;
+        }
+
+        /* Normaliza checklist + avarias */
+        osImportadas.forEach(function (o) {
+          if (o.checklist && typeof o.checklist === 'object') {
+            const novo = {};
+            Object.keys(o.checklist).forEach(function (k) { novo[k] = normalizarItemChecklist(o.checklist[k]); });
+            o.checklist = novo;
+          }
+          o.avarias = normalizarAvarias(o.avarias);
+        });
+
+        const mesclar = confirm(
+          'Backup contém ' + osImportadas.length + ' OS.\n' +
+          'Você já tem ' + listaOS.length + ' OS salvas atualmente.\n\n' +
+          'O que deseja fazer?\n\n' +
+          '• OK = MESCLAR (adicionar novas, evitar duplicadas por id)\n' +
+          '• Cancelar = SUBSTITUIR todas as OS atuais pelo backup'
+        );
+
+        if (mesclar) {
+          const mapa = {};
+          listaOS.forEach(function (o) { if (o && o.id) mapa[o.id] = o; });
+          osImportadas.forEach(function (o) {
+            const id = o.id || ('os_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+            o.id = id;
+            mapa[id] = o;
+          });
+          listaOS = Object.keys(mapa).map(function (k) { return mapa[k]; });
+        } else {
+          listaOS = osImportadas.map(function (o) {
+            if (!o.id) o.id = 'os_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+            return o;
+          });
+        }
+
+        if (!dbSalvar()) { input.value = ''; return; }
+
+        if (logoImportado) {
+          try {
+            localStorage.setItem(LS_KEY_LOGO, logoImportado);
+            logoBase64 = logoImportado;
+            aplicarLogo();
+          } catch (err) { /* ignora limite */ }
+        }
+
+        osAtualId = null;
+        osNumeroAtual = null;
+        limparFormulario();
+        renderListaOS();
+        atualizarTudo();
+
+        alert(
+          'Backup importado com sucesso!\n\n' +
+          (mesclar ? 'Modo: MESCLAR\n' : 'Modo: SUBSTITUIR\n') +
+          'OS processadas: ' + osImportadas.length + '\n' +
+          'Total agora: ' + listaOS.length + ' OS.'
+        );
+        input.value = '';
+      };
+      reader.onerror = function () {
+        alert('Erro ao ler o arquivo.');
+        input.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    /* =====================================================================
+       EXPORTAR ORÇAMENTO INTERATIVO (HTML) COM HASH DE VALIDAÇÃO
+    ===================================================================== */
+    function exportarHTMLCliente() {
+      if (!osAtualId) {
+        if (!confirm('A OS ainda não foi salva. Recomendamos salvar antes para gerar o número correto.\n\nDeseja continuar mesmo assim?')) return;
+      }
+
+      const d = lerFormulario();
+      const t = calcularTotais(d);
+
+      const telasAtivas = [];
+      if (d.telaAtiva) {
+        d.telas.forEach(function (op, i) {
+          if (op.ativa) {
+            telasAtivas.push({
+              index: i + 1,
+              nome:  nomesTela[i],
+              total: op.peca + op.mo,
+              bio:   op.bio,
+              desc:  op.desc
+            });
+          }
+        });
+      }
+
+      const outros = t.outros.map(function (o) {
+        return { nome: o.nome, total: o.total };
+      });
+
+      const temAlgo = telasAtivas.length > 0 || outros.length > 0 || d.insumoCusto > 0;
+      if (!temAlgo) {
+        if (!confirm('Nenhum serviço foi selecionado no orçamento. Deseja exportar mesmo assim?')) return;
+      }
+
+      const numeroOS    = osNumeroAtual || 'S/N';
+      const cliente     = d.cliente || 'Cliente';
+      const modelo      = d.modelo  || 'Aparelho';
+      const foneDestino = '5547933844478';
+
+      function jsonSeguro(obj) {
+        return JSON.stringify(obj)
+          .replace(/</g, '\\u003c')
+          .replace(/>/g, '\\u003e')
+          .replace(/&/g, '\\u0026');
+      }
+
+      /* ── Bloco de Vistoria Técnica de Entrada (agrupado por categoria) ── */
+      const vistoria = extrairVistoria(d.checklist);
+      let vistoriaHTML = '';
+      if (vistoria.length || d.avarias) {
+        let gruposHTML = '';
+        agruparVistoriaPorCategoria(vistoria).forEach(function (grupo) {
+          let itensLinhas = grupo.itens.map(function (v) {
+            const statusCls = v.status === 'DEFEITO' ? 'text-rose-700 font-bold'
+                            : (v.status === 'N/A' ? 'text-slate-500 font-semibold'
+                                                  : 'text-emerald-700 font-bold');
+            return '<li class="flex items-start gap-2 py-1">' +
+              '<span class="font-semibold text-slate-700 flex-shrink-0">' + esc(v.nome) + ':</span>' +
+              '<span class="' + statusCls + ' flex-shrink-0">' + esc(v.status) + '</span>' +
+              (v.obs ? '<span class="text-slate-500 flex-1 break-words">— ' + esc(v.obs) + '</span>' : '<span></span>') +
+            '</li>';
+          }).join('');
+
+          gruposHTML +=
+            '<div class="mt-2 first:mt-0">' +
+              '<p class="text-[10px] font-black text-amber-800 uppercase tracking-wider border-b border-amber-200 pb-0.5 mb-1">' + esc(grupo.categoria) + '</p>' +
+              '<ul class="text-[11px] divide-y divide-amber-100">' + itensLinhas + '</ul>' +
+            '</div>';
+        });
+
+        vistoriaHTML =
+          '<div class="mb-4 border-2 border-amber-200 bg-amber-50 rounded-lg p-3">' +
+            '<h3 class="text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">' +
+              '<i class="fa-solid fa-clipboard-check mr-1"></i> Vistoria Técnica de Entrada' +
+            '</h3>' +
+            '<p class="text-[10px] text-amber-700 mb-2">Estado do aparelho no momento da entrada. Confira antes de aprovar.</p>' +
+            gruposHTML +
+            (d.avarias ?
+              '<div class="mt-2 pt-2 border-t border-amber-200 text-[11px]">' +
+                '<span class="font-bold text-amber-800">Avarias visíveis constatadas:</span> ' +
+                '<span class="text-amber-900">' + esc(d.avarias) + '</span>' +
+              '</div>' : '') +
+          '</div>';
+      }
+
+      /* ── Bloco de opções de tela ── */
+      let telasHTML = '';
+      if (telasAtivas.length > 0) {
+        const itens = telasAtivas.map(function (op, idx) {
+          const valorAttr = 'Opção ' + op.index + ' — ' + op.nome + ' (' + money(op.total) + ')';
+          const primeira  = (idx === 0);
+          return '<label class="opcao-tela flex items-start gap-3 p-3 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-sky-400 transition">' +
+            '<input type="radio" name="opcaoTela" value="' + esc(valorAttr) + '" data-valor="' + op.total + '" onchange="selecionarOpcao(this)" class="mt-1 h-4 w-4 accent-sky-600 flex-shrink-0"' + (primeira ? ' checked' : '') + '>' +
+            '<div class="flex-1 min-w-0">' +
+              '<div class="flex justify-between items-baseline gap-2 flex-wrap">' +
+                '<span class="font-bold text-sm text-slate-800">Opção ' + op.index + ' — ' + esc(op.nome) + '</span>' +
+                '<span class="font-black text-emerald-700 text-sm whitespace-nowrap">' + money(op.total) + '</span>' +
+              '</div>' +
+              (op.desc ? '<p class="text-[11px] text-slate-500 mt-1">' + esc(op.desc) + '</p>' : '') +
+              '<p class="text-[10px] text-slate-400 mt-1">Biometria: ' + esc(op.bio) + '</p>' +
+            '</div>' +
+          '</label>';
+        }).join('');
+
+        telasHTML =
+          '<div class="mb-4">' +
+            '<h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">' +
+              '<i class="fa-solid fa-mobile-screen-button mr-1 text-slate-500"></i> Escolha a opção de tela' +
+            '</h3>' +
+            '<div class="space-y-2">' + itens + '</div>' +
+          '</div>';
+      }
+
+      let outrosHTML = '';
+      if (outros.length > 0) {
+        outrosHTML =
+          '<div class="mb-4">' +
+            '<h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">' +
+              '<i class="fa-solid fa-wrench mr-1 text-slate-500"></i> Outros serviços' +
+            '</h3>' +
+            '<div>' +
+              outros.map(function (o) {
+                return '<div class="flex justify-between items-baseline text-sm py-2 border-b border-slate-100">' +
+                  '<span class="text-slate-700 pr-2">' + esc(o.nome) + '</span>' +
+                  '<span class="font-bold text-slate-800 whitespace-nowrap">' + money(o.total) + '</span>' +
+                '</div>';
+              }).join('') +
+            '</div>' +
+          '</div>';
+      }
+
+      let insumosHTML = '';
+      if (d.insumoCusto > 0) {
+        insumosHTML =
+          '<div class="flex justify-between text-sm py-2 border-b border-slate-100 mb-3">' +
+            '<span class="text-slate-700">Insumos' + (d.insumoNome ? ' — ' + esc(d.insumoNome) : '') + '</span>' +
+            '<span class="font-bold text-slate-800">' + money(d.insumoCusto) + '</span>' +
+          '</div>';
+      }
+
+      let diagnosticoHTML = '';
+      if (d.defeito) {
+        diagnosticoHTML +=
+          '<div class="border-l-4 border-amber-400 bg-amber-50 p-3 rounded-r mb-3">' +
+            '<p class="text-[10px] font-bold text-amber-800 uppercase">Diagnóstico</p>' +
+            '<p class="text-sm text-slate-700">' + esc(d.defeito) + '</p>' +
+          '</div>';
+      }
+      if (d.solucao) {
+        diagnosticoHTML +=
+          '<div class="border-l-4 border-sky-400 bg-sky-50 p-3 rounded-r mb-3">' +
+            '<p class="text-[10px] font-bold text-sky-800 uppercase">Serviço Proposto</p>' +
+            '<p class="text-sm text-slate-700">' + esc(d.solucao) + '</p>' +
+          '</div>';
+      }
+
+      let totalHTML = '';
+      let botoesHTML = '';
+      if (temAlgo) {
+        totalHTML =
+          '<div class="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-4 flex justify-between items-center">' +
+            '<div>' +
+              '<p class="text-[10px] font-bold text-emerald-800 uppercase">Valor Total</p>' +
+              '<p class="text-[10px] text-emerald-600">' + (telasAtivas.length > 0 ? 'Tela escolhida + demais serviços' : 'Serviços + insumos') + '</p>' +
+            '</div>' +
+            '<p id="totalGeral" class="text-2xl font-black text-emerald-700">' + money(t.totalOutros) + '</p>' +
+          '</div>';
+
+        botoesHTML =
+          '<div class="sticky bottom-0 bg-white pt-3 pb-2 -mx-4 sm:-mx-6 px-4 sm:px-6 border-t border-slate-200 shadow-lg mt-4">' +
+            '<p class="text-[10px] text-slate-500 text-center mb-2">' +
+              '<i class="fa-solid fa-lock mr-1 text-emerald-600"></i> Resposta assinada com token de validação' +
+            '</p>' +
+            '<div class="grid grid-cols-2 gap-2">' +
+              '<button onclick="enviarResposta(true)" class="py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase text-xs tracking-wider rounded-lg shadow-md transition flex items-center justify-center gap-2">' +
+                '<i class="fa-solid fa-circle-check text-base"></i> Aprovar' +
+              '</button>' +
+              '<button onclick="enviarResposta(false)" class="py-3 bg-rose-600 hover:bg-rose-700 text-white font-black uppercase text-xs tracking-wider rounded-lg shadow-md transition flex items-center justify-center gap-2">' +
+                '<i class="fa-solid fa-circle-xmark text-base"></i> Reprovar' +
+              '</button>' +
+            '</div>' +
+          '</div>';
+      } else {
+        totalHTML =
+          '<div class="bg-amber-50 border-2 border-amber-200 rounded-lg p-4 text-center">' +
+            '<p class="text-sm font-bold text-amber-800"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Nenhum serviço adicionado</p>' +
+            '<p class="text-xs text-amber-600 mt-1">Entre em contato com o técnico para mais informações.</p>' +
+          '</div>';
+      }
+
+      const dados = {
+        numeroOS:    numeroOS,
+        cliente:     cliente,
+        modelo:      modelo,
+        foneDestino: foneDestino
+      };
+
+      const html = [
+        '<!DOCTYPE html>',
+        '<html lang="pt-BR">',
+        '<head>',
+        '<meta charset="UTF-8">',
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+        '<title>Orçamento ' + esc(numeroOS) + ' — ' + esc(cliente) + '</title>',
+        '<script src="https://cdn.tailwindcss.com"><\/script>',
+        '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">',
+        '<style>',
+        '  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }',
+        '  .opcao-tela.selecionada { border-color: #0ea5e9 !important; background-color: #f0f9ff !important; }',
+        '</style>',
+        '</head>',
+        '<body class="bg-slate-100 text-slate-800 min-h-screen pb-4">',
+        '  <div class="max-w-2xl mx-auto p-3 sm:p-5">',
+        '    <div class="bg-slate-900 text-white rounded-t-lg p-4 sm:p-5">',
+        '      <h1 class="text-lg sm:text-xl font-black uppercase tracking-tight leading-none">Zenilson Lacerda</h1>',
+        '      <p class="text-[10px] text-slate-400 font-semibold tracking-wider mt-1">TECNOLOGIA &amp; SERVIÇOS • ORÇAMENTO</p>',
+        '      <div class="mt-3 pt-3 border-t border-slate-700 flex justify-between items-center">',
+        '        <div>',
+        '          <p class="text-[10px] text-slate-400 uppercase">Orçamento Nº</p>',
+        '          <p class="font-bold text-sm">' + esc(numeroOS) + '</p>',
+        '        </div>',
+        '        <div class="text-right">',
+        '          <p class="text-[10px] text-slate-400 uppercase">Data</p>',
+        '          <p class="font-bold text-sm">' + esc(d.dataFmt) + '</p>',
+        '        </div>',
+        '      </div>',
+        '    </div>',
+        '    <div class="bg-white rounded-b-lg shadow-sm p-4 sm:p-6">',
+        '      <div class="grid grid-cols-2 gap-3 text-sm mb-4">',
+        '        <div>',
+        '          <p class="text-[10px] font-bold text-slate-400 uppercase">Cliente</p>',
+        '          <p class="font-semibold text-slate-800 break-words">' + esc(cliente) + '</p>',
+        '        </div>',
+        '        <div>',
+        '          <p class="text-[10px] font-bold text-slate-400 uppercase">Telefone</p>',
+        '          <p class="font-semibold text-slate-800">' + esc(d.fone || '—') + '</p>',
+        '        </div>',
+        '        <div>',
+        '          <p class="text-[10px] font-bold text-slate-400 uppercase">Aparelho</p>',
+        '          <p class="font-semibold text-slate-800">' + esc(modelo) + (d.gb ? ' • ' + esc(d.gb) : '') + '</p>',
+        '        </div>',
+        '        <div>',
+        '          <p class="text-[10px] font-bold text-slate-400 uppercase">IMEI / Série</p>',
+        '          <p class="font-semibold text-slate-800">' + esc(d.imei || '—') + '</p>',
+        '        </div>',
+        '      </div>',
+        vistoriaHTML,
+        diagnosticoHTML,
+        telasHTML,
+        outrosHTML,
+        insumosHTML,
+        totalHTML,
+        '      <p class="text-[11px] text-slate-500 text-center pt-3 mt-4 border-t border-slate-100">',
+        '        Formas de pagamento: PIX, Cartão de Débito ou Crédito.<br>',
+        '        Garantia de 90 dias nos serviços executados.',
+        '      </p>',
+        '    </div>',
+        botoesHTML,
+        '    <p class="text-center text-[10px] text-slate-400 mt-4">Zenilson Lacerda • Tecnologia &amp; Serviços • (47) 93384-4478</p>',
+        '  </div>',
+        '<script>',
+        '  var DADOS = ' + jsonSeguro(dados) + ';',
+        '  var TOTAL_OUTROS = ' + t.totalOutros + ';',
+        '  function gerarTokenOS(numero, cliente, valor) {',
+        '    var str = (numero + cliente + valor + "IDEALTECH_SECURE").toUpperCase();',
+        '    var hash = 0;',
+        '    for (var i = 0; i < str.length; i++) {',
+        '      hash = ((hash << 5) - hash) + str.charCodeAt(i);',
+        '      hash |= 0;',
+        '    }',
+        '    var hex = Math.abs(hash).toString(16).toUpperCase().padStart(6, "0");',
+        '    return (numero || "OS").replace(/[^a-zA-Z0-9]/g, "") + "-" + hex;',
+        '  }',
+        '  function selecionarOpcao(el) {',
+        '    document.querySelectorAll(".opcao-tela").forEach(function(l){ l.classList.remove("selecionada"); });',
+        '    el.closest(".opcao-tela").classList.add("selecionada");',
+        '    atualizarTotal();',
+        '  }',
+        '  function atualizarTotal() {',
+        '    var op = document.querySelector(\'input[name="opcaoTela"]:checked\');',
+        '    var total = TOTAL_OUTROS;',
+        '    if (op) total += parseFloat(op.dataset.valor) || 0;',
+        '    var el = document.getElementById("totalGeral");',
+        '    if (el) el.textContent = "R$ " + total.toFixed(2).replace(".", ",");',
+        '  }',
+        '  function enviarResposta(aprovado) {',
+        '    var status = aprovado ? "✅ APROVADO" : "❌ REPROVADO";',
+        '    var opSelecionada = document.querySelector(\'input[name="opcaoTela"]:checked\');',
+        '    var totalFinal = TOTAL_OUTROS;',
+        '    if (opSelecionada) totalFinal += parseFloat(opSelecionada.dataset.valor) || 0;',
+        '    var tokenValida = gerarTokenOS(DADOS.numeroOS, DADOS.cliente, totalFinal.toFixed(2));',
+        '    var dataHora = new Date().toLocaleString("pt-BR");',
+        '    var msg = "Olá! Resposta formal sobre o orçamento da OS *" + DADOS.numeroOS + "*.\\n\\n";',
+        '    msg += "Status: *" + status + "*\\n";',
+        '    msg += "Cliente: " + DADOS.cliente + "\\n";',
+        '    msg += "Aparelho: " + DADOS.modelo + "\\n";',
+        '    if (opSelecionada) {',
+        '      msg += "Opção Escolhida: " + opSelecionada.value + "\\n";',
+        '    }',
+        '    msg += "Valor Registrado: R$ " + totalFinal.toFixed(2).replace(".", ",") + "\\n\\n";',
+        '    if (aprovado) {',
+        '      msg += "✍️ *DECLARAÇÃO DE ACEITE:*\\n";',
+        '      msg += "Declaro estar de acordo com o orçamento e com as condições informadas.\\n\\n";',
+        '    } else {',
+        '      msg += "Declaro a REPROVAÇÃO do orçamento informado.\\n\\n";',
+        '    }',
+        '    msg += "🔒 *Token de Validação:* " + tokenValida + "\\n";',
+        '    msg += "📅 *Data/Hora:* " + dataHora + "\\n\\n";',
+        '    msg += "_Mensagem enviada via Orçamento Interativo Zenilson Lacerda | IdealTech._";',
+        '    var url = "https://wa.me/" + DADOS.foneDestino + "?text=" + encodeURIComponent(msg);',
+        '    window.open(url, "_blank");',
+        '  }',
+        '  document.addEventListener("DOMContentLoaded", function(){',
+        '    var chk = document.querySelector(\'input[name="opcaoTela"]:checked\');',
+        '    if (chk) chk.closest(".opcao-tela").classList.add("selecionada");',
+        '    atualizarTotal();',
+        '  });',
+        '<\/script>',
+        '</body>',
+        '</html>'
+      ].join('\n');
+
+      const nomeCliente = (d.cliente || 'cliente').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20);
+      const nomeArquivo = 'orcamento_' + numeroOS.replace(/[^a-zA-Z0-9-]/g, '_') + '_' + nomeCliente + '.html';
+
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = nomeArquivo;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+
+      alert(
+        'Orçamento interativo com validação exportado!\n\n' +
+        'Arquivo: ' + nomeArquivo + '\n\n' +
+        '➡️ Envie este arquivo para o cliente via WhatsApp.\n' +
+        '➡️ O cliente verá a vistoria de entrada (agrupada por categoria), escolherá a opção de tela, aprovará ou reprovará — e a resposta volta com Token de Validação (Hash).'
+      );
+    }
+
+    /* =====================================================================
+       INICIALIZAÇÃO
+    ===================================================================== */
+    document.addEventListener('DOMContentLoaded', function () {
+      montarChecklistForm();
+      montarServicos();
+      limparFormulario();
+      carregarLogo();
+      dbCarregar();
+      renderListaOS();
+
+      document.getElementById('logoUpload').addEventListener('change', function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (file) processarLogo(file);
+      });
+
+      document.addEventListener('input', function (e) {
+        if (e.target.closest('#formArea')) atualizarTudo();
+      });
+      document.addEventListener('change', function (e) {
+        if (e.target.closest('#formArea')) atualizarTudo();
+      });
+
+      atualizarTudo();
+    });
+  </script>
+</body>
+</html>

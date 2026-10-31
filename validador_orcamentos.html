@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validador de Orçamentos — Zenilson Lacerda</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 min-h-screen p-4 text-slate-800">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-slate-900 text-white rounded-t-xl p-5">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-shield-halved text-2xl text-emerald-400"></i>
+        <div>
+          <h1 class="text-lg font-black uppercase">Validador de Tokens</h1>
+          <p class="text-[11px] text-slate-400">Confira se a resposta do cliente é autêntica</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-b-xl shadow-sm p-5 space-y-4">
+      <div class="flex gap-2 border-b border-slate-200 pb-2">
+        <button onclick="setMode('auto')" id="tabAuto" class="px-3 py-1 text-xs font-bold rounded bg-slate-900 text-white">📋 Colar Mensagem</button>
+        <button onclick="setMode('manual')" id="tabManual" class="px-3 py-1 text-xs font-bold rounded bg-slate-100 text-slate-600">✍️ Modo Manual</button>
+      </div>
+
+      <!-- MODO AUTO -->
+      <div id="modeAuto">
+        <label class="text-xs font-bold text-slate-600 uppercase">Mensagem recebida do cliente no WhatsApp</label>
+        <textarea id="msgInput" rows="10" class="w-full mt-1 p-3 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-sky-400" placeholder="Cole aqui a mensagem completa que o cliente enviou..."></textarea>
+        <button onclick="validarAuto()" class="w-full mt-3 py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded shadow transition">
+          <i class="fa-solid fa-magnifying-glass mr-2"></i> Validar Token
+        </button>
+      </div>
+
+      <!-- MODO MANUAL -->
+      <div id="modeManual" class="hidden space-y-3">
+        <div>
+          <label class="text-xs font-bold text-slate-600 uppercase">Número da OS</label>
+          <input id="mNumero" type="text" placeholder="OS-0001" class="w-full mt-1 p-2 border rounded text-sm">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600 uppercase">Nome do Cliente</label>
+          <input id="mCliente" type="text" placeholder="João Silva" class="w-full mt-1 p-2 border rounded text-sm">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600 uppercase">Valor Total (R$)</label>
+          <input id="mValor" type="text" placeholder="450,00" class="w-full mt-1 p-2 border rounded text-sm">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-600 uppercase">Token recebido do cliente</label>
+          <input id="mToken" type="text" placeholder="OS0001-A7B3F2" class="w-full mt-1 p-2 border rounded text-sm font-mono">
+        </div>
+        <button onclick="validarManual()" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded shadow transition">
+          <i class="fa-solid fa-magnifying-glass mr-2"></i> Validar Token
+        </button>
+      </div>
+
+      <div id="resultado" class="hidden"></div>
+    </div>
+
+    <p class="text-center text-[10px] text-slate-400 mt-4">Zenilson Lacerda • Tecnologia &amp; Serviços • IdealTech</p>
+  </div>
+
+<script>
+/* ================== TOKEN (mesma função do orçamento) ================== */
+function gerarTokenOS(numero, cliente, valor) {
+  var str = (numero + cliente + valor + "IDEALTECH_SECURE").toUpperCase();
+  var hash = 0;
+  for (var i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  var hex = Math.abs(hash).toString(16).toUpperCase().padStart(6, '0');
+  return (numero || 'OS').replace(/[^a-zA-Z0-9]/g, '') + '-' + hex;
+}
+
+/* ================== EXTRAÇÃO DA MENSAGEM ================== */
+function extrairDados(msg) {
+  const r = { numeroOS: null, cliente: null, valor: null, token: null, status: null, opcao: null, dataHora: null };
+  let m;
+
+  m = msg.match(/or[cç]amento da OS \*([^*\n]+)\*/i);
+  if (m) r.numeroOS = m[1].trim();
+
+  m = msg.match(/Cliente:\s*([^\n]+)/i);
+  if (m) r.cliente = m[1].trim();
+
+  m = msg.match(/Valor Registrado:\s*R\$\s*([\d.,]+)/i);
+  if (m) r.valor = m[1].replace(/\./g, '').replace(',', '.'); // "1.234,56" -> "1234.56"
+
+  m = msg.match(/Token de Valida[cç][aã]o:\*?\s*([A-Z0-9\-]+)/i);
+  if (m) r.token = m[1].trim().toUpperCase();
+
+  m = msg.match(/Status:\s*\*([^*]+)\*/i);
+  if (m) r.status = m[1].trim();
+
+  m = msg.match(/Op[cç][aã]o Escolhida:\s*([^\n]+)/i);
+  if (m) r.opcao = m[1].trim();
+
+  m = msg.match(/Data\/Hora:\*?\s*([^\n_]+)/i);
+  if (m) r.dataHora = m[1].trim();
+
+  return r;
+}
+
+/* ================== UI ================== */
+function setMode(mode) {
+  const ta = document.getElementById('tabAuto');
+  const tm = document.getElementById('tabManual');
+  const da = document.getElementById('modeAuto');
+  const dm = document.getElementById('modeManual');
+  if (mode === 'auto') {
+    ta.className = 'px-3 py-1 text-xs font-bold rounded bg-slate-900 text-white';
+    tm.className = 'px-3 py-1 text-xs font-bold rounded bg-slate-100 text-slate-600';
+    da.classList.remove('hidden'); dm.classList.add('hidden');
+  } else {
+    tm.className = 'px-3 py-1 text-xs font-bold rounded bg-slate-900 text-white';
+    ta.className = 'px-3 py-1 text-xs font-bold rounded bg-slate-100 text-slate-600';
+    dm.classList.remove('hidden'); da.classList.add('hidden');
+  }
+  document.getElementById('resultado').classList.add('hidden');
+}
+
+function mostrarResultado(dados, tokenEsperado, match) {
+  const box = document.getElementById('resultado');
+  box.classList.remove('hidden');
+
+  const boxClass   = match ? 'border-emerald-300 bg-emerald-50' : 'border-rose-300 bg-rose-50';
+  const iconClass  = match ? 'fa-circle-check text-emerald-600' : 'fa-circle-xmark text-rose-600';
+  const titleClass = match ? 'text-emerald-800' : 'text-rose-800';
+  const subClass   = match ? 'text-emerald-700' : 'text-rose-700';
+  const divClass   = match ? 'border-emerald-200' : 'border-rose-200';
+  const title = match ? '✅ TOKEN VÁLIDO' : '❌ TOKEN INVÁLIDO';
+  const sub = match
+    ? 'A resposta é autêntica. O cliente realmente usou o orçamento HTML que você enviou, e os dados não foram alterados.'
+    : 'Atenção: os dados não conferem com o token. Pode ser: (1) cliente editou a mensagem, (2) erro de digitação, ou (3) mensagem fabricada.';
+
+  box.innerHTML = `
+    <div class="border-2 ${boxClass} rounded-lg p-4">
+      <div class="flex items-start gap-3">
+        <i class="fa-solid ${iconClass} text-2xl mt-0.5"></i>
+        <div class="flex-1">
+          <p class="font-black ${titleClass} text-sm">${title}</p>
+          <p class="text-[11px] ${subClass} mt-1">${sub}</p>
+        </div>
+      </div>
+      <div class="mt-4 grid grid-cols-2 gap-2 text-[11px]">
+        ${dados.numeroOS ? `<div><span class="font-bold text-slate-500">OS:</span> <span class="font-mono">${dados.numeroOS}</span></div>` : ''}
+        ${dados.cliente  ? `<div><span class="font-bold text-slate-500">Cliente:</span> ${dados.cliente}</div>` : ''}
+        ${dados.valor    ? `<div><span class="font-bold text-slate-500">Valor:</span> R$ ${dados.valor.replace('.', ',')}</div>` : ''}
+        ${dados.status   ? `<div><span class="font-bold text-slate-500">Status:</span> ${dados.status}</div>` : ''}
+        ${dados.opcao    ? `<div class="col-span-2"><span class="font-bold text-slate-500">Opção:</span> ${dados.opcao}</div>` : ''}
+        ${dados.dataHora ? `<div class="col-span-2"><span class="font-bold text-slate-500">Enviado em:</span> ${dados.dataHora}</div>` : ''}
+      </div>
+      <div class="mt-4 pt-3 border-t ${divClass} space-y-1 text-[11px]">
+        <div class="flex justify-between gap-2">
+          <span class="text-slate-500">Token recebido:</span>
+          <span class="font-mono font-bold">${dados.token || '—'}</span>
+        </div>
+        <div class="flex justify-between gap-2">
+          <span class="text-slate-500">Token esperado:</span>
+          <span class="font-mono font-bold">${tokenEsperado}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ================== VALIDAÇÃO ================== */
+function validarAuto() {
+  const msg = document.getElementById('msgInput').value.trim();
+  if (!msg) { alert('Cole a mensagem recebida do cliente.'); return; }
+
+  const dados = extrairDados(msg);
+  const faltando = [];
+  if (!dados.numeroOS) faltando.push('Número da OS');
+  if (!dados.cliente)  faltando.push('Cliente');
+  if (!dados.valor)    faltando.push('Valor');
+  if (!dados.token)    faltando.push('Token');
+
+  if (faltando.length) {
+    alert('Não foi possível extrair: ' + faltando.join(', ') + '.\n\nUse o Modo Manual para digitar os dados.');
+    return;
+  }
+
+  const tokenEsperado = gerarTokenOS(dados.numeroOS, dados.cliente, dados.valor);
+  const match = tokenEsperado === dados.token;
+  mostrarResultado(dados, tokenEsperado, match);
+}
+
+function validarManual() {
+  const numero  = document.getElementById('mNumero').value.trim();
+  const cliente = document.getElementById('mCliente').value.trim();
+  let valor     = document.getElementById('mValor').value.trim();
+  const token   = document.getElementById('mToken').value.trim().toUpperCase();
+
+  if (!numero || !cliente || !valor || !token) {
+    alert('Preencha todos os campos.');
+    return;
+  }
+
+  valor = valor.replace(/\./g, '').replace(',', '.');
+  const n = parseFloat(valor);
+  if (isNaN(n)) { alert('Valor inválido.'); return; }
+  valor = n.toFixed(2);
+
+  const tokenEsperado = gerarTokenOS(numero, cliente, valor);
+  const match = tokenEsperado === token;
+  mostrarResultado(
+    { numeroOS: numero, cliente: cliente, valor: valor, token: token, status: null, opcao: null, dataHora: null },
+    tokenEsperado, match
+  );
+}
+</script>
+</body>
+</html>
