@@ -80,7 +80,7 @@
     </div>
 
     <script>
-        const BANCO_AGENDAMENTOS = [{"id":1793355548459,"hora":"07:20","hora_fim":"08:10","serie":"7º ANO","turma":"1","local":"401","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","_data":"2026-10-30","_ts":1793355548459,"cartName":"CARRINHO 01"},{"id":1793355548460,"hora":"08:10","hora_fim":"09:00","serie":"7º ANO","turma":"2","local":"402","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","_data":"2026-10-30","_ts":1793355548459,"cartName":"CARRINHO 01"},{"id":1793355548461,"hora":"09:00","hora_fim":"09:50","serie":"6º ANO","turma":"2","local":"304","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","_data":"2026-10-30","_ts":1793355548459,"cartName":"CARRINHO 02"},{"id":1793355548462,"hora":"10:10","hora_fim":"11:00","serie":"6º ANO","turma":"1","local":"303","prof":"GLAUCIA CARVALHO FURTADO","qtd":"26","_data":"2026-10-30","_ts":1793355548459,"cartName":"CARRINHO 01"},{"id":1793355548463,"hora":"10:10","hora_fim":"11:00","serie":"6º ANO","turma":"1","local":"303","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","_data":"2026-10-30","_ts":1793355548459,"cartName":"CARRINHO 02"},{"id":1793355548464,"hora":"11:00","hora_fim":"11:50","serie":"6º ANO","turma":"2","local":"304","prof":"GLAUCIA CARVALHO FURTADO","qtd":"27","_data":"2026-10-30","_ts":1793355548459,"cartName":"CARRINHO 01"},{"id":1793355548465,"hora":"11:00","hora_fim":"11:50","serie":"7º ANO","turma":"2","local":"402","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","_data":"2026-10-30","_ts":1793355548459,"cartName":"CARRINHO 02"},{"hora":"11:50","hora_fim":"12:40","serie":"8º ANO","turma":"2","local":"404","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","_data":"2026-10-30","_ts":1793355555209,"id":1793355548466,"cartName":"CARRINHO 01"},{"hora":"16:10","hora_fim":"17:00","serie":"1º ANO","turma":"3","local":"404","prof":"NATIELE COSTA ROCHA FERREIRA","qtd":"5","_data":"2026-10-30","_ts":1793355561858,"id":1793355548467,"cartName":"CARRINHO 01"}];
+        const BANCO_AGENDAMENTOS = [{"hora":"07:20","hora_fim":"08:10","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-11-03","_ts":1793702197555,"id":1793702188598,"cartName":"CARRINHO 01"},{"id":1793702188599,"hora":"08:10","hora_fim":"09:00","serie":"7º ANO","turma":"2","local":"402","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 01"},{"hora":"08:10","hora_fim":"09:00","serie":"8º ANO","turma":"1","local":"403","prof":"CRISTIANO KERBER","qtd":"5","_data":"2026-11-03","_ts":1793702237576,"id":1793702188600,"cartName":"CARRINHO 02"},{"id":1793702188601,"hora":"09:00","hora_fim":"09:50","serie":"9º ANO","turma":"1","local":"405","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 01"},{"id":1793702188602,"hora":"09:00","hora_fim":"09:50","serie":"7º ANO","turma":"1","local":"401","prof":"CRISTIANO KERBER","qtd":"31","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 02"},{"hora":"10:10","hora_fim":"11:00","serie":"8º ANO","turma":"1","local":"403","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"30","_data":"2026-11-03","_ts":1793702210204,"id":1793702188603,"cartName":"CARRINHO 01"},{"id":1793702188604,"hora":"10:10","hora_fim":"11:00","serie":"9º ANO","turma":"1","local":"405","prof":"CRISTIANO KERBER","qtd":"5","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 02"},{"id":1793702188605,"hora":"11:00","hora_fim":"11:50","serie":"7º ANO","turma":"1","local":"401","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 01"},{"hora":"11:00","hora_fim":"11:50","serie":"8º ANO","turma":"2","local":"404","prof":"CRISTIANO KERBER","qtd":"5","_data":"2026-11-03","_ts":1793702248250,"id":1793702188606,"cartName":"CARRINHO 02"},{"id":1793702188607,"hora":"13:20","hora_fim":"14:10","serie":"1º ANO","turma":"1","local":"204","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 01"},{"id":1793702188608,"hora":"14:10","hora_fim":"15:00","serie":"4º ANO","turma":"1","local":"305","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 01"},{"id":1793702188609,"hora":"15:00","hora_fim":"15:50","serie":"4º ANO","turma":"1","local":"305","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 01"},{"id":1793702188610,"hora":"16:10","hora_fim":"17:00","serie":"3º ANO","turma":"1","local":"307","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 01"},{"id":1793702188611,"hora":"17:00","hora_fim":"17:50","serie":"1º ANO","turma":"1","local":"204","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","_data":"2026-11-03","_ts":1793702188598,"cartName":"CARRINHO 01"}];
         let ultimoHorarioAtivo = null;
 
         function formatarDataBR(iso) {
@@ -141,25 +141,36 @@
             
             const aulasHoje = BANCO_AGENDAMENTOS.filter(item => item._data === todayISO);
 
+            const currentTimeStr = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0');
+
+            // REGRA DO TEMPO: SE NÃO HOUVER AULAS CADASTRADAS PARA HOJE
             if (aulasHoje.length === 0) {
-                cronogramaLista.innerHTML = `
-                    <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #64748b;">
-                        <i class="ph-fill ph-calendar-x" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;"></i>
-                        <h3 style="margin: 0 0 8px 0; color: var(--text-dark); font-size: 18px; font-weight: 800;">NENHUMA PROGRAMAÇÃO CADASTRADA</h3>
-                        <p style="margin: 0; color: var(--text-muted); font-size: 14px; font-weight: 500;">Não há agendamentos de Chromebooks registrados para o dia de hoje.</p>
-                    </div>`;
+                // ANTES DAS 08:00 -> AVISA QUE A AGENDA ESTÁ EM PROCESSAMENTO PELO TI
+                if (currentTimeStr < "08:00") {
+                    cronogramaLista.innerHTML = `
+                        <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #f59e0b; background: #fffbeb;">
+                            <i class="ph-fill ph-clock-countdown" style="font-size: 52px; color: #d97706; margin-bottom: 12px;"></i>
+                            <h3 style="margin: 0 0 8px 0; color: #b45309; font-size: 18px; font-weight: 800; text-transform: uppercase;">PROGRAMAÇÃO EM PROCESSAMENTO</h3>
+                            <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 600; line-height: 1.5;">O setor de TI ainda está subindo a programação do dia. Por favor, solicite a atualização da página em alguns minutos.</p>
+                        </div>`;
+                } else {
+                    // A PARTIR DAS 08:00 -> INFORMA QUE NÃO HÁ CADASTRADA
+                    cronogramaLista.innerHTML = `
+                        <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #64748b;">
+                            <i class="ph-fill ph-calendar-x" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;"></i>
+                            <h3 style="margin: 0 0 8px 0; color: var(--text-dark); font-size: 18px; font-weight: 800;">NENHUMA PROGRAMAÇÃO CADASTRADA</h3>
+                            <p style="margin: 0; color: var(--text-muted); font-size: 14px; font-weight: 500;">Não há agendamentos de Chromebooks registrados para o dia de hoje.</p>
+                        </div>`;
+                }
                 return;
             }
 
-            const currentTimeStr = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0');
-            
             let ultimoHorarioFim = "00:00";
             aulasHoje.forEach(item => {
                 const fim = item.hora_fim || "00:00";
                 if (fim > ultimoHorarioFim) ultimoHorarioFim = fim;
             });
 
-            // AJUSTE: SÓ EXIBE "AGENDA FINALIZADA" APÓS ULTRAPASSAR O HORÁRIO FINAL DA ÚLTIMA AULA
             if (currentTimeStr > ultimoHorarioFim) {
                 cronogramaLista.innerHTML = `
                     <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #10b981; background: #f0fdf4;">
