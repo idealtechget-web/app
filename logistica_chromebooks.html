@@ -61,6 +61,8 @@
         .prof-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: flex-end; }
         .qtd { background: #f8fafc; color: var(--text-muted); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 800; border: 1px solid var(--border-light); display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.3px; }
         
+        .obs-tag { margin-top: 10px; padding: 8px 10px; background: #fffbeb; border-left: 3px solid #f59e0b; border-radius: 6px; font-size: 12px; font-weight: 700; color: #b45309; text-transform: uppercase; }
+
         .footer-branding { text-align: center; margin-top: 40px; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 50px; display: flex; align-items: center; justify-content: center; gap: 6px; }
     </style>
 </head>
@@ -80,7 +82,7 @@
     </div>
 
     <script>
-        const BANCO_AGENDAMENTOS = [{"id":1793878717553,"hora":"16:10","hora_fim":"17:00","serie":"2º ANO","turma":"1","local":"301","prof":"BRUNA KLUGE DA SILVA","qtd":"30","_data":"2026-11-05","_ts":1793878717553,"cartName":"CARRINHO 01"},{"id":1793878717554,"hora":"17:00","hora_fim":"17:50","serie":"2º ANO","turma":"1","local":"301","prof":"BRUNA KLUGE DA SILVA","qtd":"30","_data":"2026-11-05","_ts":1793878717553,"cartName":"CARRINHO 01"}];
+        const BANCO_AGENDAMENTOS = [{"hora":"07:20","hora_fim":"11:00","serie":"MOSTRA PEDAGÓGICA","turma":"","local":"ESPAÇO EXTERNO","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"10","obs":"PE0F51P3 (074555), PE0F51RM (074541), PE0F51P7 (074552), PE0F51M4 (074521), PE0F51MA (074538), PE0DLLNM (068041), PE0F51LM (074522), PE0F51LS (074548), PE0F51QG (074544) E PE0DMDN0 (068058)","_data":"2026-11-07","_ts":1793962270295,"id":1793961128299,"cartName":"CARRINHO 01"}];
         let ultimoHorarioAtivo = null;
 
         function formatarDataBR(iso) {
@@ -91,6 +93,7 @@
 
         function gerarCardHTML(item) {
             const sala = item.local ? `<span class="sala-value">${item.local}</span>` : `<span class="sala-pendente"><i class="ph-bold ph-warning"></i> ADD SALA</span>`;
+            const obsBox = item.obs ? `<div class="obs-tag"><i class="ph-bold ph-note-pencil"></i> OBS: ${item.obs}</div>` : '';
             
             let corCarrinho = '#2563eb';
             let bgCarrinho = '#eff6ff';
@@ -125,6 +128,7 @@
                     </div>
                     <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: ${item.qtd}</span>
                 </div>
+                ${obsBox}
             </div>`;
         }
 
@@ -143,9 +147,7 @@
 
             const currentTimeStr = String(today.getHours()).padStart(2, '0') + ':' + String(today.getMinutes()).padStart(2, '0');
 
-            // REGRA DO TEMPO: SE NÃO HOUVER AULAS CADASTRADAS PARA HOJE
             if (aulasHoje.length === 0) {
-                // ANTES DAS 08:00 -> AVISA QUE A AGENDA ESTÁ EM PROCESSAMENTO PELO TI
                 if (currentTimeStr < "08:00") {
                     cronogramaLista.innerHTML = `
                         <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #f59e0b; background: #fffbeb;">
@@ -154,7 +156,6 @@
                             <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 600; line-height: 1.5;">O setor de TI ainda está subindo a programação do dia. Por favor, solicite a atualização da página em alguns minutos.</p>
                         </div>`;
                 } else {
-                    // A PARTIR DAS 08:00 -> INFORMA QUE NÃO HÁ CADASTRADA
                     cronogramaLista.innerHTML = `
                         <div class="card" style="text-align: center; padding: 40px 20px; border-left: 6px solid #64748b;">
                             <i class="ph-fill ph-calendar-x" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;"></i>
