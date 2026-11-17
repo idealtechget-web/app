@@ -35,6 +35,9 @@
         
         .card { background: var(--card-bg); border-radius: 14px; padding: 16px; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); border-left: 6px solid #cbd5e1; transition: 0.3s; scroll-margin-top: 20px; border-top: 1px solid var(--border-light); border-right: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
         
+        .card.manutencao-card { border-left: 6px solid #dc2626 !important; background: #fef2f2; border-top: 1px solid #fecaca; border-right: 1px solid #fecaca; border-bottom: 1px solid #fecaca; }
+        .badge-manutencao-ativa { background: #dc2626; color: white; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; vertical-align: middle; margin-left: 8px; animation: piscar 2s infinite; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px; }
+        
         .card.atual { box-shadow: 0 0 0 2px var(--warning), 0 8px 24px rgba(245, 158, 11, 0.2); border-left-color: var(--warning) !important; border-top: none; border-right: none; border-bottom: none; }
         .badge-atual { background: var(--warning); color: white; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; vertical-align: middle; margin-left: 8px; animation: piscar 2s infinite; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px; }
 
@@ -47,7 +50,7 @@
         @keyframes piscar { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--border-light); padding-bottom: 12px; margin-bottom: 12px; }
-        .horario { font-size: 18px; font-weight: 900; color: var(--text-dark); display: flex; align-items: center; gap: 6px; letter-spacing: -0.5px; }
+        .horario { font-size: 18px; font-weight: 900; color: var(--text-dark); display: flex; align-items: center; gap: 6px; letter-spacing: -0.5px; flex-wrap: wrap; }
         
         .badge-carrinho { font-size: 11px; font-weight: 800; padding: 5px 10px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 4px; }
 
@@ -55,6 +58,7 @@
         .info-item { display: flex; flex-direction: column; }
         .label { color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; letter-spacing: 0.3px; }
         .value { font-size: 15px; font-weight: 700; color: var(--text-dark); text-transform: uppercase; letter-spacing: -0.3px; }
+        .value-manutencao { font-size: 16px; font-weight: 900; color: #b91c1c; text-transform: uppercase; letter-spacing: -0.3px; }
         .sala-value { font-size: 16px; font-weight: 800; color: var(--success); }
         .sala-pendente { color: var(--danger); font-weight: 800; font-size: 14px; background: #fef2f2; padding: 4px 8px; border-radius: 6px; border: 1px solid #fca5a5; display: inline-flex; align-items: center; gap: 4px; }
         
@@ -82,7 +86,7 @@
     </div>
 
     <script>
-        const BANCO_AGENDAMENTOS = [{"hora":"07:20","hora_fim":"08:10","serie":"2ª SÉRIE EM","turma":"","local":"407","prof":"ALAN DOS SANTOS","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825860152,"id":1794825739070,"cartName":"CARRINHO 01"},{"id":1794825739069,"hora":"07:20","hora_fim":"08:10","serie":"6º ANO","turma":"2","local":"304","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825739069,"cartName":"CARRINHO 02"},{"hora":"08:10","hora_fim":"09:00","serie":"8º ANO","turma":"2","local":"404","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825749075,"id":1794825739071,"cartName":"CARRINHO 01"},{"id":1794825739072,"hora":"08:10","hora_fim":"09:00","serie":"6º ANO","turma":"1","local":"303","prof":"CRISTIANO KERBER","qtd":"31","obs":"","_data":"2026-11-16","_ts":1794825739069,"cartName":"CARRINHO 02"},{"id":1794825739073,"hora":"09:00","hora_fim":"09:50","serie":"6º ANO","turma":"1","local":"303","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825739069,"cartName":"CARRINHO 01"},{"hora":"09:00","hora_fim":"09:50","serie":"8º ANO","turma":"1","local":"403","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","obs":"","_data":"2026-11-16","_ts":1794825781886,"id":1794825739074,"cartName":"CARRINHO 02"},{"hora":"10:10","hora_fim":"11:00","serie":"8º ANO","turma":"1","local":"403","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825755772,"id":1794825739075,"cartName":"CARRINHO 01"},{"id":1794825739076,"hora":"11:00","hora_fim":"11:50","serie":"7º ANO","turma":"1","local":"401","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825739069,"cartName":"CARRINHO 01"},{"id":1794825739077,"hora":"11:00","hora_fim":"11:50","serie":"9º ANO","turma":"1","local":"405","prof":"ESMAEL AURINO DA SILVA","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825739069,"cartName":"CARRINHO 02"},{"hora":"11:50","hora_fim":"12:40","serie":"8º ANO","turma":"2","local":"404","prof":"LUCINEIA KRAML MAESTRIPIERI MARCELINO","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825764365,"id":1794825739078,"cartName":"CARRINHO 01"},{"id":1794825739079,"hora":"11:50","hora_fim":"12:40","serie":"9º ANO","turma":"1","local":"405","prof":"ESMAEL AURINO DA SILVA","qtd":"30","obs":"","_data":"2026-11-16","_ts":1794825739069,"cartName":"CARRINHO 02"},{"hora":"13:20","hora_fim":"14:10","serie":"5º ANO","turma":"1","local":"403","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","obs":"","_data":"2026-11-16","_ts":1794825789903,"id":1794825739080,"cartName":"CARRINHO 01"},{"hora":"14:10","hora_fim":"15:00","serie":"5º ANO","turma":"1","local":"403","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","obs":"","_data":"2026-11-16","_ts":1794825805482,"id":1794825739081,"cartName":"CARRINHO 01"},{"hora":"16:10","hora_fim":"17:00","serie":"5º ANO","turma":"2","local":"404","prof":"ALAN DOS SANTOS","qtd":"20","obs":"","_data":"2026-11-16","_ts":1794825797465,"id":1794825739082,"cartName":"CARRINHO 02"},{"id":1794825739084,"hora":"17:00","hora_fim":"17:50","serie":"2º ANO","turma":"1","local":"301","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","obs":"","_data":"2026-11-16","_ts":1794825739069,"cartName":"CARRINHO 01"},{"hora":"17:00","hora_fim":"17:50","serie":"5º ANO","turma":"1","local":"403","prof":"BRUNO CAUE LANG SOUZA","qtd":"6","obs":"","_data":"2026-11-16","_ts":1794825771581,"id":1794825739083,"cartName":"CARRINHO 02"}];
+        const BANCO_AGENDAMENTOS = [{"id":1794910729925,"hora":"07:20","hora_fim":"08:10","serie":"6º ANO","turma":"2","local":"304","prof":"GLAUCIA CARVALHO FURTADO","qtd":"27","obs":"","_data":"2026-11-17","_ts":1794910729925,"cartName":"CARRINHO 01"},{"hora":"07:20","hora_fim":"08:10","serie":"8º ANO","turma":"2","local":"404","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"29","obs":"","_data":"2026-11-17","_ts":1794910755715,"id":1794910729926,"cartName":"CARRINHO 02"},{"id":1794910729927,"hora":"09:00","hora_fim":"09:50","serie":"6º ANO","turma":"1","local":"303","prof":"GLAUCIA CARVALHO FURTADO","qtd":"26","obs":"","_data":"2026-11-17","_ts":1794910729925,"cartName":"CARRINHO 01"},{"hora":"10:00","hora_fim":"10:50","serie":"4º ANO","turma":"1","local":"305","prof":"MARTA","qtd":"1","obs":"BANCA","_data":"2026-11-18","_ts":1794856228332,"id":1794856228332,"cartName":"COLABORADOR"},{"id":1794910729928,"hora":"10:10","hora_fim":"11:00","serie":"6º ANO","turma":"2","local":"304","prof":"GLAUCIA CARVALHO FURTADO","qtd":"27","obs":"","_data":"2026-11-17","_ts":1794910729925,"cartName":"CARRINHO 01"},{"hora":"10:10","hora_fim":"11:00","serie":"8º ANO","turma":"1","local":"403","prof":"MICHELE ALMEIDA DA SILVEIRA","qtd":"29","obs":"","_data":"2026-11-17","_ts":1794910763829,"id":1794910729929,"cartName":"CARRINHO 02"},{"id":1794910729930,"hora":"11:00","hora_fim":"11:50","serie":"6º ANO","turma":"1","local":"303","prof":"GLAUCIA CARVALHO FURTADO","qtd":"26","obs":"","_data":"2026-11-17","_ts":1794910729925,"cartName":"CARRINHO 01"},{"id":1794910729931,"hora":"13:20","hora_fim":"14:10","serie":"1º ANO","turma":"1","local":"204","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","obs":"","_data":"2026-11-17","_ts":1794910729925,"cartName":"CARRINHO 02"},{"id":1794910729932,"hora":"17:00","hora_fim":"17:50","serie":"1º ANO","turma":"1","local":"204","prof":"CAROLINI CIPRIANI DA COSTA","qtd":"31","obs":"","_data":"2026-11-17","_ts":1794910729925,"cartName":"CARRINHO 02"},{"hora":"17:00","hora_fim":"17:50","serie":"7º ANO","turma":"1","local":"401","prof":"MARTA","qtd":"1","obs":"BANCA","_data":"2026-11-18","_ts":1794856251543,"id":1794856251543,"cartName":"COLABORADOR"}];
         let ultimoHorarioAtivo = null;
 
         function formatarDataBR(iso) {
@@ -92,29 +96,44 @@
         }
 
         function gerarCardHTML(item) {
+            const isManutencao = item.cartName === 'MANUTENÇÃO';
             const sala = item.local ? `<span class="sala-value">${item.local}</span>` : `<span class="sala-pendente"><i class="ph-bold ph-warning"></i> ADD SALA</span>`;
             const obsBox = item.obs ? `<div class="obs-tag"><i class="ph-bold ph-note-pencil"></i> OBS: ${item.obs}</div>` : '';
             
             let corCarrinho = '#2563eb';
             let bgCarrinho = '#eff6ff';
             let borderCarrinho = '#bfdbfe';
+            let iconeBadge = 'ph-user-check';
+            let extraCardClass = '';
+            let labelSolicitante = 'Solicitante';
+            let labelSetor = 'Série/Setor';
+            let iconeSetor = 'ph-users';
+            let classeValorSetor = 'value';
 
             if (item.cartName === 'CARRINHO 02') {
                 corCarrinho = '#7c3aed'; bgCarrinho = '#f5f3ff'; borderCarrinho = '#ddd6fe';
             } else if (item.cartName === 'COLABORADOR') {
                 corCarrinho = '#ea580c'; bgCarrinho = '#fff7ed'; borderCarrinho = '#ffedd5';
+            } else if (isManutencao) {
+                corCarrinho = '#dc2626'; bgCarrinho = '#fee2e2'; borderCarrinho = '#fecaca';
+                iconeBadge = 'ph-wrench';
+                extraCardClass = 'manutencao-card';
+                labelSolicitante = 'Responsável';
+                labelSetor = 'Em Manutenção';
+                iconeSetor = 'ph-warning-circle';
+                classeValorSetor = 'value-manutencao';
             }
 
             return `
-            <div class="card">
+            <div class="card ${extraCardClass}" data-manutencao="${isManutencao}">
                 <div class="card-header">
                     <span class="horario">${item.hora} às ${item.hora_fim || '??:??'}</span>
-                    <span class="badge-carrinho" style="background:${bgCarrinho}; color:${corCarrinho}; border:1px solid ${borderCarrinho};"><i class="ph-bold ph-user-check"></i> ${item.cartName}</span>
+                    <span class="badge-carrinho" style="background:${bgCarrinho}; color:${corCarrinho}; border:1px solid ${borderCarrinho};"><i class="ph-bold ${iconeBadge}"></i> ${item.cartName}</span>
                 </div>
                 <div class="info-grid">
                     <div class="info-item">
-                        <span class="label"><i class="ph-bold ph-users"></i> Série/Setor</span>
-                        <span class="value">${item.serie} ${item.turma}</span>
+                        <span class="label"><i class="ph-bold ${iconeSetor}"></i> ${labelSetor}</span>
+                        <span class="${classeValorSetor}">${item.serie} ${item.turma}</span>
                     </div>
                     <div class="info-item">
                         <span class="label"><i class="ph-bold ph-door-open"></i> Sala/Local</span>
@@ -123,7 +142,7 @@
                 </div>
                 <div class="prof-row">
                     <div class="info-item">
-                        <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> Solicitante</span>
+                        <span class="label"><i class="ph-bold ph-chalkboard-teacher"></i> ${labelSolicitante}</span>
                         <span class="value">${item.prof}</span>
                     </div>
                     <span class="qtd"><i class="ph-bold ph-laptop"></i> QTD: ${item.qtd}</span>
@@ -203,6 +222,7 @@
             let targetCards = [];
 
             for (let card of cards) {
+                const isManut = card.getAttribute('data-manutencao') === 'true';
                 const timeEl = card.querySelector('.horario');
                 if (!timeEl) continue;
 
@@ -214,16 +234,21 @@
                     if (currentTimeStr > end) {
                         card.classList.add('passada');
                     } else if (currentTimeStr >= start && currentTimeStr <= end) {
-                        statusTipo = 'AGORA';
-                        if (!targetStartTime) targetStartTime = start;
-                        if (start === targetStartTime) targetCards.push(card);
+                        if (isManut) {
+                            timeEl.innerHTML += '<span class="badge-manutencao-ativa"><i class="ph-bold ph-wrench"></i> EM MANUTENÇÃO</span>';
+                        } else {
+                            statusTipo = 'AGORA';
+                            if (!targetStartTime) targetStartTime = start;
+                            if (start === targetStartTime) targetCards.push(card);
+                        }
                     }
                 }
             }
 
             if (!statusTipo) {
                 for (let card of cards) {
-                    if (card.classList.contains('passada')) continue;
+                    const isManut = card.getAttribute('data-manutencao') === 'true';
+                    if (isManut || card.classList.contains('passada')) continue;
                     const timeEl = card.querySelector('.horario');
                     if (!timeEl) continue;
 
